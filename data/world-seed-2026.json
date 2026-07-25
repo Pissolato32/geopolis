@@ -1,0 +1,2343 @@
+{
+  "scenarioId": "world-seed-2026",
+  "startDate": "2026-07-24",
+  "description": "GeoPolis 2026 Contemporary World Seed generated dynamically from real-world data.",
+  "initialEntities": [
+    {
+      "id": "country-us",
+      "name": "United States",
+      "entityType": "country",
+      "position": {
+        "lat": 38,
+        "lng": -97
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 28185,
+          "inflationRate": 0.03,
+          "treasury": 3382,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 614,
+          "foodOutput": 868,
+          "mineralsOutput": 527,
+          "industrialOutput": 735
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-us-1",
+              "provinceName": "United States Capital Region",
+              "lat": 38,
+              "lng": -97,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-us"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-br",
+      "name": "Brazil",
+      "entityType": "country",
+      "position": {
+        "lat": -10,
+        "lng": -55
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 3260,
+          "inflationRate": 0.03,
+          "treasury": 391,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 115,
+          "foodOutput": 575,
+          "mineralsOutput": 351,
+          "industrialOutput": 112
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-br-1",
+              "provinceName": "Brazil Capital Region",
+              "lat": -10,
+              "lng": -55,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-br"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-cn",
+      "name": "China",
+      "entityType": "country",
+      "position": {
+        "lat": 35,
+        "lng": 105
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 21230,
+          "inflationRate": 0.03,
+          "treasury": 2548,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 475,
+          "foodOutput": 3570,
+          "mineralsOutput": 2148,
+          "industrialOutput": 561
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-cn-1",
+              "provinceName": "China Capital Region",
+              "lat": 35,
+              "lng": 105,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-cn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ru",
+      "name": "Russia",
+      "entityType": "country",
+      "position": {
+        "lat": 60,
+        "lng": 100
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 1480,
+          "inflationRate": 0.03,
+          "treasury": 178,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 80,
+          "foodOutput": 398,
+          "mineralsOutput": 245,
+          "industrialOutput": 67
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ru-1",
+              "provinceName": "Russia Capital Region",
+              "lat": 60,
+              "lng": 100,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-ru"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-gb",
+      "name": "United Kingdom",
+      "entityType": "country",
+      "position": {
+        "lat": 54,
+        "lng": -2
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 720,
+          "inflationRate": 0.03,
+          "treasury": 86,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 64,
+          "foodOutput": 208,
+          "mineralsOutput": 131,
+          "industrialOutput": 48
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-gb-1",
+              "provinceName": "United Kingdom Capital Region",
+              "lat": 54,
+              "lng": -2,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-gb"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-fr",
+      "name": "France",
+      "entityType": "country",
+      "position": {
+        "lat": 46,
+        "lng": 2
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 730,
+          "inflationRate": 0.03,
+          "treasury": 88,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 65,
+          "foodOutput": 210,
+          "mineralsOutput": 132,
+          "industrialOutput": 48
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-fr-1",
+              "provinceName": "France Capital Region",
+              "lat": 46,
+              "lng": 2,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-fr"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-de",
+      "name": "Germany",
+      "entityType": "country",
+      "position": {
+        "lat": 51,
+        "lng": 9
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 4200,
+          "inflationRate": 0.03,
+          "treasury": 504,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 134,
+          "foodOutput": 248,
+          "mineralsOutput": 155,
+          "industrialOutput": 135
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-de-1",
+              "provinceName": "Germany Capital Region",
+              "lat": 51,
+              "lng": 9,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-in",
+      "name": "India",
+      "entityType": "country",
+      "position": {
+        "lat": 20,
+        "lng": 77
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 14130,
+          "inflationRate": 0.03,
+          "treasury": 1696,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 333,
+          "foodOutput": 3560,
+          "mineralsOutput": 2142,
+          "industrialOutput": 383
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-in-1",
+              "provinceName": "India Capital Region",
+              "lat": 20,
+              "lng": 77,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-jp",
+      "name": "Japan",
+      "entityType": "country",
+      "position": {
+        "lat": 36,
+        "lng": 138
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 6300,
+          "inflationRate": 0.03,
+          "treasury": 756,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 176,
+          "foodOutput": 353,
+          "mineralsOutput": 218,
+          "industrialOutput": 188
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-jp-1",
+              "provinceName": "Japan Capital Region",
+              "lat": 36,
+              "lng": 138,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-jp"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ar",
+      "name": "Argentina",
+      "entityType": "country",
+      "position": {
+        "lat": -38,
+        "lng": -63
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 500,
+          "inflationRate": 0.03,
+          "treasury": 60,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 60,
+          "foodOutput": 153,
+          "mineralsOutput": 98,
+          "industrialOutput": 43
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ar-1",
+              "provinceName": "Argentina Capital Region",
+              "lat": -38,
+              "lng": -63,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-ar"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-cu",
+      "name": "Cuba",
+      "entityType": "country",
+      "position": {
+        "lat": 21.5,
+        "lng": -80
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 160,
+          "inflationRate": 0.03,
+          "treasury": 19,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 68,
+          "mineralsOutput": 47,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-cu-1",
+              "provinceName": "Cuba Capital Region",
+              "lat": 21.5,
+              "lng": -80,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-cu"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ua",
+      "name": "Ukraine",
+      "entityType": "country",
+      "position": {
+        "lat": 49,
+        "lng": 32
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 460,
+          "inflationRate": 0.03,
+          "treasury": 55,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 59,
+          "foodOutput": 143,
+          "mineralsOutput": 92,
+          "industrialOutput": 42
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ua-1",
+              "provinceName": "Ukraine Capital Region",
+              "lat": 49,
+              "lng": 32,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-ua"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-za",
+      "name": "South Africa",
+      "entityType": "country",
+      "position": {
+        "lat": -29,
+        "lng": 24
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 640,
+          "inflationRate": 0.03,
+          "treasury": 77,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 63,
+          "foodOutput": 188,
+          "mineralsOutput": 119,
+          "industrialOutput": 46
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-za-1",
+              "provinceName": "South Africa Capital Region",
+              "lat": -29,
+              "lng": 24,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-za"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-au",
+      "name": "Australia",
+      "entityType": "country",
+      "position": {
+        "lat": -25,
+        "lng": 133
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 310,
+          "inflationRate": 0.03,
+          "treasury": 37,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 56,
+          "foodOutput": 105,
+          "mineralsOutput": 69,
+          "industrialOutput": 38
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-au-1",
+              "provinceName": "Australia Capital Region",
+              "lat": -25,
+              "lng": 133,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-au"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-eg",
+      "name": "Egypt",
+      "entityType": "country",
+      "position": {
+        "lat": 26,
+        "lng": 30
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 1090,
+          "inflationRate": 0.03,
+          "treasury": 131,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 72,
+          "foodOutput": 300,
+          "mineralsOutput": 186,
+          "industrialOutput": 57
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-eg-1",
+              "provinceName": "Egypt Capital Region",
+              "lat": 26,
+              "lng": 30,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-eg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-sa",
+      "name": "Saudi Arabia",
+      "entityType": "country",
+      "position": {
+        "lat": 24,
+        "lng": 45
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 400,
+          "inflationRate": 0.03,
+          "treasury": 48,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 58,
+          "foodOutput": 128,
+          "mineralsOutput": 83,
+          "industrialOutput": 40
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-sa-1",
+              "provinceName": "Saudi Arabia Capital Region",
+              "lat": 24,
+              "lng": 45,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-sa"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-mx",
+      "name": "Mexico",
+      "entityType": "country",
+      "position": {
+        "lat": 23,
+        "lng": -102
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 1330,
+          "inflationRate": 0.03,
+          "treasury": 160,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 77,
+          "foodOutput": 360,
+          "mineralsOutput": 222,
+          "industrialOutput": 63
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-mx-1",
+              "provinceName": "Mexico Capital Region",
+              "lat": 23,
+              "lng": -102,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-mx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ca",
+      "name": "Canada",
+      "entityType": "country",
+      "position": {
+        "lat": 60,
+        "lng": -95
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 430,
+          "inflationRate": 0.03,
+          "treasury": 52,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 59,
+          "foodOutput": 135,
+          "mineralsOutput": 87,
+          "industrialOutput": 41
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ca-1",
+              "provinceName": "Canada Capital Region",
+              "lat": 60,
+              "lng": -95,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-ca"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-it",
+      "name": "Italy",
+      "entityType": "country",
+      "position": {
+        "lat": 42.8,
+        "lng": 12.8
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 640,
+          "inflationRate": 0.03,
+          "treasury": 77,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 63,
+          "foodOutput": 188,
+          "mineralsOutput": 119,
+          "industrialOutput": 46
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-it-1",
+              "provinceName": "Italy Capital Region",
+              "lat": 42.8,
+              "lng": 12.8,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-it"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-es",
+      "name": "Spain",
+      "entityType": "country",
+      "position": {
+        "lat": 40,
+        "lng": -4
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 520,
+          "inflationRate": 0.03,
+          "treasury": 62,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 60,
+          "foodOutput": 158,
+          "mineralsOutput": 101,
+          "industrialOutput": 43
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-es-1",
+              "provinceName": "Spain Capital Region",
+              "lat": 40,
+              "lng": -4,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-es"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-kr",
+      "name": "South Korea",
+      "entityType": "country",
+      "position": {
+        "lat": 36,
+        "lng": 128
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 570,
+          "inflationRate": 0.03,
+          "treasury": 68,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 61,
+          "foodOutput": 170,
+          "mineralsOutput": 108,
+          "industrialOutput": 44
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-kr-1",
+              "provinceName": "South Korea Capital Region",
+              "lat": 36,
+              "lng": 128,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-kr"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-id",
+      "name": "Indonesia",
+      "entityType": "country",
+      "position": {
+        "lat": -5,
+        "lng": 120
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 2780,
+          "inflationRate": 0.03,
+          "treasury": 334,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 106,
+          "foodOutput": 723,
+          "mineralsOutput": 440,
+          "industrialOutput": 100
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-id-1",
+              "provinceName": "Indonesia Capital Region",
+              "lat": -5,
+              "lng": 120,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-id"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-tr",
+      "name": "Turkey",
+      "entityType": "country",
+      "position": {
+        "lat": 39,
+        "lng": 35
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 890,
+          "inflationRate": 0.03,
+          "treasury": 107,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 68,
+          "foodOutput": 250,
+          "mineralsOutput": 156,
+          "industrialOutput": 52
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-tr-1",
+              "provinceName": "Turkey Capital Region",
+              "lat": 39,
+              "lng": 35,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-tr"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-pl",
+      "name": "Poland",
+      "entityType": "country",
+      "position": {
+        "lat": 52,
+        "lng": 19
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 430,
+          "inflationRate": 0.03,
+          "treasury": 52,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 59,
+          "foodOutput": 135,
+          "mineralsOutput": 87,
+          "industrialOutput": 41
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-pl-1",
+              "provinceName": "Poland Capital Region",
+              "lat": 52,
+              "lng": 19,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-pl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-se",
+      "name": "Sweden",
+      "entityType": "country",
+      "position": {
+        "lat": 62,
+        "lng": 15
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 150,
+          "inflationRate": 0.03,
+          "treasury": 18,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 65,
+          "mineralsOutput": 45,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-se-1",
+              "provinceName": "Sweden Capital Region",
+              "lat": 62,
+              "lng": 15,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-se"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-no",
+      "name": "Norway",
+      "entityType": "country",
+      "position": {
+        "lat": 62,
+        "lng": 10
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 100,
+          "inflationRate": 0.03,
+          "treasury": 12,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 52,
+          "foodOutput": 53,
+          "mineralsOutput": 38,
+          "industrialOutput": 33
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-no-1",
+              "provinceName": "Norway Capital Region",
+              "lat": 62,
+              "lng": 10,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-no"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-fi",
+      "name": "Finland",
+      "entityType": "country",
+      "position": {
+        "lat": 64,
+        "lng": 26
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 110,
+          "inflationRate": 0.03,
+          "treasury": 13,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 52,
+          "foodOutput": 55,
+          "mineralsOutput": 39,
+          "industrialOutput": 33
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-fi-1",
+              "provinceName": "Finland Capital Region",
+              "lat": 64,
+              "lng": 26,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-fi"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-nl",
+      "name": "Netherlands",
+      "entityType": "country",
+      "position": {
+        "lat": 52.5,
+        "lng": 5.7
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 230,
+          "inflationRate": 0.03,
+          "treasury": 28,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 55,
+          "foodOutput": 85,
+          "mineralsOutput": 57,
+          "industrialOutput": 36
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-nl-1",
+              "provinceName": "Netherlands Capital Region",
+              "lat": 52.5,
+              "lng": 5.7,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-nl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ch",
+      "name": "Switzerland",
+      "entityType": "country",
+      "position": {
+        "lat": 47,
+        "lng": 8
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 140,
+          "inflationRate": 0.03,
+          "treasury": 17,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 63,
+          "mineralsOutput": 44,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ch-1",
+              "provinceName": "Switzerland Capital Region",
+              "lat": 47,
+              "lng": 8,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-ch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-at",
+      "name": "Austria",
+      "entityType": "country",
+      "position": {
+        "lat": 47.3,
+        "lng": 13.3
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 140,
+          "inflationRate": 0.03,
+          "treasury": 17,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 63,
+          "mineralsOutput": 44,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-at-1",
+              "provinceName": "Austria Capital Region",
+              "lat": 47.3,
+              "lng": 13.3,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-at"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-be",
+      "name": "Belgium",
+      "entityType": "country",
+      "position": {
+        "lat": 50.8,
+        "lng": 4.4
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 170,
+          "inflationRate": 0.03,
+          "treasury": 20,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 70,
+          "mineralsOutput": 48,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-be-1",
+              "provinceName": "Belgium Capital Region",
+              "lat": 50.8,
+              "lng": 4.4,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-be"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-pt",
+      "name": "Portugal",
+      "entityType": "country",
+      "position": {
+        "lat": 39.5,
+        "lng": -8
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 150,
+          "inflationRate": 0.03,
+          "treasury": 18,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 65,
+          "mineralsOutput": 45,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-pt-1",
+              "provinceName": "Portugal Capital Region",
+              "lat": 39.5,
+              "lng": -8,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-pt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-gr",
+      "name": "Greece",
+      "entityType": "country",
+      "position": {
+        "lat": 39,
+        "lng": 22
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 160,
+          "inflationRate": 0.03,
+          "treasury": 19,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 68,
+          "mineralsOutput": 47,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-gr-1",
+              "provinceName": "Greece Capital Region",
+              "lat": 39,
+              "lng": 22,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-gr"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-cl",
+      "name": "Chile",
+      "entityType": "country",
+      "position": {
+        "lat": -35,
+        "lng": -71
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 240,
+          "inflationRate": 0.03,
+          "treasury": 29,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 55,
+          "foodOutput": 88,
+          "mineralsOutput": 59,
+          "industrialOutput": 36
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-cl-1",
+              "provinceName": "Chile Capital Region",
+              "lat": -35,
+              "lng": -71,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-cl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-co",
+      "name": "Colombia",
+      "entityType": "country",
+      "position": {
+        "lat": 4,
+        "lng": -73
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 560,
+          "inflationRate": 0.03,
+          "treasury": 67,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 61,
+          "foodOutput": 168,
+          "mineralsOutput": 107,
+          "industrialOutput": 44
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-co-1",
+              "provinceName": "Colombia Capital Region",
+              "lat": 4,
+              "lng": -73,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-co"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-pe",
+      "name": "Peru",
+      "entityType": "country",
+      "position": {
+        "lat": -10,
+        "lng": -76
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 380,
+          "inflationRate": 0.03,
+          "treasury": 46,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 58,
+          "foodOutput": 123,
+          "mineralsOutput": 80,
+          "industrialOutput": 40
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-pe-1",
+              "provinceName": "Peru Capital Region",
+              "lat": -10,
+              "lng": -76,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-pe"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ve",
+      "name": "Venezuela",
+      "entityType": "country",
+      "position": {
+        "lat": 8,
+        "lng": -66
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 330,
+          "inflationRate": 0.03,
+          "treasury": 40,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 57,
+          "foodOutput": 110,
+          "mineralsOutput": 72,
+          "industrialOutput": 38
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ve-1",
+              "provinceName": "Venezuela Capital Region",
+              "lat": 8,
+              "lng": -66,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-ve"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ng",
+      "name": "Nigeria",
+      "entityType": "country",
+      "position": {
+        "lat": 10,
+        "lng": 8
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 2160,
+          "inflationRate": 0.03,
+          "treasury": 259,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 93,
+          "foodOutput": 568,
+          "mineralsOutput": 347,
+          "industrialOutput": 84
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ng-1",
+              "provinceName": "Nigeria Capital Region",
+              "lat": 10,
+              "lng": 8,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-ng"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ke",
+      "name": "Kenya",
+      "entityType": "country",
+      "position": {
+        "lat": 1,
+        "lng": 38
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 580,
+          "inflationRate": 0.03,
+          "treasury": 70,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 62,
+          "foodOutput": 173,
+          "mineralsOutput": 110,
+          "industrialOutput": 45
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ke-1",
+              "provinceName": "Kenya Capital Region",
+              "lat": 1,
+              "lng": 38,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-ke"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-pk",
+      "name": "Pakistan",
+      "entityType": "country",
+      "position": {
+        "lat": 30,
+        "lng": 70
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 2300,
+          "inflationRate": 0.03,
+          "treasury": 276,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 96,
+          "foodOutput": 603,
+          "mineralsOutput": 368,
+          "industrialOutput": 88
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-pk-1",
+              "provinceName": "Pakistan Capital Region",
+              "lat": 30,
+              "lng": 70,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-pk"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-bd",
+      "name": "Bangladesh",
+      "entityType": "country",
+      "position": {
+        "lat": 24,
+        "lng": 90
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 1740,
+          "inflationRate": 0.03,
+          "treasury": 209,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 85,
+          "foodOutput": 463,
+          "mineralsOutput": 284,
+          "industrialOutput": 74
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-bd-1",
+              "provinceName": "Bangladesh Capital Region",
+              "lat": 24,
+              "lng": 90,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-bd"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-vn",
+      "name": "Vietnam",
+      "entityType": "country",
+      "position": {
+        "lat": 16,
+        "lng": 106
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 1020,
+          "inflationRate": 0.03,
+          "treasury": 122,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 70,
+          "foodOutput": 283,
+          "mineralsOutput": 176,
+          "industrialOutput": 56
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-vn-1",
+              "provinceName": "Vietnam Capital Region",
+              "lat": 16,
+              "lng": 106,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-vn"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-th",
+      "name": "Thailand",
+      "entityType": "country",
+      "position": {
+        "lat": 15,
+        "lng": 100
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 750,
+          "inflationRate": 0.03,
+          "treasury": 90,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 65,
+          "foodOutput": 215,
+          "mineralsOutput": 135,
+          "industrialOutput": 49
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-th-1",
+              "provinceName": "Thailand Capital Region",
+              "lat": 15,
+              "lng": 100,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-th"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ph",
+      "name": "Philippines",
+      "entityType": "country",
+      "position": {
+        "lat": 13,
+        "lng": 122
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 1150,
+          "inflationRate": 0.03,
+          "treasury": 138,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 73,
+          "foodOutput": 315,
+          "mineralsOutput": 195,
+          "industrialOutput": 59
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ph-1",
+              "provinceName": "Philippines Capital Region",
+              "lat": 13,
+              "lng": 122,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-ph"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-my",
+      "name": "Malaysia",
+      "entityType": "country",
+      "position": {
+        "lat": 2.5,
+        "lng": 112.5
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 370,
+          "inflationRate": 0.03,
+          "treasury": 44,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 57,
+          "foodOutput": 120,
+          "mineralsOutput": 78,
+          "industrialOutput": 39
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-my-1",
+              "provinceName": "Malaysia Capital Region",
+              "lat": 2.5,
+              "lng": 112.5,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-my"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-sg",
+      "name": "Singapore",
+      "entityType": "country",
+      "position": {
+        "lat": 1.35,
+        "lng": 103.8
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 110,
+          "inflationRate": 0.03,
+          "treasury": 13,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 52,
+          "foodOutput": 55,
+          "mineralsOutput": 39,
+          "industrialOutput": 33
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-sg-1",
+              "provinceName": "Singapore Capital Region",
+              "lat": 1.35,
+              "lng": 103.8,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-sg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-nz",
+      "name": "New Zealand",
+      "entityType": "country",
+      "position": {
+        "lat": -41,
+        "lng": 174
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 100,
+          "inflationRate": 0.03,
+          "treasury": 12,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 52,
+          "foodOutput": 53,
+          "mineralsOutput": 38,
+          "industrialOutput": 33
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-nz-1",
+              "provinceName": "New Zealand Capital Region",
+              "lat": -41,
+              "lng": 174,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-nz"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-ir",
+      "name": "Iran",
+      "entityType": "country",
+      "position": {
+        "lat": 32,
+        "lng": 53
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 900,
+          "inflationRate": 0.03,
+          "treasury": 108,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 68,
+          "foodOutput": 253,
+          "mineralsOutput": 158,
+          "industrialOutput": 53
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-ir-1",
+              "provinceName": "Iran Capital Region",
+              "lat": 32,
+              "lng": 53,
+              "neighborIds": [],
+              "resourceRich": true,
+              "ownerId": "country-ir"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-iq",
+      "name": "Iraq",
+      "entityType": "country",
+      "position": {
+        "lat": 33,
+        "lng": 44
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 450,
+          "inflationRate": 0.03,
+          "treasury": 54,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 59,
+          "foodOutput": 140,
+          "mineralsOutput": 90,
+          "industrialOutput": 41
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-iq-1",
+              "provinceName": "Iraq Capital Region",
+              "lat": 33,
+              "lng": 44,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-iq"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "country-il",
+      "name": "Israel",
+      "entityType": "country",
+      "position": {
+        "lat": 31.5,
+        "lng": 34.75
+      },
+      "components": [
+        {
+          "type": "economy.indicator",
+          "gdp": 140,
+          "inflationRate": 0.03,
+          "treasury": 17,
+          "taxRate": 0.2
+        },
+        {
+          "type": "economy.production",
+          "energyOutput": 53,
+          "foodOutput": 63,
+          "mineralsOutput": 44,
+          "industrialOutput": 34
+        },
+        {
+          "type": "politics.stability",
+          "stabilityIndex": 0.75,
+          "approvalRating": 0.55,
+          "militaryLoyalty": 0.9
+        },
+        {
+          "type": "geo.province",
+          "provinces": [
+            {
+              "provinceId": "prov-il-1",
+              "provinceName": "Israel Capital Region",
+              "lat": 31.5,
+              "lng": 34.75,
+              "neighborIds": [],
+              "resourceRich": false,
+              "ownerId": "country-il"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "initialRelations": [
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-br",
+      "affinity": 0.65,
+      "tension": 0.15,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-cn",
+      "affinity": -0.45,
+      "tension": 0.65,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-ru",
+      "affinity": -0.85,
+      "tension": 0.85,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-ru",
+      "targetEntityId": "country-ua",
+      "affinity": -0.95,
+      "tension": 0.95,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-gb",
+      "affinity": 0.9,
+      "tension": 0.05,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-fr",
+      "affinity": 0.85,
+      "tension": 0.1,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-de",
+      "affinity": 0.88,
+      "tension": 0.08,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-jp",
+      "affinity": 0.9,
+      "tension": 0.05,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-cn",
+      "targetEntityId": "country-ru",
+      "affinity": 0.65,
+      "tension": 0.2,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-br",
+      "targetEntityId": "country-ar",
+      "affinity": 0.75,
+      "tension": 0.1,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-il",
+      "affinity": 0.92,
+      "tension": 0.05,
+      "recognition": "full"
+    },
+    {
+      "sourceEntityId": "country-us",
+      "targetEntityId": "country-sa",
+      "affinity": 0.7,
+      "tension": 0.2,
+      "recognition": "full"
+    }
+  ]
+}
