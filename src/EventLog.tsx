@@ -174,7 +174,7 @@ function EventRow({ evt }: { evt: GameEvent }) {
     return (
       <article className="feed-row feed-ai">
         <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-ai">AI</span>
+        <span className="feed-tag tag-ai">AI STRATEGY</span>
         <span className="feed-text">
           <CountryLink code={evt.country} /> {evt.action} — {evt.rationale}.
         </span>
@@ -222,7 +222,7 @@ function EventRow({ evt }: { evt: GameEvent }) {
     return (
       <article className="feed-row feed-turn">
         <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-turn">TURN</span>
+        <span className="feed-tag tag-turn">TURNO N</span>
         <span className="feed-text">
           <b>Turn {s.tick}</b> — {s.economiesGrown} economies grew, {s.economiesShrunk} shrank, {s.combats} combats, {s.treaties} treaties, {s.aiDecisions} AI moves. Global GDP {gdpSign}{fmtMoney(s.globalGdpDelta)}.
         </span>
@@ -261,6 +261,61 @@ function EventRow({ evt }: { evt: GameEvent }) {
         <span className="feed-tag tag-econ">STAB</span>
         <span className="feed-text">
           <CountryLink code={evt.country} /> stability now {evt.stability}/100 ({sign}{evt.delta}).
+        </span>
+      </article>
+    );
+  }
+  if (evt.type === "military.recruitment") {
+    return (
+      <article className="feed-row feed-mil">
+        <span className="feed-time">{time}</span>
+        <span className="feed-tag tag-mil">MIL</span>
+        <span className="feed-text">
+          <CountryLink code={evt.country} /> commissioned <b>{evt.unitType}</b> unit <b>{evt.unitId}</b> (${fmtMoney(evt.cost)}).
+        </span>
+      </article>
+    );
+  }
+  if (evt.type === "aid.sent") {
+    return (
+      <article className="feed-row feed-aid">
+        <span className="feed-time">{time}</span>
+        <span className="feed-tag tag-aid">AID</span>
+        <span className="feed-text">
+          <CountryLink code={evt.from} /> sent ${fmtMoney(evt.amount)} aid to <CountryLink code={evt.target} /> (+{evt.affinityGain} affinity).
+        </span>
+      </article>
+    );
+  }
+  if (evt.type === "intel.gathered") {
+    return (
+      <article className="feed-row feed-intel">
+        <span className="feed-time">{time}</span>
+        <span className="feed-tag tag-intel">INTEL</span>
+        <span className="feed-text">
+          <CountryLink code={evt.player} /> gathered intelligence on <CountryLink code={evt.target} /> — intel level {evt.intelLevel}/100 (${fmtMoney(evt.cost)}).
+        </span>
+      </article>
+    );
+  }
+  if (evt.type === "sabotage.executed") {
+    return (
+      <article className="feed-row feed-sabotage">
+        <span className="feed-time">{time}</span>
+        <span className="feed-tag tag-sabotage">SABOTAGE</span>
+        <span className="feed-text">
+          <CountryLink code={evt.from} /> sabotaged <CountryLink code={evt.target} /> — stability {evt.stabilityHit}, readiness {evt.readinessHit} (${fmtMoney(evt.cost)}).
+        </span>
+      </article>
+    );
+  }
+  if (evt.type === "sabotage.failed") {
+    return (
+      <article className="feed-row feed-sabotage">
+        <span className="feed-time">{time}</span>
+        <span className="feed-tag tag-sabotage">SABOTAGE</span>
+        <span className="feed-text">
+          <CountryLink code={evt.from} /> sabotage against <CountryLink code={evt.target} /> FAILED — {evt.reason} (${fmtMoney(evt.cost)}).
         </span>
       </article>
     );

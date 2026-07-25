@@ -7,11 +7,17 @@
 import { useEffect, useState } from "react";
 import { selection } from "./selectionManager.js";
 import { gameSocket } from "./gameSocket.js";
-import type { Country, DiplomaticPosture, Relationship, StrictIntent, Unit } from "./shared/types.js";
+import type { Country, DiplomaticPosture, Relationship, StrictIntent, Unit, UnitType } from "./shared/types.js";
 
 type Tab = "economy" | "military" | "diplomacy";
 
 const PLAYER_CODE = "USA";
+
+const UNIT_COSTS: Record<UnitType, number> = {
+  infantry: 50,
+  armor: 120,
+  navy: 200,
+};
 
 export function CountryProfile() {
   const [sel, setSel] = useState<ReturnType<typeof selection.getSelected>>(null);
@@ -109,11 +115,7 @@ function CountryProfileBody({
       </div>
 
       {!isSelf && (
-        <footer className="action-bar">
-          <button className="btn btn-danger" onClick={() => sendIntent("declare-war")}>Declare War</button>
-          <button className="btn btn-accent" onClick={() => sendIntent("propose-trade")}>Propose Trade</button>
-          <button className="btn btn-success" onClick={() => sendIntent("improve-relations")}>Improve Relations</button>
-        </footer>
+        <ForeignActionPanel country={country} sendIntent={sendIntent} />
       )}
       {isSelf && <GovernancePanel country={country} />}
 
@@ -298,6 +300,86 @@ function UnitProfile({ unit, toast }: { unit: Unit; toast: string | null }) {
   );
 }
 
+// ---- Foreign action panel (covert ops + diplomacy) -------------------------
+
+function ForeignActionPanel({
+  country,
+  sendIntent,
+}: {
+  country: Country;
+  sendIntent: (intent: StrictIntent["intent"], extra?: { terms?: string }) => void;
+}) {
+  return (
+    <footer className="action-bar foreign-actions">
+      <div className="action-group">
+        <span className="action-group-label">Diplomacy</span>
+        <div className="action-row">
+          <button className="btn btn-danger" onClick={() => sendIntent("declare-war")}>Declare War</button>
+          <button className="btn btn-accent" onClick={() => sendIntent("propose-trade")}>Propose Trade</button>
+          <button className="btn btn-success" onClick={() => sendIntent("improve-relations")}>Improve Relations</button>
+        </div>
+      </div>
+      <div className="action-group">
+        <span className="action-group-label">Foreign Policy</span>
+        <div className="action-row">
+          <button
+            className="btn btn-aid"
+            onClick={() => sendIntentWithAmount("send-aid", 50)}
+            title="+15 affinity, -20 tension"
+          >
+            Send Aid ($50B)
+          </button>
+          <button
+            className="btn btn-intel"
+            onClick={() => sendIntentWithAmount("gather-intel", 30)}
+            title="+25 intel points"
+          >
+            Gather Intel ($30B)
+          </button>
+          <button
+            className="btn btn-sabotage"
+            onClick={() => sendIntentWithAmount("fund-sabotage", 100)}
+            title="-15 to -25 stability & readiness (30% failure risk)"
+          >
+            Fund Sabotage ($100B)
+          </button>
+        </div>
+      </div>
+    </footer>
+  );
+
+  function sendIntentWithAmount(intent: "send-aid" | "gather-intel" | "fund-sabotage", amount: number) {
+    const payload = { intent, from: PLAYER_CODE, target: country.id, amount, cost: amount } as StrictIntent;
+    gameSocket.sendIntent(payload);
+  }
+}
+
+// ---- Military production panel (player nation) -----------------------------
+
+function MilitaryProductionPanel({ country }: { country: Country }) {
+  const recruit = (unitType: UnitType) => {
+    const cost = UNIT_COSTS[unitType];
+    const payload: StrictIntent = { intent: "recruit-unit", from: country.id, unitType, cost };
+    gameSocket.sendIntent(payload);
+  };
+  return (
+    <div className="action-group production">
+      <span className="action-group-label">Military Production</span>
+      <div className="action-row">
+        <button className="btn btn-mil" onClick={() => recruit("infantry")} title="$50B — deploys at capital">
+          Train Infantry ($50B)
+        </button>
+        <button className="btn btn-mil" onClick={() => recruit("armor")} title="$120B — deploys at capital">
+          Build Armor ($120B)
+        </button>
+        <button className="btn btn-mil" onClick={() => recruit("navy")} title="$200B — deploys at capital">
+          Commission Fleet ($200B)
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ---- Governance panel (player nation controls) -----------------------------
 
 const POSTURES: { value: DiplomaticPosture; label: string; desc: string }[] = [
@@ -312,6 +394,8 @@ function GovernancePanel({ country }: { country: Country }) {
   const [readiness, setReadiness] = useState(country.military.readiness);
   const [posture, setPosture] = useState<DiplomaticPosture>(country.posture);
   const [taxFeedback, setTaxFeedback] = useState<string | null>(null);
+
+  // sync local state when the country object updates (e.g. after a turn)
 
   // sync local state when the country object updates (e.g. after a turn)
   useEffect(() => {
@@ -402,6 +486,8 @@ function GovernancePanel({ country }: { country: Country }) {
         </div>
         <div className="gov-hint">{POSTURES.find((p) => p.value === posture)?.desc}</div>
       </div>
+
+      <MilitaryProductionPanel country={country} />
     </footer>
   );
 }

@@ -209,6 +209,10 @@ class GameSocket {
     if (intent.intent === "set-readiness") { this.applyPlayerPolicy({ readiness: intent.level }); return; }
     if (intent.intent === "set-posture") { this.applyPlayerPolicy({ posture: intent.posture }); return; }
 
+    // Recruitment creates a unit locally immediately — the server validates
+    // but the dashboard adds the marker so the player sees instant feedback.
+    if (intent.intent === "recruit-unit") { this.handleRecruitUnit(intent); return; }
+
     if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(intent));
       return;
@@ -277,6 +281,44 @@ class GameSocket {
     }
   }
 
+  /** Recruit a new military unit. Creates it at the player's capital,
+   *  adds it to the roster, emits a recruitment event, and forwards the
+   *  intent to the server for validation/persistence. */
+  private handleRecruitUnit(intent: Extract<StrictIntent, { intent: "recruit-unit" }>): void {
+    const player = this.countries.find((c) => c.id === intent.from);
+    if (!player) return;
+    const id = `${intent.from}-${Date.now().toString(36)}`;
+    const names: Record<string, string> = { infantry: "Infantry", armor: "Armor", navy: "Fleet" };
+    const unit: Unit = {
+      id,
+      name: `${Math.floor(Math.random() * 90 + 10)}th ${names[intent.unitType] ?? "Unit"}`,
+      ownerCode: intent.from,
+      type: intent.unitType,
+      readiness: 80,
+      morale: 75,
+      latlng: [...player.latlng] as [number, number],
+      strength: intent.unitType === "infantry" ? 10000 : intent.unitType === "armor" ? 5000 : 3000,
+    };
+    this.units = [...this.units, unit];
+    this.broadcastUnits();
+    const evt: GameEvent = {
+      type: "military.recruitment",
+      at: new Date().toISOString(),
+      country: intent.from,
+      unitType: intent.unitType,
+      unitId: id,
+      cost: intent.cost,
+    };
+    this.emit(evt);
+    if (this.gameId) void persistEvent(this.gameId, evt);
+    // forward to server if live
+    if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(intent));
+    } else if (this.mode === "live") {
+      void this.postAction(intent);
+    }
+  }
+
   // ---- simulator ----------------------------------------------------------
 
   private startSim(): void {
@@ -319,12 +361,16 @@ class GameSocket {
     for (const l of this.eventListeners) l(evt);
   }
 
-  /** Advance the world by one simulation turn. Processes economy, tensions,
-   *  combat, and diplomacy. Emits events and persists the new state. */
+  /** Advance the world by one simulation turn. In live mode, asks the
+   *  server to tick. In sim mode, processes the turn locally. */
   async advanceTurn(): Promise<void> {
     if (this.turnInProgress || this.countries.length === 0) return;
     this.turnInProgress = true;
     try {
+      if (this.mode === "live") {
+        const ok = await this.postServerTick();
+        if (ok) return; // events will arrive over WS
+      }
       const nextTick = this.currentTick + 1;
       const result = processTurn(this.countries, this.units, nextTick);
       this.countries = result.countries;
