@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import { selection } from "./selectionManager.js";
 import { gameSocket } from "./gameSocket.js";
-import type { ConflictZone, Country, DiplomaticPosture, IntelLevel, Relationship, StrictIntent, Unit, UnitType } from "./shared/types.js";
+import type { Country, DiplomaticPosture, Relationship, StrictIntent, Unit } from "./shared/types.js";
 
 type Tab = "economy" | "military" | "diplomacy";
 
@@ -52,15 +52,6 @@ export function CountryProfile() {
     );
   }
 
-  if (sel.kind === "zone") {
-    return (
-      <>
-        <ZoneReport zone={sel.zone} toast={toast} />
-        {toast && <div className="toast">{toast}</div>}
-      </>
-    );
-  }
-
   return (
     <>
       <CountryProfileBody country={sel.country} tab={tab} setTab={setTab} toast={toast} />
@@ -83,6 +74,10 @@ function CountryProfileBody({
   toast: string | null;
 }) {
   const isSelf = country.id === PLAYER_CODE;
+  const sendIntent = (intent: StrictIntent["intent"], extra?: { terms?: string }) => {
+    const payload = { intent, from: PLAYER_CODE, target: country.id, ...(extra ?? {}) } as StrictIntent;
+    gameSocket.sendIntent(payload);
+  };
 
   return (
     <aside className="panel profile">
@@ -114,10 +109,13 @@ function CountryProfileBody({
       </div>
 
       {!isSelf && (
-        <ForeignActionPanel country={country} />
+        <footer className="action-bar">
+          <button className="btn btn-danger" onClick={() => sendIntent("declare-war")}>Declare War</button>
+          <button className="btn btn-accent" onClick={() => sendIntent("propose-trade")}>Propose Trade</button>
+          <button className="btn btn-success" onClick={() => sendIntent("improve-relations")}>Improve Relations</button>
+        </footer>
       )}
       {isSelf && <GovernancePanel country={country} />}
-      {isSelf && <RecruitmentPanel country={country} />}
 
       {toast && <div className="toast">{toast}</div>}
     </aside>
@@ -405,199 +403,6 @@ function GovernancePanel({ country }: { country: Country }) {
         <div className="gov-hint">{POSTURES.find((p) => p.value === posture)?.desc}</div>
       </div>
     </footer>
-  );
-}
-
-// ---- Foreign action panel (espionage + aid) ---------------------------------
-
-function ForeignActionPanel({ country }: { country: Country }) {
-  const [intel, setIntel] = useState<IntelLevel>(gameSocket.getIntel()[country.id] ?? 0);
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    return gameSocket.onIntel((map) => setIntel(map[country.id] ?? 0));
-  }, [country.id]);
-
-  const flash = (m: string) => {
-    setMsg(m);
-    setTimeout(() => setMsg(null), 3000);
-  };
-
-  const act = (action: () => void, cooldown = 600) => {
-    if (busy) return;
-    setBusy(true);
-    action();
-    setTimeout(() => setBusy(false), cooldown);
-  };
-
-  const sendAid = () => {
-    const intent: StrictIntent = { intent: "send-aid", from: PLAYER_CODE, target: country.id, amount: 50e9 };
-    gameSocket.sendIntent(intent);
-    flash("Aid package dispatched — relations improving.");
-  };
-
-  const gatherIntel = () => {
-    const intent: StrictIntent = { intent: "gather-intel", from: PLAYER_CODE, target: country.id, cost: 30e9 };
-    gameSocket.sendIntent(intent);
-    flash("Intelligence operatives deployed.");
-  };
-
-  const fundSabotage = () => {
-    const intent: StrictIntent = { intent: "fund-sabotage", from: PLAYER_CODE, target: country.id, cost: 100e9 };
-    gameSocket.sendIntent(intent);
-    flash("Covert operation initiated.");
-  };
-
-  return (
-    <footer className="action-bar foreign-actions">
-      <div className="intel-bar-section">
-        <div className="intel-header">
-          <span className="gov-label">Intel Level</span>
-          <span className="intel-value">{intel}/100</span>
-        </div>
-        <div className="intel-bar">
-          <div className="intel-fill" style={{ width: `${intel}%` }} />
-        </div>
-      </div>
-      <button className="btn btn-success" disabled={busy} onClick={() => act(sendAid)}>
-        Send Aid ($50B)
-      </button>
-      <button className="btn btn-info" disabled={busy} onClick={() => act(gatherIntel)}>
-        Gather Intel ($30B)
-      </button>
-      <button className="btn btn-danger" disabled={busy} onClick={() => act(fundSabotage)}>
-        Fund Sabotage ($100B)
-      </button>
-      {msg && <span className="gov-feedback">{msg}</span>}
-    </footer>
-  );
-}
-
-// ---- Recruitment panel (military production) --------------------------------
-
-const RECRUIT_OPTIONS: { type: UnitType; label: string; cost: number; desc: string }[] = [
-  { type: "infantry", label: "Train Infantry", cost: 50e9, desc: "300 strength · 80 readiness" },
-  { type: "armor", label: "Build Armor", cost: 120e9, desc: "500 strength · 80 readiness" },
-  { type: "navy", label: "Commission Fleet", cost: 200e9, desc: "800 strength · 80 readiness" },
-];
-
-function RecruitmentPanel({ country }: { country: Country }) {
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  const recruit = (type: UnitType, cost: number) => {
-    if (busy) return;
-    if (country.economy.treasury < cost) {
-      setMsg("Insufficient treasury funds.");
-      setTimeout(() => setMsg(null), 3000);
-      return;
-    }
-    setBusy(true);
-    const intent: StrictIntent = { intent: "recruit-unit", from: country.id, unitType: type, cost };
-    gameSocket.sendIntent(intent);
-    setMsg(`${RECRUIT_OPTIONS.find((o) => o.type === type)!.label} deployed at capital.`);
-    setTimeout(() => setMsg(null), 3000);
-    setTimeout(() => setBusy(false), 600);
-  };
-
-  return (
-    <footer className="action-bar recruitment">
-      <span className="gov-label">Military Production</span>
-      <div className="recruit-grid">
-        {RECRUIT_OPTIONS.map((opt) => (
-          <button
-            key={opt.type}
-            className={country.economy.treasury >= opt.cost ? "recruit-btn" : "recruit-btn recruit-disabled"}
-            disabled={busy || country.economy.treasury < opt.cost}
-            onClick={() => recruit(opt.type, opt.cost)}
-          >
-            <span className="recruit-label">{opt.label}</span>
-            <span className="recruit-cost">${(opt.cost / 1e9).toFixed(0)}B</span>
-            <span className="recruit-desc">{opt.desc}</span>
-          </button>
-        ))}
-      </div>
-      {msg && <span className="gov-feedback">{msg}</span>}
-    </footer>
-  );
-}
-
-// ---- Zone report (conflict zone intel display) ------------------------------
-
-function ZoneReport({ zone, toast }: { zone: ConflictZone; toast: string | null }) {
-  const intel = gameSocket.getIntel();
-  // use the intel level of the zone's primary owner
-  const primaryOwner = zone.ownerCodes[0];
-  const intelLevel = intel[primaryOwner] ?? 0;
-
-  const intelTier: "low" | "medium" | "high" =
-    intelLevel >= 71 ? "high" : intelLevel >= 31 ? "medium" : "low";
-
-  return (
-    <section className="panel profile-pane">
-      <header className="profile-head zone-head">
-        <span className="zone-icon" aria-hidden>⬢</span>
-        <div>
-          <h2>Conflict Zone Report</h2>
-          <span className="brand-sub">
-            {zone.hostility >= 70 ? "Active hostilities detected" : zone.hostility >= 35 ? "Military presence" : "Neutral deployment"}
-          </span>
-        </div>
-      </header>
-
-      <div className="profile-body">
-        <div className="zone-meta">
-          <div className="stat-row">
-            <span className="stat-label">Location</span>
-            <span className="stat-value">{zone.centroid[0].toFixed(1)}°, {zone.centroid[1].toFixed(1)}°</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Hostility Index</span>
-            <span className="stat-value">{zone.hostility}/100</span>
-          </div>
-        </div>
-
-        <div className="intel-gate">
-          <div className="intel-header">
-            <span className="gov-label">Reconnaissance</span>
-            <span className={`intel-tier intel-tier-${intelTier}`}>{intelTier.toUpperCase()} INTEL</span>
-          </div>
-
-          {intelTier === "low" && (
-            <div className="intel-content intel-unknown">
-              <p>Unknown military presence detected.</p>
-              <p className="intel-hint">Gather intelligence on the involved nations to reveal more.</p>
-            </div>
-          )}
-          {intelTier === "medium" && (
-            <div className="intel-content intel-partial">
-              <p>Estimated unit count: <b>{zone.unitCount}</b></p>
-              <p>{zone.dominantType === "armor" ? "Armored presence suspected" : zone.dominantType === "navy" ? "Naval activity suspected" : "Infantry presence suspected"}.</p>
-              <p className="intel-hint">Further intelligence will reveal exact units and readiness.</p>
-            </div>
-          )}
-          {intelTier === "high" && (
-            <div className="intel-content intel-full">
-              <div className="zone-unit-list">
-                {zone.units.map((u) => (
-                  <div key={u.id} className="zone-unit-row">
-                    <span className="zone-unit-name">{u.name}</span>
-                    <span className="zone-unit-type">{u.type}</span>
-                    <span className="zone-unit-stat">R{u.readiness} M{u.morale}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="zone-owners">
-                <span className="gov-label">Deployed by</span>
-                <span>{zone.ownerCodes.join(", ")}</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      {toast && <div className="toast">{toast}</div>}
-    </section>
   );
 }
 
