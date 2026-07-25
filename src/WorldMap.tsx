@@ -8,7 +8,7 @@ import { geoEqualEarth, geoPath } from "d3-geo";
 import type { GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ConflictZone, Country, IntelLevel, Relationship, Unit, UnitType, WorldSeed } from "./shared/types.js";
+import type { ConflictZone, Country, IntelLevel, Unit, UnitType, WorldSeed } from "./shared/types.js";
 import { gameSocket } from "./gameSocket.js";
 import { selection } from "./selectionManager.js";
 
@@ -37,7 +37,6 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   const [trajectories, setTrajectories] = useState<Trajectory[]>([]);
 
   const selectedRef = useRef<Country | null>(null);
-  const selectedUnitRef = useRef<Unit | null>(null);
 
   // player's intel level per foreign country (0-100)
   const intelRef = useRef<Map<string, IntelLevel>>(new Map());
@@ -68,7 +67,6 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   useEffect(() => {
     return selection.subscribe((sel) => {
       selectedRef.current = sel?.kind === "country" ? sel.country : null;
-      selectedUnitRef.current = sel?.kind === "unit" ? sel.unit : null;
       requestAnimationFrame(draw);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -213,24 +211,16 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
 
     // military unit layer — conflict zone clustering + fog of war
     const selCountry = selectedRef.current;
-    const selUnitId = selectedUnitRef.current?.id ?? null;
-    if (intelMode) {
-      // fog of war: cluster units into conflict zones and gate by intel
-      const zones = clusterConflictZones(units, CLUSTER_RADIUS_DEG);
-      for (const zone of zones) {
-        const xy = projection(zone.centroid);
-        if (!xy) continue;
+    // Always cluster units into conflict zones — individual markers are never drawn.
+    const zones = clusterConflictZones(units, CLUSTER_RADIUS_DEG);
+    for (const zone of zones) {
+      const xy = projection(zone.centroid);
+      if (!xy) continue;
+      if (zone.unitCount === 1) {
+        drawWarMarker(ctx, xy[0], xy[1], zone, intelMode);
+      } else {
         const intel = selCountry ? (intelRef.current.get(selCountry.id) ?? 0) : 100;
-        drawConflictZoneMarker(ctx, xy[0], xy[1], zone, intel);
-      }
-    } else {
-      // normal mode: draw individual units
-      for (const u of units) {
-        const xy = projection(u.latlng);
-        if (!xy) continue;
-        const rel = selCountry ? relationshipOf(selCountry, u.ownerCode) : "neutral";
-        const color = unitColor(u, rel, selUnitId === u.id);
-        drawUnitMarker(ctx, xy[0], xy[1], u.type, color);
+        drawConflictZoneMarker(ctx, xy[0], xy[1], zone, intelMode ? intel : 100);
       }
     }
 
@@ -352,51 +342,6 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
 
 // ---- helpers ---------------------------------------------------------------
 
-function relationshipOf(sel: Country, ownerCode: string): "ally" | "enemy" | "neutral" {
-  if (sel.id === ownerCode) return "ally";
-  const r = sel.relationships.find((x) => x.countryCode === ownerCode) as Relationship | undefined;
-  if (!r) return "neutral";
-  if (r.tension >= 60) return "enemy";
-  if (r.tension <= 25 && r.affinity >= 30) return "ally";
-  return "neutral";
-}
-
-function unitColor(_u: Unit, rel: "ally" | "enemy" | "neutral", selected: boolean): string {
-  if (selected) return "#ffffff";
-  if (rel === "ally") return "#4a9fe8"; // blue
-  if (rel === "enemy") return "#e8635a"; // red
-  return "#8ba3b5"; // gray
-}
-
-function drawUnitMarker(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  type: Unit["type"],
-  color: string
-) {
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.strokeStyle = "rgba(0,0,0,0.6)";
-  ctx.lineWidth = 1;
-  const r = 6;
-  ctx.beginPath();
-  if (type === "infantry") {
-    ctx.rect(x - r, y - r, r * 2, r * 2); // square
-  } else if (type === "armor") {
-    ctx.moveTo(x, y - r);
-    ctx.lineTo(x + r, y);
-    ctx.lineTo(x, y + r);
-    ctx.lineTo(x - r, y);
-    ctx.closePath(); // diamond
-  } else {
-    ctx.arc(x, y, r, 0, Math.PI * 2); // circle = navy
-  }
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
-}
-
 // ---- Conflict zone clustering + fog of war ----
 
 /** Group units within an 8° lat/lng radius into hexagonal conflict zones. */
@@ -476,6 +421,39 @@ function drawConflictZoneMarker(
   ctx.fillText(String(zone.unitCount), x, y);
   // intel gating: show owner codes only if intel >= 31 (Medium+)
   if (intel >= 31) {
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.font = "9px var(--mono)";
+    ctx.fillText(zone.ownerCodes.join(","), x, y + r + 10);
+  }
+  ctx.restore();
+}
+
+/** Draw a single-unit war marker (swords icon) for zones with only one unit. */
+function drawWarMarker(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  zone: ConflictZone,
+  showOwner: boolean
+): void {
+  const r = 12;
+  const color = zone.hostility >= 70 ? "#c0392b" : zone.hostility >= 35 ? "#e67e22" : "#2980b9";
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = "rgba(0,0,0,0.6)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  // crossed swords glyph
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.font = "14px var(--mono)";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("\u2694", x, y + 1);
+  // owner code shown when fog-of-war is off (intelMode false)
+  if (showOwner === false) {
     ctx.fillStyle = "rgba(255,255,255,0.7)";
     ctx.font = "9px var(--mono)";
     ctx.fillText(zone.ownerCodes.join(","), x, y + r + 10);
