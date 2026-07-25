@@ -409,9 +409,14 @@ function simulateIntent(intent: StrictIntent, seed: WorldSeed | null, units: Uni
     return { ok: true, acknowledged: intent, events: [] };
   }
 
-  // Policy intents are handled by applyPlayerPolicy in sendIntent, not here.
-  // Return early so TypeScript can narrow the remaining union to target-bearing intents.
-  if (intent.intent === "set-tax" || intent.intent === "set-readiness" || intent.intent === "set-posture") {
+  // Policy, covert ops, and recruitment intents are handled by the player's
+  // local methods in sendIntent, not here. Return early so TypeScript can
+  // narrow the remaining union to target-bearing intents.
+  if (
+    intent.intent === "set-tax" || intent.intent === "set-readiness" || intent.intent === "set-posture" ||
+    intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage" ||
+    intent.intent === "recruit-unit"
+  ) {
     return { ok: true, acknowledged: intent, events: [] };
   }
 

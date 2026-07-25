@@ -36,6 +36,9 @@ export interface Country {
   relationships: Relationship[];
 }
 
+/** Player's espionage knowledge about a foreign nation (0 = blind, 100 = full). */
+export type IntelLevel = number; // 0..100
+
 export interface WorldSeed {
   generatedAt: string; // ISO timestamp
   source: string;
@@ -81,7 +84,12 @@ export type GameEvent =
   | { type: "ai.decision"; at: string; tick: number; country: string; action: string; rationale: string }
   | { type: "policy.tax-set"; at: string; country: string; rate: number; treasuryImpact: number }
   | { type: "policy.readiness-set"; at: string; country: string; level: number; moraleImpact: number }
-  | { type: "policy.posture-set"; at: string; country: string; posture: DiplomaticPosture };
+  | { type: "policy.posture-set"; at: string; country: string; posture: DiplomaticPosture }
+  | { type: "military.recruitment"; at: string; country: string; unitType: UnitType; unitId: string; cost: number }
+  | { type: "intel.gathered"; at: string; player: string; target: string; intelLevel: number; cost: number }
+  | { type: "aid.sent"; at: string; from: string; target: string; amount: number; affinityGain: number }
+  | { type: "sabotage.executed"; at: string; from: string; target: string; stabilityHit: number; readinessHit: number; cost: number }
+  | { type: "sabotage.failed"; at: string; from: string; target: string; cost: number; reason: string };
 
 // Aggregate result of one simulation turn, emitted with turn.advanced.
 export interface TurnSummary {
@@ -113,8 +121,26 @@ export type StrictIntent =
   | { intent: "disband-unit"; unitId: string; from: string }
   | { intent: "set-tax"; from: string; rate: number }
   | { intent: "set-readiness"; from: string; level: number }
-  | { intent: "set-posture"; from: string; posture: DiplomaticPosture };
+  | { intent: "set-posture"; from: string; posture: DiplomaticPosture }
+  | { intent: "send-aid"; from: string; target: string; amount: number }
+  | { intent: "gather-intel"; from: string; target: string; cost: number }
+  | { intent: "fund-sabotage"; from: string; target: string; cost: number }
+  | { intent: "recruit-unit"; from: string; unitType: UnitType; cost: number };
 
 export type IntentResponse =
   | { ok: true; acknowledged: StrictIntent; events: GameEvent[] }
   | { ok: false; error: string };
+
+/** A geographic cluster of military units, rendered as a single fog-of-war marker. */
+export interface ConflictZone {
+  id: string;
+  centroid: [number, number];
+  unitCount: number;
+  ownerCodes: string[];
+  /** Dominant unit type in the cluster, for intel-gated display. */
+  dominantType: UnitType;
+  /** 0 = friendly/neutral presence, 100 = active hostilities. */
+  hostility: number;
+  /** Units belonging to the cluster (hidden unless intel is high). */
+  units: Unit[];
+}

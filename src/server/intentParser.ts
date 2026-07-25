@@ -29,13 +29,66 @@ export class StrictIntentParser {
       case "declare-war":
       case "propose-trade":
       case "improve-relations":
-        return this.parseCountryIntent(intent as Partial<Extract<StrictIntent, { from: string; target: string }>>);
+      case "send-aid":
+      case "gather-intel":
+      case "fund-sabotage":
+        return this.parseCountryIntent(
+          intent as Partial<Extract<StrictIntent, { from: string; target: string; intent: string }>>
+        );
       case "move-unit":
       case "disband-unit":
         return this.parseUnitIntent(intent as Partial<Extract<StrictIntent, { unitId: string }>>);
+      case "set-tax":
+      case "set-readiness":
+      case "set-posture":
+      case "recruit-unit":
+        return this.parsePlayerIntent(intent as Partial<StrictIntent>);
       default:
         return { ok: false, error: `unsupported intent "${intent.intent}"` };
     }
+  }
+
+  /** Validate policy, covert-op, and recruitment intents that target the player's own nation. */
+  private parsePlayerIntent(intent: Partial<StrictIntent>): IntentResponse {
+    const i = intent.intent as "set-tax" | "set-readiness" | "set-posture" | "recruit-unit";
+    const from = (intent as Partial<Extract<StrictIntent, { from: string }>>).from;
+    if (typeof from !== "string") {
+      return { ok: false, error: '"from" must be a string' };
+    }
+    if (!this.find(from)) {
+      return { ok: false, error: `unknown "from" country: ${from}` };
+    }
+
+    if (i === "set-tax") {
+      const rate = (intent as Extract<StrictIntent, { intent: "set-tax" }>).rate;
+      if (typeof rate !== "number" || rate < 0 || rate > 1) {
+        return { ok: false, error: '"rate" must be a number between 0 and 1' };
+      }
+      return { ok: true, acknowledged: intent as Extract<StrictIntent, { intent: "set-tax" }>, events: [] };
+    }
+    if (i === "set-readiness") {
+      const level = (intent as Extract<StrictIntent, { intent: "set-readiness" }>).level;
+      if (typeof level !== "number" || level < 0 || level > 100) {
+        return { ok: false, error: '"level" must be a number between 0 and 100' };
+      }
+      return { ok: true, acknowledged: intent as Extract<StrictIntent, { intent: "set-readiness" }>, events: [] };
+    }
+    if (i === "set-posture") {
+      const posture = (intent as Extract<StrictIntent, { intent: "set-posture" }>).posture;
+      if (!posture || typeof posture !== "string") {
+        return { ok: false, error: '"posture" must be a DiplomaticPosture string' };
+      }
+      return { ok: true, acknowledged: intent as Extract<StrictIntent, { intent: "set-posture" }>, events: [] };
+    }
+    // recruit-unit
+    const recruit = intent as Extract<StrictIntent, { intent: "recruit-unit" }>;
+    if (typeof recruit.unitType !== "string" || !["infantry", "armor", "navy"].includes(recruit.unitType)) {
+      return { ok: false, error: '"unitType" must be one of: infantry, armor, navy' };
+    }
+    if (typeof recruit.cost !== "number" || recruit.cost <= 0) {
+      return { ok: false, error: '"cost" must be a positive number' };
+    }
+    return { ok: true, acknowledged: recruit, events: [] };
   }
 
   private parseCountryIntent(
