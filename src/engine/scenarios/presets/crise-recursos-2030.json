@@ -1,0 +1,241 @@
+{
+  "metadata": {
+    "name": "Crise de Recursos — 2030",
+    "version": "1.0.0",
+    "description": "Escassez global de commodities, estresse no MarketSystem, alta dependência de rotas comerciais. Países exportadores e importadores em tensão por recursos críticos.",
+    "simulation": {
+      "maxTicks": 300,
+      "seed": 2030
+    }
+  },
+  "worldState": {
+    "entities": [
+      {
+        "id": "country-us",
+        "name": "Estados Unidos",
+        "entityType": "country",
+        "position": { "lat": 38.0, "lng": -97.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 32000, "inflationRate": 0.035, "treasury": 2500, "taxRate": 0.26 },
+          { "type": "economy.production", "energyOutput": 350, "foodOutput": 400, "mineralsOutput": 150, "industrialOutput": 550 },
+          { "type": "politics.stability", "stabilityIndex": 0.70, "approvalRating": 0.42, "militaryLoyalty": 0.90 }
+        ]
+      },
+      {
+        "id": "country-cn",
+        "name": "China",
+        "entityType": "country",
+        "position": { "lat": 35.0, "lng": 105.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 28500, "inflationRate": 0.025, "treasury": 3500, "taxRate": 0.22 },
+          { "type": "economy.production", "energyOutput": 450, "foodOutput": 500, "mineralsOutput": 350, "industrialOutput": 700 },
+          { "type": "politics.stability", "stabilityIndex": 0.78, "approvalRating": 0.48, "militaryLoyalty": 0.95 }
+        ]
+      },
+      {
+        "id": "country-ru",
+        "name": "Rússia",
+        "entityType": "country",
+        "position": { "lat": 60.0, "lng": 40.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 6200, "inflationRate": 0.055, "treasury": 1800, "taxRate": 0.20 },
+          { "type": "economy.production", "energyOutput": 600, "foodOutput": 200, "mineralsOutput": 500, "industrialOutput": 200 },
+          { "type": "politics.stability", "stabilityIndex": 0.62, "approvalRating": 0.38, "militaryLoyalty": 0.85 }
+        ]
+      },
+      {
+        "id": "country-sa",
+        "name": "Arábia Saudita",
+        "entityType": "country",
+        "position": { "lat": 24.0, "lng": 45.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 4600, "inflationRate": 0.02, "treasury": 4000, "taxRate": 0.15 },
+          { "type": "economy.production", "energyOutput": 700, "foodOutput": 60, "mineralsOutput": 80, "industrialOutput": 100 },
+          { "type": "politics.stability", "stabilityIndex": 0.68, "approvalRating": 0.45, "militaryLoyalty": 0.92 }
+        ]
+      },
+      {
+        "id": "country-br",
+        "name": "Brasil",
+        "entityType": "country",
+        "position": { "lat": -14.0, "lng": -52.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 3200, "inflationRate": 0.045, "treasury": 600, "taxRate": 0.24 },
+          { "type": "economy.production", "energyOutput": 250, "foodOutput": 600, "mineralsOutput": 300, "industrialOutput": 150 },
+          { "type": "politics.stability", "stabilityIndex": 0.58, "approvalRating": 0.32, "militaryLoyalty": 0.78 }
+        ]
+      },
+      {
+        "id": "country-de",
+        "name": "Alemanha",
+        "entityType": "country",
+        "position": { "lat": 51.0, "lng": 10.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 4500, "inflationRate": 0.022, "treasury": 900, "taxRate": 0.28 },
+          { "type": "economy.production", "energyOutput": 150, "foodOutput": 180, "mineralsOutput": 40, "industrialOutput": 450 },
+          { "type": "politics.stability", "stabilityIndex": 0.82, "approvalRating": 0.55, "militaryLoyalty": 0.88 }
+        ]
+      },
+      {
+        "id": "country-ua",
+        "name": "Ucrânia",
+        "entityType": "country",
+        "position": { "lat": 49.0, "lng": 31.0 },
+        "components": [
+          { "type": "economy.indicator", "gdp": 600, "inflationRate": 0.08, "treasury": 150, "taxRate": 0.18 },
+          { "type": "economy.production", "energyOutput": 80, "foodOutput": 350, "mineralsOutput": 100, "industrialOutput": 60 },
+          { "type": "politics.stability", "stabilityIndex": 0.42, "approvalRating": 0.28, "militaryLoyalty": 0.75 }
+        ]
+      },
+      {
+        "id": "market-energy",
+        "name": "Mercado Global de Energia",
+        "entityType": "market",
+        "components": [
+          { "type": "economy.market", "resourceType": "energy", "currentPrice": 120, "totalSupply": 0, "totalDemand": 0, "priceVolatility": 0.55 }
+        ]
+      },
+      {
+        "id": "market-food",
+        "name": "Mercado Global de Alimentos",
+        "entityType": "market",
+        "components": [
+          { "type": "economy.market", "resourceType": "food", "currentPrice": 85, "totalSupply": 0, "totalDemand": 0, "priceVolatility": 0.40 }
+        ]
+      },
+      {
+        "id": "market-minerals",
+        "name": "Mercado Global de Minerais",
+        "entityType": "market",
+        "components": [
+          { "type": "economy.market", "resourceType": "minerals", "currentPrice": 150, "totalSupply": 0, "totalDemand": 0, "priceVolatility": 0.45 }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "sourceEntityId": "country-us",
+        "targetEntityId": "country-cn",
+        "affinity": -0.60,
+        "tension": 0.75,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-us",
+        "targetEntityId": "country-ru",
+        "affinity": -0.70,
+        "tension": 0.82,
+        "recognition": "partial"
+      },
+      {
+        "sourceEntityId": "country-us",
+        "targetEntityId": "country-sa",
+        "affinity": 0.55,
+        "tension": 0.30,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-us",
+        "targetEntityId": "country-br",
+        "affinity": 0.40,
+        "tension": 0.25,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-cn",
+        "targetEntityId": "country-ru",
+        "affinity": 0.65,
+        "tension": 0.50,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-cn",
+        "targetEntityId": "country-sa",
+        "affinity": 0.30,
+        "tension": 0.40,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-cn",
+        "targetEntityId": "country-br",
+        "affinity": 0.50,
+        "tension": 0.20,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-ru",
+        "targetEntityId": "country-ua",
+        "affinity": -0.75,
+        "tension": 0.88,
+        "recognition": "partial"
+      },
+      {
+        "sourceEntityId": "country-ru",
+        "targetEntityId": "country-de",
+        "affinity": -0.40,
+        "tension": 0.55,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-de",
+        "targetEntityId": "country-ua",
+        "affinity": 0.35,
+        "tension": 0.45,
+        "recognition": "full"
+      },
+      {
+        "sourceEntityId": "country-us",
+        "targetEntityId": "country-ua",
+        "affinity": 0.45,
+        "tension": 0.35,
+        "recognition": "full"
+      }
+    ],
+    "provinces": [
+      { "id": "prov-us-gulf", "name": "Golfo dos EUA", "lat": 30.0, "lng": -90.0, "neighborIds": ["prov-us-plains"], "ownerId": "country-us", "resourceRich": true },
+      { "id": "prov-us-plains", "name": "Grandes Planícies", "lat": 42.0, "lng": -100.0, "neighborIds": ["prov-us-gulf"], "ownerId": "country-us", "resourceRich": false },
+      { "id": "prov-ru-ural", "name": "Urais", "lat": 58.0, "lng": 60.0, "neighborIds": ["prov-ru-siberia"], "ownerId": "country-ru", "resourceRich": true },
+      { "id": "prov-ru-siberia", "name": "Sibéria", "lat": 62.0, "lng": 95.0, "neighborIds": ["prov-ru-ural"], "ownerId": "country-ru", "resourceRich": true },
+      { "id": "prov-sa-east", "name": "Província Oriental Saudita", "lat": 25.0, "lng": 49.0, "neighborIds": [], "ownerId": "country-sa", "resourceRich": true },
+      { "id": "prov-br-amazon", "name": "Amazônia", "lat": -4.0, "lng": -60.0, "neighborIds": ["prov-br-south"], "ownerId": "country-br", "resourceRich": true },
+      { "id": "prov-br-south", "name": "Sul do Brasil", "lat": -23.0, "lng": -48.0, "neighborIds": ["prov-br-amazon"], "ownerId": "country-br", "resourceRich": false },
+      { "id": "prov-de-north", "name": "Norte da Alemanha", "lat": 53.0, "lng": 10.0, "neighborIds": [], "ownerId": "country-de", "resourceRich": false },
+      { "id": "prov-ua-east", "name": "Leste da Ucrânia", "lat": 48.5, "lng": 37.0, "neighborIds": ["prov-ru-ural"], "ownerId": "country-ua", "resourceRich": true },
+      { "id": "prov-ua-west", "name": "Oeste da Ucrânia", "lat": 49.5, "lng": 25.0, "neighborIds": ["prov-de-north"], "ownerId": "country-ua", "resourceRich": false },
+      { "id": "prov-cn-east", "name": "Costa Leste Chinesa", "lat": 32.0, "lng": 120.0, "neighborIds": ["prov-cn-west"], "ownerId": "country-cn", "resourceRich": false },
+      { "id": "prov-cn-west", "name": "Oeste da China", "lat": 38.0, "lng": 90.0, "neighborIds": ["prov-cn-east", "prov-ru-siberia"], "ownerId": "country-cn", "resourceRich": true }
+    ]
+  },
+  "eventTriggers": [
+    {
+      "tick": 8,
+      "eventType": "economy.market-crash",
+      "parameters": { "severity": "high", "region": "global", "sector": "energy" }
+    },
+    {
+      "tick": 12,
+      "eventType": "economy.resource-shortage",
+      "parameters": { "resourceType": "energy", "affectedCountries": ["country-de", "country-ua"] }
+    },
+    {
+      "tick": 18,
+      "eventType": "test.sanction-wave",
+      "parameters": { "initiator": "country-us", "target": "country-ru", "sanctionType": "energy-embargo" }
+    },
+    {
+      "tick": 25,
+      "eventType": "economy.market-crash",
+      "parameters": { "severity": "medium", "region": "europe", "sector": "minerals" }
+    },
+    {
+      "tick": 35,
+      "eventType": "test.global-summit",
+      "parameters": { "theme": "resource-security", "host": "country-br" }
+    },
+    {
+      "tick": 50,
+      "eventType": "test.treaty-proposal",
+      "parameters": { "type": "resource-pact", "proposedBy": "country-br", "target": "country-us" }
+    }
+  ]
+}
