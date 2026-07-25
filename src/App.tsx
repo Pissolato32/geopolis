@@ -16,12 +16,36 @@ import seedData from "../data/world-seed-2026.json";
 
 const SEED = seedData as WorldSeed;
 
+interface ScenarioMeta {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export default function App() {
   const [seed] = useState<WorldSeed>(SEED);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [errMsg, setErrMsg] = useState<string>("");
   const [tick, setTick] = useState(0);
   const [turnBusy, setTurnBusy] = useState(false);
+  const [scenarios, setScenarios] = useState<ScenarioMeta[]>([]);
+  const [activeScenario, setActiveScenario] = useState("world-seed-2026");
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/v1/scenarios")
+      .then((r) => r.json())
+      .then((d: { scenarios: ScenarioMeta[] }) => {
+        if (!cancelled) setScenarios(d.scenarios);
+      })
+      .catch(() => {
+        if (!cancelled) setScenarios([{ id: "world-seed-2026", name: "Modern World 2026", description: "" }]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,6 +117,33 @@ export default function App() {
         </div>
         <GlobalSearch seed={seed} />
         <div className="topbar-status">
+          <div className={`scenario-picker${scenarioOpen ? " open" : ""}`}>
+            <button
+              className="scenario-trigger"
+              onClick={() => setScenarioOpen((o) => !o)}
+              title="Switch scenario"
+            >
+              {scenarios.find((s) => s.id === activeScenario)?.name ?? "Modern World 2026"} ▾
+            </button>
+            {scenarioOpen && (
+              <div className="scenario-menu" role="menu">
+                {scenarios.map((s) => (
+                  <button
+                    key={s.id}
+                    className={`scenario-option${s.id === activeScenario ? " active" : ""}`}
+                    onClick={() => {
+                      setActiveScenario(s.id);
+                      setScenarioOpen(false);
+                      void location.reload();
+                    }}
+                  >
+                    <span className="scenario-name">{s.name}</span>
+                    {s.description && <span className="scenario-desc">{s.description}</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <span className="tick-badge" title="Simulation turn">Turn {tick}</span>
           <button
             className={turnBusy ? "btn btn-accent turn-btn turn-busy" : "btn btn-accent turn-btn"}

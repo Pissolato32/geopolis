@@ -10,8 +10,23 @@ import { resolve } from "node:path";
 import http from "node:http";
 import express from "express";
 import { WebSocketServer, WebSocket } from "ws";
-import type { GameEvent, WorldSeed } from "../shared/types.js";
+import type { Country, GameEvent, MarketPrice, Unit, WorldSeed } from "../shared/types.js";
 import { StrictIntentParser } from "./intentParser.js";
+import { processTurn } from "../turnEngine.js";
+import { seedMarketPrices, tickMarketPrices } from "./marketSim.js";
+
+interface ScenarioMeta {
+  id: string;
+  name: string;
+  description: string;
+  seedFile: string;
+}
+
+const SCENARIOS: ScenarioMeta[] = [
+  { id: "world-seed-2026", name: "Modern World 2026", description: "Current geopolitical snapshot with all 246 nations.", seedFile: "data/world-seed-2026.json" },
+  { id: "crise-recursos-2030", name: "Resource Crisis 2030", description: "Global resource shortage scenario with elevated tensions.", seedFile: "data/world-seed-2026.json" },
+  { id: "guerra-fria-1962", name: "Cold War 1962", description: "Bipolar superpower standoff at the height of the Cuban Missile Crisis.", seedFile: "data/world-seed-2026.json" },
+];
 
 const DIST_DIR = resolve(process.cwd(), "dist");
 const HOST = "0.0.0.0";
@@ -87,14 +102,49 @@ function main() {
   const parser = new StrictIntentParser(seed);
   console.log(`[server] seed loaded: ${seed.countryCount} countries`);
 
+  // Mutable live state — the server now owns a running simulation that
+  // /api/v1/tick advances and /api/v1/action mutates. Both endpoints echo
+  // their events back over the WebSocket as event_emitted envelopes so
+  // connected dashboards stay in sync without polling.
+  let liveCountries: Country[] = seed.countries.map((c) => ({ ...c }));
+  let liveUnits: Unit[] = [];
+  let liveTick = 0;
+  let liveMarket: MarketPrice[] = seedMarketPrices();
+  const clients = new Set<WebSocket>();
+
   const app = express();
+  app.use(express.json());
   app.use((_, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Client-Info, Apikey");
     next();
   });
-  app.get("/health", (_req, res) => res.json({ ok: true, countries: seed.countryCount }));
+  app.get("/health", (_req, res) => res.json({ ok: true, countries: seed.countryCount, tick: liveTick }));
   app.get("/api/world", (_req, res) => res.json(seed));
+  app.get("/api/v1/scenarios", (_req, res) => res.json({ scenarios: SCENARIOS }));
+  app.get("/api/v1/state", (_req, res) => res.json({ tick: liveTick, countries: liveCountries, units: liveUnits, market: liveMarket }));
+
+  // POST /api/v1/action — accept a strict intent, validate + simulate it.
+  app.post("/api/v1/action", (req, res) => {
+    const result = parser.parse(req.body);
+    if (result.ok) {
+      for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
+    }
+    res.json(result);
+  });
+
+  // POST /api/v1/tick — advance the simulation by one turn and stream events.
+  app.post("/api/v1/tick", (_req, res) => {
+    liveTick += 1;
+    const result = processTurn(liveCountries, liveUnits, liveTick);
+    liveCountries = result.countries;
+    liveUnits = result.units;
+    liveMarket = tickMarketPrices(liveMarket);
+    for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
+    broadcastEnvelope(clients, "tick_advanced", { tick: liveTick, summary: result.events[0] });
+    res.json({ ok: true, tick: liveTick, events: result.events });
+  });
 
   // Serve the built dashboard so a single process powers the whole app on one port.
   if (existsSync(DIST_DIR)) {
@@ -105,7 +155,6 @@ function main() {
   const server = http.createServer(app);
   const wss = new WebSocketServer({ server, path: "/ws" });
 
-  const clients = new Set<WebSocket>();
   wss.on("connection", (ws: WebSocket) => {
     clients.add(ws);
     ws.send(JSON.stringify({ type: "hello", at: new Date().toISOString(), countryCount: seed.countryCount }));
@@ -119,9 +168,7 @@ function main() {
       }
       const result = parser.parse(parsed);
       if (result.ok) {
-        for (const evt of result.events) {
-          broadcast(clients, evt);
-        }
+        for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
       }
       ws.send(JSON.stringify(result));
     });
@@ -131,7 +178,7 @@ function main() {
   // periodic ambient events so the left-panel feed is alive on its own
   const ticker = setInterval(() => {
     if (clients.size === 0) return;
-    broadcast(clients, makeRandomEvent(seed));
+    broadcastEnvelope(clients, "event_emitted", makeRandomEvent(seed));
   }, 4000);
 
   server.listen(PORT, HOST, () => {
@@ -151,8 +198,8 @@ function main() {
   process.on("SIGTERM", shutdown);
 }
 
-function broadcast(clients: Set<WebSocket>, evt: GameEvent) {
-  const msg = JSON.stringify(evt);
+function broadcastEnvelope(clients: Set<WebSocket>, kind: string, payload: unknown) {
+  const msg = JSON.stringify({ type: kind, payload });
   for (const c of clients) {
     if (c.readyState === c.OPEN) c.send(msg);
   }

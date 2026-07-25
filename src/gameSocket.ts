@@ -184,8 +184,18 @@ class GameSocket {
     }
     if (typeof msg !== "object" || msg === null) return;
     const m = msg as Record<string, unknown>;
+    // Server sends typed envelopes: { type: "event_emitted", payload: GameEvent }
+    // or { type: "tick_advanced", payload: { tick, summary } }. Legacy bare
+    // IntentResponse objects (with an `ok` field) are still supported for
+    // the direct WS send/reply path.
     if (typeof m["ok"] === "boolean") {
       for (const l of this.intentListeners) l(m as unknown as IntentResponse);
+    } else if (m["type"] === "event_emitted" && m["payload"] && typeof m["payload"] === "object") {
+      for (const l of this.eventListeners) l((m["payload"] as Record<string, unknown>) as unknown as GameEvent);
+    } else if (m["type"] === "tick_advanced" && m["payload"] && typeof (m["payload"] as Record<string, unknown>)["tick"] === "number") {
+      const tick = (m["payload"] as { tick: number }).tick;
+      this.currentTick = tick;
+      this.broadcastTick();
     } else if (typeof m["type"] === "string") {
       for (const l of this.eventListeners) l(m as unknown as GameEvent);
     }
@@ -201,6 +211,12 @@ class GameSocket {
 
     if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(intent));
+      return;
+    }
+    // HTTP POST fallback when WS is open but unresponsive, or as a direct
+    // REST call to /api/v1/action when the dashboard prefers request/response.
+    if (this.mode === "live") {
+      void this.postAction(intent);
       return;
     }
     const res = simulateIntent(intent, this.seed, this.units);
@@ -219,6 +235,45 @@ class GameSocket {
         this.broadcastUnits();
         if (this.gameId) void persistUnitMutation(this.gameId, intent);
       }
+    }
+  }
+
+  /** POST an intent to /api/v1/action as an HTTP fallback when the
+   *  WebSocket is not usable. The server validates and returns an
+   *  IntentResponse; we pipe it through the same listener path. */
+  private async postAction(intent: StrictIntent): Promise<void> {
+    try {
+      const r = await fetch("/api/v1/action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(intent),
+      });
+      if (!r.ok) return;
+      const res = (await r.json()) as IntentResponse;
+      for (const l of this.intentListeners) l(res);
+      if (res.ok) {
+        for (const evt of res.events) {
+          this.emit(evt);
+          if (this.gameId) void persistEvent(this.gameId, evt);
+        }
+      }
+    } catch {
+      // network failed — fall back to local simulation
+      const res = simulateIntent(intent, this.seed, this.units);
+      for (const l of this.intentListeners) l(res);
+    }
+  }
+
+  /** POST to /api/v1/tick to advance the live server's simulation by one
+   *  turn. Events arrive over the WebSocket as event_emitted envelopes; this
+   *  call just triggers the advance. Returns true if the server accepted. */
+  async postServerTick(): Promise<boolean> {
+    if (this.mode !== "live") return false;
+    try {
+      const r = await fetch("/api/v1/tick", { method: "POST" });
+      return r.ok;
+    } catch {
+      return false;
     }
   }
 

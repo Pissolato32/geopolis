@@ -115,6 +115,12 @@ export class StrictIntentParser {
         return this.handleImproveRelations(
           intent as Extract<StrictIntent, { intent: "improve-relations" }>
         );
+      case "send-aid":
+        return this.handleSendAid(intent as Extract<StrictIntent, { intent: "send-aid" }>);
+      case "gather-intel":
+        return this.handleGatherIntel(intent as Extract<StrictIntent, { intent: "gather-intel" }>);
+      case "fund-sabotage":
+        return this.handleFundSabotage(intent as Extract<StrictIntent, { intent: "fund-sabotage" }>);
       default:
         return { ok: false, error: "unreachable" };
     }
@@ -204,6 +210,66 @@ export class StrictIntentParser {
       parties: [a.id, d.id],
       kind: "non-aggression",
       durationYears: 10,
+    };
+    return { ok: true, acknowledged: intent, events: [evt] };
+  }
+
+  // ---- Phase 3 covert-op + aid handlers ------------------------------------
+
+  private handleSendAid(
+    intent: Extract<StrictIntent, { intent: "send-aid" }>
+  ): IntentResponse {
+    const evt: GameEvent = {
+      type: "aid.sent",
+      at: this.now(),
+      from: intent.from,
+      target: intent.target,
+      amount: intent.amount,
+      affinityGain: 15,
+    };
+    return { ok: true, acknowledged: intent, events: [evt] };
+  }
+
+  private handleGatherIntel(
+    intent: Extract<StrictIntent, { intent: "gather-intel" }>
+  ): IntentResponse {
+    const evt: GameEvent = {
+      type: "intel.gathered",
+      at: this.now(),
+      player: intent.from,
+      target: intent.target,
+      intelLevel: 25,
+      cost: intent.cost,
+    };
+    return { ok: true, acknowledged: intent, events: [evt] };
+  }
+
+  private handleFundSabotage(
+    intent: Extract<StrictIntent, { intent: "fund-sabotage" }>
+  ): IntentResponse {
+    // 30% failure risk — on failure, tension maxes to 100 and no damage lands.
+    const failed = Math.random() < 0.3;
+    if (failed) {
+      const evt: GameEvent = {
+        type: "sabotage.failed",
+        at: this.now(),
+        from: intent.from,
+        target: intent.target,
+        cost: intent.cost,
+        reason: "operative captured before mission execution",
+      };
+      return { ok: true, acknowledged: intent, events: [evt] };
+    }
+    const stabilityHit = -(15 + Math.round(Math.random() * 10));
+    const readinessHit = -(15 + Math.round(Math.random() * 10));
+    const evt: GameEvent = {
+      type: "sabotage.executed",
+      at: this.now(),
+      from: intent.from,
+      target: intent.target,
+      stabilityHit,
+      readinessHit,
+      cost: intent.cost,
     };
     return { ok: true, acknowledged: intent, events: [evt] };
   }
