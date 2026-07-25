@@ -1,1 +1,0 @@
-{"version":3,"file":"timeline-archiver.d.ts","sourceRoot":"","sources":["../../src/persistence/timeline-archiver.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,0CAA0C,CAAC;AACrE,OAAO,EAAE,UAAU,EAAE,MAAM,2CAA2C,CAAC;AAEvE;;GAEG;AACH,qBAAa,gBAAgB;IAC3B;;;;;;OAMG;WACW,oBAAoB,CAAC,QAAQ,EAAE,QAAQ,CAAC,SAAS,CAAC,EAAE,MAAM,CAAC,EAAE,UAAU,GAAG,MAAM;CAgB/F"}

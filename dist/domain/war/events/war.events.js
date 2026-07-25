@@ -1,9 +1,0 @@
-export const WAR_FUEL_CONSUMED_EVENT = 'war.fuel-consumed';
-export const WAR_FUEL_DEPLETED_EVENT = 'war.fuel-depleted';
-export const WAR_COMBAT_RESOLVED_EVENT = 'war.combat-resolved';
-export const WAR_UNIT_MOVED_EVENT = 'war.unit-moved';
-export const WAR_MOVE_ORDERED_EVENT = 'war.move-ordered';
-export const WAR_PROVINCE_CAPTURED_EVENT = 'war.province-captured';
-export const WAR_PEACE_REQUESTED_EVENT = 'war.peace-requested';
-export const WAR_PEACE_SIGNED_EVENT = 'war.peace-signed';
-//# sourceMappingURL=war.events.js.map
