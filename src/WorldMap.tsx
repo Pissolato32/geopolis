@@ -8,11 +8,13 @@ import { geoEqualEarth, geoPath } from "d3-geo";
 import type { GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Country, Relationship, Unit, WorldSeed } from "./shared/types.js";
+import type { ConflictZone, Country, IntelLevel, Relationship, Unit, UnitType, WorldSeed } from "./shared/types.js";
 import { gameSocket } from "./gameSocket.js";
 import { selection } from "./selectionManager.js";
 
 const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const CLUSTER_RADIUS_DEG = 8; // 8° lat/lng grouping radius
+const TRAJECTORY_DURATION_MS = 8000; // dashed lines persist for 8s
 
 type CountryFeature = {
   type: "Feature";
@@ -31,9 +33,22 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [units, setUnits] = useState<Unit[]>([]);
   const [tensionMode, setTensionMode] = useState(false);
+  const [intelMode, setIntelMode] = useState(false);
+  const [trajectories, setTrajectories] = useState<Trajectory[]>([]);
 
   const selectedRef = useRef<Country | null>(null);
   const selectedUnitRef = useRef<Unit | null>(null);
+
+  // player's intel level per foreign country (0-100)
+  const intelRef = useRef<Map<string, IntelLevel>>(new Map());
+
+  // trajectory lines: dashed teal lines that fade after 8 seconds
+  interface Trajectory {
+    id: string;
+    from: [number, number];
+    to: [number, number];
+    createdAt: number;
+  }
 
   // lookups
   const byNumeric = useRef<Map<string, Country>>(new Map());
@@ -59,9 +74,26 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // unit roster subscription
+  // unit roster subscription + trajectory event listener
   useEffect(() => {
-    return gameSocket.onUnits(setUnits);
+    const unsubUnits = gameSocket.onUnits(setUnits);
+    const unsubEvents = gameSocket.onEvent((evt) => {
+      if (evt.type === "war.unit-destroyed" || evt.type === "war.combat-resolved") return;
+    });
+    return () => {
+      unsubUnits();
+      unsubEvents();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // intel tracking: listen for intel.gathered events and update the map
+  useEffect(() => {
+    return gameSocket.onEvent((evt) => {
+      if (evt.type === "intel.gathered") {
+        intelRef.current.set(evt.target, evt.intelLevel);
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -179,23 +211,56 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
       }
     }
 
-    // military unit layer
+    // military unit layer — conflict zone clustering + fog of war
     const selCountry = selectedRef.current;
     const selUnitId = selectedUnitRef.current?.id ?? null;
-    for (const u of units) {
-      const xy = projection(u.latlng);
-      if (!xy) continue;
-      const rel = selCountry ? relationshipOf(selCountry, u.ownerCode) : "neutral";
-      const color = unitColor(u, rel, selUnitId === u.id);
-      drawUnitMarker(ctx, xy[0], xy[1], u.type, color);
+    if (intelMode) {
+      // fog of war: cluster units into conflict zones and gate by intel
+      const zones = clusterConflictZones(units, CLUSTER_RADIUS_DEG);
+      for (const zone of zones) {
+        const xy = projection(zone.centroid);
+        if (!xy) continue;
+        const intel = selCountry ? (intelRef.current.get(selCountry.id) ?? 0) : 100;
+        drawConflictZoneMarker(ctx, xy[0], xy[1], zone, intel);
+      }
+    } else {
+      // normal mode: draw individual units
+      for (const u of units) {
+        const xy = projection(u.latlng);
+        if (!xy) continue;
+        const rel = selCountry ? relationshipOf(selCountry, u.ownerCode) : "neutral";
+        const color = unitColor(u, rel, selUnitId === u.id);
+        drawUnitMarker(ctx, xy[0], xy[1], u.type, color);
+      }
+    }
+
+    // trajectory lines (dashed teal, persist 8s)
+    const now = Date.now();
+    for (const t of trajectories) {
+      const age = now - t.createdAt;
+      if (age > TRAJECTORY_DURATION_MS) continue;
+      const alpha = 1 - age / TRAJECTORY_DURATION_MS;
+      const fromXY = projection(t.from);
+      const toXY = projection(t.to);
+      if (!fromXY || !toXY) continue;
+      drawTrajectory(ctx, fromXY[0], fromXY[1], toXY[0], toXY[1], alpha);
     }
   };
 
   // redraw on any input change
   useEffect(() => {
     draw();
+    // prune expired trajectories every second
+    const timer = setInterval(() => {
+      setTrajectories((prev) => {
+        const now = Date.now();
+        const kept = prev.filter((t) => now - t.createdAt < TRAJECTORY_DURATION_MS);
+        return kept.length === prev.length ? prev : kept;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [features, size, hoveredId, units, tensionMode, tensionMap]);
+  }, [features, size, hoveredId, units, tensionMode, intelMode, tensionMap, trajectories]);
 
   // pointer handling — hover + hit detection (country polygons then units)
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -266,6 +331,13 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
         >
           Map Mode: Tension {tensionMode ? "ON" : "OFF"}
         </button>
+        <button
+          className={intelMode ? "chip chip-intel active" : "chip"}
+          onClick={() => setIntelMode((m) => !m)}
+          title="Cluster military units into conflict zones with fog-of-war intel gating"
+        >
+          Map Mode: Fog of War {intelMode ? "ON" : "OFF"}
+        </button>
       </div>
       <canvas
         ref={canvasRef}
@@ -322,6 +394,123 @@ function drawUnitMarker(
   }
   ctx.fill();
   ctx.stroke();
+  ctx.restore();
+}
+
+// ---- Conflict zone clustering + fog of war ----
+
+/** Group units within an 8° lat/lng radius into hexagonal conflict zones. */
+function clusterConflictZones(units: Unit[], radiusDeg: number): ConflictZone[] {
+  if (units.length === 0) return [];
+  const visited = new Set<number>();
+  const zones: ConflictZone[] = [];
+
+  for (let i = 0; i < units.length; i++) {
+    if (visited.has(i)) continue;
+    const cluster = [units[i]!];
+    visited.add(i);
+    for (let j = i + 1; j < units.length; j++) {
+      if (visited.has(j)) continue;
+      const dLat = Math.abs(units[i]!.latlng[0] - units[j]!.latlng[0]);
+      const dLng = Math.abs(units[i]!.latlng[1] - units[j]!.latlng[1]);
+      if (dLat <= radiusDeg && dLng <= radiusDeg) {
+        cluster.push(units[j]!);
+        visited.add(j);
+      }
+    }
+    const lat = cluster.reduce((s, u) => s + u.latlng[0], 0) / cluster.length;
+    const lng = cluster.reduce((s, u) => s + u.latlng[1], 0) / cluster.length;
+    const ownerSet = new Set(cluster.map((u) => u.ownerCode));
+    const typeCounts = new Map<string, number>();
+    for (const u of cluster) typeCounts.set(u.type, (typeCounts.get(u.type) ?? 0) + 1);
+    const dominantType = [...typeCounts.entries()].sort((a, b) => b[1] - a[1])[0]![0] as UnitType;
+    // hostility: if multiple owners present, higher; scale by unit count
+    const hostility = ownerSet.size > 1
+      ? Math.min(100, 50 + cluster.length * 10)
+      : Math.min(50, cluster.length * 5);
+    zones.push({
+      id: `zone-${i}`,
+      centroid: [lat, lng],
+      unitCount: cluster.length,
+      ownerCodes: [...ownerSet],
+      dominantType,
+      hostility,
+      units: cluster,
+    });
+  }
+  return zones;
+}
+
+/** Draw a hexagonal conflict zone blip, color-coded by hostility level.
+ *  Red 70+, Amber 35+, Blue <35. Intel level controls detail shown. */
+function drawConflictZoneMarker(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  zone: ConflictZone,
+  intel: IntelLevel
+): void {
+  const r = 10 + Math.min(8, zone.unitCount);
+  const color = zone.hostility >= 70 ? "#c0392b" : zone.hostility >= 35 ? "#e67e22" : "#2980b9";
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = "rgba(0,0,0,0.6)";
+  ctx.lineWidth = 1.5;
+  // hexagon
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 3) * i - Math.PI / 6;
+    const px = x + r * Math.cos(angle);
+    const py = y + r * Math.sin(angle);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // unit count label
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.font = "bold 10px var(--mono)";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(String(zone.unitCount), x, y);
+  // intel gating: show owner codes only if intel >= 31 (Medium+)
+  if (intel >= 31) {
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.font = "9px var(--mono)";
+    ctx.fillText(zone.ownerCodes.join(","), x, y + r + 10);
+  }
+  ctx.restore();
+}
+
+/** Draw a dashed teal trajectory line with arrowhead, fading over time. */
+function drawTrajectory(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  alpha: number
+): void {
+  ctx.save();
+  ctx.strokeStyle = `rgba(26, 188, 156, ${alpha})`;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // arrowhead
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const ah = 8;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - ah * Math.cos(angle - Math.PI / 6), y2 - ah * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(x2 - ah * Math.cos(angle + Math.PI / 6), y2 - ah * Math.sin(angle + Math.PI / 6));
+  ctx.closePath();
+  ctx.fillStyle = `rgba(26, 188, 156, ${alpha})`;
+  ctx.fill();
   ctx.restore();
 }
 
