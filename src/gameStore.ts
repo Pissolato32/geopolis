@@ -6,7 +6,7 @@
 // back so the state persists.
 
 import { createClient } from "@supabase/supabase-js";
-import type { Country, DiplomaticPosture, GameEvent, IntelLevel, MarketPrice, PlayerPolicy, Relationship, Unit, UnitType, WorldSeed } from "./shared/types.js";
+import type { Country, DiplomaticPosture, GameEvent, MarketPrice, PlayerPolicy, Relationship, Unit, UnitType, WorldSeed } from "./shared/types.js";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -14,7 +14,6 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const GAME_NAME = "Modern World 2026";
-const PLAYER_CODE = "USA";
 
 // Row shapes (snake_case from the DB).
 interface GameRow {
@@ -74,7 +73,6 @@ export interface PersistedWorld {
   units: Unit[];
   market: MarketPrice[];
   events: GameEvent[];
-  intel: Record<string, IntelLevel>;
 }
 
 /** Load or create the world for this browser. Returns the full hydrated state. */
@@ -138,56 +136,6 @@ export async function persistPlayerPolicy(
     .eq("game_id", gameId)
     .eq("code", countryCode);
   if (error) console.warn("[store] persistPlayerPolicy", error.message);
-}
-
-/** Upsert the player's intel level for a target country. */
-export async function persistIntel(
-  gameId: string,
-  playerCode: string,
-  targetCode: string,
-  intelLevel: IntelLevel
-): Promise<void> {
-  const { error } = await supabase
-    .from("intel")
-    .upsert(
-      { game_id: gameId, player_code: playerCode, target_code: targetCode, intel_level: intelLevel },
-      { onConflict: "game_id,player_code,target_code" }
-    );
-  if (error) console.warn("[store] persistIntel", error.message);
-}
-
-/** Load all intel levels for the player in this game. */
-export async function loadIntelLevels(gameId: string, playerCode: string): Promise<Record<string, IntelLevel>> {
-  const { data, error } = await supabase
-    .from("intel")
-    .select("target_code, intel_level")
-    .eq("game_id", gameId)
-    .eq("player_code", playerCode);
-  if (error) {
-    console.warn("[store] loadIntelLevels", error.message);
-    return {};
-  }
-  const map: Record<string, IntelLevel> = {};
-  for (const row of (data as { target_code: string; intel_level: number }[] | null) ?? []) {
-    map[row.target_code] = row.intel_level;
-  }
-  return map;
-}
-
-/** Persist a newly recruited unit (insert into units table). */
-export async function persistRecruitUnit(gameId: string, unit: Unit): Promise<void> {
-  const { error } = await supabase.from("units").insert(toUnitRow(unit, gameId));
-  if (error) console.warn("[store] persistRecruitUnit", error.message);
-}
-
-/** Persist a treasury update for a country (after spending on ops/recruitment). */
-export async function persistTreasuryUpdate(gameId: string, countryCode: string, treasury: number): Promise<void> {
-  const { error } = await supabase
-    .from("countries")
-    .update({ treasury })
-    .eq("game_id", gameId)
-    .eq("code", countryCode);
-  if (error) console.warn("[store] persistTreasuryUpdate", error.message);
 }
 
 /** Persist the results of a simulation turn: country stats, relationships, surviving units, and the tick counter. */
@@ -312,18 +260,17 @@ async function seedWorld(seed: WorldSeed): Promise<PersistedWorld> {
   const marketRows = market.map((m) => ({ game_id: gameId, resource: m.resource, price: m.price, delta: m.delta }));
   await batchInsert("market_prices", marketRows);
 
-  return { gameId, countries: seed.countries, units, market, events: [], intel: {} };
+  return { gameId, countries: seed.countries, units, market, events: [] };
 }
 
 async function hydrateWorld(game: GameRow): Promise<PersistedWorld> {
   const gameId = game.id;
 
-  const [countriesR, unitsR, marketR, eventsR, intelR] = await Promise.all([
+  const [countriesR, unitsR, marketR, eventsR] = await Promise.all([
     supabase.from("countries").select("*").eq("game_id", gameId).limit(300),
     supabase.from("units").select("*").eq("game_id", gameId).limit(500),
     supabase.from("market_prices").select("*").eq("game_id", gameId),
     supabase.from("events").select("payload").eq("game_id", gameId).order("at", { ascending: false }).limit(200),
-    supabase.from("intel").select("target_code, intel_level").eq("game_id", gameId).eq("player_code", PLAYER_CODE),
   ]);
 
   // relationships can exceed the 1000-row PostgREST default, so paginate
@@ -350,12 +297,7 @@ async function hydrateWorld(game: GameRow): Promise<PersistedWorld> {
 
   const events: GameEvent[] = ((eventsR.data as { payload: GameEvent }[] | null) ?? []).map((r) => r.payload).reverse();
 
-  const intel: Record<string, IntelLevel> = {};
-  for (const row of (intelR.data as { target_code: string; intel_level: number }[] | null) ?? []) {
-    intel[row.target_code] = row.intel_level;
-  }
-
-  return { gameId, countries, units, market, events, intel };
+  return { gameId, countries, units, market, events };
 }
 
 /** Fetch all relationships for a game, paginating past the 1000-row PostgREST default. */

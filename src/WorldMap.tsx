@@ -8,7 +8,7 @@ import { geoEqualEarth, geoPath } from "d3-geo";
 import type { GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ConflictZone, Country, Unit, WorldSeed } from "./shared/types.js";
+import type { Country, Relationship, Unit, WorldSeed } from "./shared/types.js";
 import { gameSocket } from "./gameSocket.js";
 import { selection } from "./selectionManager.js";
 
@@ -30,13 +30,10 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   const [size, setSize] = useState({ w: 800, h: 400 });
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [units, setUnits] = useState<Unit[]>([]);
-  const [zones, setZones] = useState<ConflictZone[]>([]);
-  const [trajectory, setTrajectory] = useState<{ from: [number, number]; to: [number, number]; id: string } | null>(null);
   const [tensionMode, setTensionMode] = useState(false);
 
   const selectedRef = useRef<Country | null>(null);
   const selectedUnitRef = useRef<Unit | null>(null);
-  const hoveredZoneRef = useRef<ConflictZone | null>(null);
 
   // lookups
   const byNumeric = useRef<Map<string, Country>>(new Map());
@@ -64,16 +61,9 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
 
   // unit roster subscription
   useEffect(() => {
-    const unsubUnits = gameSocket.onUnits(setUnits);
-    const unsubTraj = gameSocket.onTrajectory(setTrajectory);
-    return () => { unsubUnits(); unsubTraj(); };
+    return gameSocket.onUnits(setUnits);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // recompute conflict zones whenever units change
-  useEffect(() => {
-    setZones(gameSocket.getConflictZones());
-  }, [units]);
 
   // load topojson
   useEffect(() => {
@@ -189,37 +179,15 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
       }
     }
 
-    // military conflict-zone layer (fog of war: no individual units shown)
-    for (const z of zones) {
-      const xy = projection(z.centroid);
+    // military unit layer
+    const selCountry = selectedRef.current;
+    const selUnitId = selectedUnitRef.current?.id ?? null;
+    for (const u of units) {
+      const xy = projection(u.latlng);
       if (!xy) continue;
-      drawConflictZone(ctx, xy[0], xy[1], z, hoveredZoneRef.current?.id === z.id);
-    }
-
-    // movement trajectory for player units (dashed line from origin to destination)
-    if (trajectory) {
-      const fromXy = projection(trajectory.from);
-      const toXy = projection(trajectory.to);
-      if (fromXy && toXy) {
-        ctx.save();
-        ctx.strokeStyle = "#4ae3c4";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 4]);
-        ctx.beginPath();
-        ctx.moveTo(fromXy[0], fromXy[1]);
-        ctx.lineTo(toXy[0], toXy[1]);
-        ctx.stroke();
-        // arrowhead at destination
-        const angle = Math.atan2(toXy[1] - fromXy[1], toXy[0] - fromXy[0]);
-        ctx.setLineDash([]);
-        ctx.beginPath();
-        ctx.moveTo(toXy[0], toXy[1]);
-        ctx.lineTo(toXy[0] - 8 * Math.cos(angle - 0.4), toXy[1] - 8 * Math.sin(angle - 0.4));
-        ctx.moveTo(toXy[0], toXy[1]);
-        ctx.lineTo(toXy[0] - 8 * Math.cos(angle + 0.4), toXy[1] - 8 * Math.sin(angle + 0.4));
-        ctx.stroke();
-        ctx.restore();
-      }
+      const rel = selCountry ? relationshipOf(selCountry, u.ownerCode) : "neutral";
+      const color = unitColor(u, rel, selUnitId === u.id);
+      drawUnitMarker(ctx, xy[0], xy[1], u.type, color);
     }
   };
 
@@ -227,24 +195,22 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   useEffect(() => {
     draw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [features, size, hoveredId, zones, trajectory, tensionMode, tensionMap]);
+  }, [features, size, hoveredId, units, tensionMode, tensionMap]);
 
-  // pointer handling — hover + hit detection (zones first, then country polygons)
+  // pointer handling — hover + hit detection (country polygons then units)
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
-    // conflict zones take hover priority
-    const hoveredZone = hitZone(mx, my);
-    if (hoveredZone) {
-      hoveredZoneRef.current = hoveredZone;
+    // units take hover priority so they feel clickable
+    const hoveredUnit = hitUnit(mx, my);
+    if (hoveredUnit) {
       setHoveredId(null);
       canvas.style.cursor = "pointer";
       return;
     }
-    hoveredZoneRef.current = null;
     if (features.length === 0) return;
     const projection = proj();
     const pathGen = geoPath(projection);
@@ -259,15 +225,14 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     canvas.style.cursor = foundId ? "pointer" : "default";
   };
 
-  const hitZone = (mx: number, my: number): ConflictZone | null => {
+  const hitUnit = (mx: number, my: number): Unit | null => {
     const projection = proj();
-    for (const z of zones) {
-      const xy = projection(z.centroid);
+    for (const u of units) {
+      const xy = projection(u.latlng);
       if (!xy) continue;
       const dx = mx - xy[0];
       const dy = my - xy[1];
-      const radius = z.hostility >= 70 ? 16 : 12;
-      if (dx * dx + dy * dy <= radius * radius) return z;
+      if (dx * dx + dy * dy <= 9 * 9) return u;
     }
     return null;
   };
@@ -278,10 +243,10 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
-    // conflict zones first
-    const z = hitZone(mx, my);
-    if (z) {
-      selection.selectZone(z);
+    // unit first
+    const u = hitUnit(mx, my);
+    if (u) {
+      selection.selectUnit(u);
       return;
     }
     if (hoveredId == null) return;
@@ -315,50 +280,48 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
 
 // ---- helpers ---------------------------------------------------------------
 
-/** Draw a glowing conflict-zone marker — a radar-blip hexagon with a pulsing aura. */
-function drawConflictZone(
+function relationshipOf(sel: Country, ownerCode: string): "ally" | "enemy" | "neutral" {
+  if (sel.id === ownerCode) return "ally";
+  const r = sel.relationships.find((x) => x.countryCode === ownerCode) as Relationship | undefined;
+  if (!r) return "neutral";
+  if (r.tension >= 60) return "enemy";
+  if (r.tension <= 25 && r.affinity >= 30) return "ally";
+  return "neutral";
+}
+
+function unitColor(_u: Unit, rel: "ally" | "enemy" | "neutral", selected: boolean): string {
+  if (selected) return "#ffffff";
+  if (rel === "ally") return "#4a9fe8"; // blue
+  if (rel === "enemy") return "#e8635a"; // red
+  return "#8ba3b5"; // gray
+}
+
+function drawUnitMarker(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  zone: ConflictZone,
-  hovered: boolean
+  type: Unit["type"],
+  color: string
 ) {
-  const isHostile = zone.hostility >= 70;
-  const isPresence = zone.hostility >= 35;
-  const baseColor = isHostile ? "#e8635a" : isPresence ? "#e8b84a" : "#4a9fe8";
-  const r = hovered ? 14 : 10;
-
   ctx.save();
-  // outer glow / aura
-  const gradient = ctx.createRadialGradient(x, y, r * 0.5, x, y, r * 2.5);
-  gradient.addColorStop(0, isHostile ? "rgba(232,99,90,0.35)" : isPresence ? "rgba(232,184,74,0.25)" : "rgba(74,159,232,0.2)");
-  gradient.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = color;
+  ctx.strokeStyle = "rgba(0,0,0,0.6)";
+  ctx.lineWidth = 1;
+  const r = 6;
   ctx.beginPath();
-  ctx.arc(x, y, r * 2.5, 0, Math.PI * 2);
-  ctx.fill();
-
-  // hexagon marker
-  ctx.fillStyle = baseColor;
-  ctx.strokeStyle = hovered ? "#ffffff" : "rgba(0,0,0,0.5)";
-  ctx.lineWidth = hovered ? 2 : 1;
-  ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    const px = x + r * Math.cos(angle);
-    const py = y + r * Math.sin(angle);
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
+  if (type === "infantry") {
+    ctx.rect(x - r, y - r, r * 2, r * 2); // square
+  } else if (type === "armor") {
+    ctx.moveTo(x, y - r);
+    ctx.lineTo(x + r, y);
+    ctx.lineTo(x, y + r);
+    ctx.lineTo(x - r, y);
+    ctx.closePath(); // diamond
+  } else {
+    ctx.arc(x, y, r, 0, Math.PI * 2); // circle = navy
   }
-  ctx.closePath();
   ctx.fill();
   ctx.stroke();
-
-  // inner dot
-  ctx.fillStyle = "rgba(255,255,255,0.8)";
-  ctx.beginPath();
-  ctx.arc(x, y, 2, 0, Math.PI * 2);
-  ctx.fill();
   ctx.restore();
 }
 

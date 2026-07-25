@@ -216,61 +216,6 @@ function EventRow({ evt }: { evt: GameEvent }) {
       </article>
     );
   }
-  if (evt.type === "military.recruitment") {
-    return (
-      <article className="feed-row feed-mil">
-        <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-mil">MIL</span>
-        <span className="feed-text">
-          <CountryLink code={evt.country} /> recruited {evt.unitType} unit <b>{evt.unitId.slice(-6)}</b> (${(evt.cost / 1e9).toFixed(0)}B).
-        </span>
-      </article>
-    );
-  }
-  if (evt.type === "intel.gathered") {
-    return (
-      <article className="feed-row feed-intel">
-        <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-intel">INTEL</span>
-        <span className="feed-text">
-          <CountryLink code={evt.player} /> intelligence on <CountryLink code={evt.target} /> raised to {evt.intelLevel}/100 (${(evt.cost / 1e9).toFixed(0)}B).
-        </span>
-      </article>
-    );
-  }
-  if (evt.type === "aid.sent") {
-    return (
-      <article className="feed-row feed-diplo">
-        <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-diplo">AID</span>
-        <span className="feed-text">
-          <CountryLink code={evt.from} /> sent ${fmtMoney(evt.amount)} in aid to <CountryLink code={evt.target} /> (affinity +{evt.affinityGain}).
-        </span>
-      </article>
-    );
-  }
-  if (evt.type === "sabotage.executed") {
-    return (
-      <article className="feed-row feed-sabotage">
-        <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-sabotage">SABOTAGE</span>
-        <span className="feed-text">
-          <CountryLink code={evt.from} /> sabotaged <CountryLink code={evt.target} /> — stability -{evt.stabilityHit}, readiness -{evt.readinessHit}.
-        </span>
-      </article>
-    );
-  }
-  if (evt.type === "sabotage.failed") {
-    return (
-      <article className="feed-row feed-sabotage feed-warn">
-        <span className="feed-time">{time}</span>
-        <span className="feed-tag tag-sabotage">FAILED</span>
-        <span className="feed-text">
-          <CountryLink code={evt.from} /> sabotage against <CountryLink code={evt.target} /> failed — {evt.reason}.
-        </span>
-      </article>
-    );
-  }
   if (evt.type === "turn.advanced") {
     const s = evt.summary;
     const gdpSign = s.globalGdpDelta >= 0 ? "+" : "";

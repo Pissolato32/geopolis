@@ -3,12 +3,11 @@
 // hyperlinked entities) and a Unit (selected from a military marker on the
 // canvas). Components subscribe to selection changes.
 
-import type { ConflictZone, Country, Unit } from "./shared/types.js";
+import type { Country, Unit } from "./shared/types.js";
 
 export type Selection =
   | { kind: "country"; country: Country }
   | { kind: "unit"; unit: Unit }
-  | { kind: "zone"; zone: ConflictZone }
   | null;
 
 type Listener = (sel: Selection) => void;
@@ -31,11 +30,6 @@ export class SelectionManager {
     this.set(next);
   }
 
-  selectZone(zone: ConflictZone | null): void {
-    const next: Selection = zone ? { kind: "zone", zone } : null;
-    this.set(next);
-  }
-
   clear(): void {
     this.set(null);
   }
@@ -46,9 +40,7 @@ export class SelectionManager {
       ((this.current?.kind === "country" && next?.kind === "country" &&
         this.current.country.id === next.country.id) ||
         (this.current?.kind === "unit" && next?.kind === "unit" &&
-          this.current.unit.id === next.unit.id) ||
-        (this.current?.kind === "zone" && next?.kind === "zone" &&
-          this.current.zone.id === next.zone.id));
+          this.current.unit.id === next.unit.id));
     if (sameId) return;
     this.current = next;
     for (const l of this.listeners) l(this.current);
