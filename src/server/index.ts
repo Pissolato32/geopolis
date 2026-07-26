@@ -109,6 +109,7 @@ function main() {
   let liveCountries: Country[] = seed.countries.map((c) => ({ ...c }));
   let liveUnits: Unit[] = [];
   let liveTick = 0;
+  let isPaused = true;
   let liveMarket: MarketPrice[] = seedMarketPrices();
   const clients = new Set<WebSocket>();
 
@@ -157,13 +158,21 @@ function main() {
 
   wss.on("connection", (ws: WebSocket) => {
     clients.add(ws);
-    ws.send(JSON.stringify({ type: "hello", at: new Date().toISOString(), countryCount: seed.countryCount }));
+    ws.send(JSON.stringify({ type: "hello", at: new Date().toISOString(), countryCount: seed.countryCount, paused: isPaused }));
     ws.on("message", (data: Buffer) => {
       let parsed: unknown;
       try {
         parsed = JSON.parse(data.toString());
       } catch {
         ws.send(JSON.stringify({ ok: false, error: "invalid JSON" }));
+        return;
+      }
+      const m = parsed as Record<string, unknown>;
+      if (m["type"] === "set_simulation_speed") {
+        isPaused = Boolean(m["paused"]);
+        const speed = Number(m["speed"] ?? 0);
+        console.log(`[server] simulation ${isPaused ? "PAUSED" : "RUNNING"} at ${speed}x`);
+        ws.send(JSON.stringify({ ok: true, type: "set_simulation_speed", paused: isPaused, speed }));
         return;
       }
       const result = parser.parse(parsed);
@@ -175,8 +184,11 @@ function main() {
     ws.on("close", () => clients.delete(ws));
   });
 
-  // periodic ambient events so the left-panel feed is alive on its own
+  // periodic ambient events so the left-panel feed is alive on its own.
+  // Frozen when isPaused is true — the simulation only advances via
+  // POST /api/v1/tick (manual +1 Tick) or when the client unpauses.
   const ticker = setInterval(() => {
+    if (isPaused) return;
     if (clients.size === 0) return;
     broadcastEnvelope(clients, "event_emitted", makeRandomEvent(seed));
   }, 4000);

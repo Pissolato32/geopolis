@@ -142,6 +142,7 @@ class GameSocket {
     if (this.simState.paused === paused) return;
     this.simState = { ...this.simState, paused };
     this.broadcastSimState();
+    this.sendSimControl();
     if (paused) this.stopAutoTick(); else this.startAutoTick();
   }
 
@@ -149,11 +150,24 @@ class GameSocket {
     if (speed === 0) { this.setPaused(true); return; }
     this.simState = { paused: false, speed };
     this.broadcastSimState();
+    this.sendSimControl();
     this.startAutoTick();
   }
 
   private broadcastSimState(): void {
     for (const l of this.simStateListeners) l(this.simState);
+  }
+
+  /** Notify the live server of pause/speed changes so its ambient event
+   *  generator freezes immediately when the player pauses. */
+  private sendSimControl(): void {
+    if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: "set_simulation_speed",
+        paused: this.simState.paused,
+        speed: this.simState.speed,
+      }));
+    }
   }
 
   private startAutoTick(): void {
@@ -268,7 +282,12 @@ class GameSocket {
     // or { type: "tick_advanced", payload: { tick, summary } }. Legacy bare
     // IntentResponse objects (with an `ok` field) are still supported for
     // the direct WS send/reply path.
-    if (typeof m["ok"] === "boolean") {
+    if (typeof m["ok"] === "boolean" && m["type"] === "set_simulation_speed") {
+      return;
+    } else if (m["type"] === "hello" && typeof m["paused"] === "boolean") {
+      this.simState = { ...this.simState, paused: m["paused"] as boolean };
+      this.broadcastSimState();
+    } else if (typeof m["ok"] === "boolean") {
       for (const l of this.intentListeners) l(m as unknown as IntentResponse);
     } else if (m["type"] === "event_emitted" && m["payload"] && typeof m["payload"] === "object") {
       for (const l of this.eventListeners) l((m["payload"] as Record<string, unknown>) as unknown as GameEvent);
@@ -449,6 +468,7 @@ class GameSocket {
   private ensureSimRunning(): void {
     if (this.simTimer) return;
     this.simTimer = setInterval(() => {
+      if (this.simState.paused) return;
       if (!this.seed) return;
       const evt = simulateRandomEvent(this.seed, this.units);
       this.emit(evt);

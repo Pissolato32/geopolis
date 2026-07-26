@@ -217,7 +217,7 @@ export default function App() {
           <span className="tick-badge" title="Simulation turn">Turn {tick}</span>
           <div className="speed-controls">
             <button
-              className={simPaused && simSpeed === 0 ? "speed-btn active" : "speed-btn"}
+              className={simPaused ? "speed-btn active" : "speed-btn"}
               onClick={() => setSpeed(0)}
               title="Pause simulation"
             >

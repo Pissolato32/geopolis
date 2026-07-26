@@ -1,52 +1,138 @@
 // EventLog — left panel. A scrollable feed consuming all game events from the
 // WebSocket. Country codes in every event render as clickable inline links
-// that update the SelectionManager (cross-navigation).
+// that update the SelectionManager (cross-navigation). Filter tabs suppress
+// routine noise so the major-events feed stays readable.
 
 import { useEffect, useRef, useState } from "react";
 import { gameSocket } from "./gameSocket.js";
 import type { GameEvent } from "./shared/types.js";
 import { selection } from "./selectionManager.js";
 
+type FilterTab = "major" | "mine" | "military" | "all";
+
 interface FeedEntry {
   id: string;
   evt: GameEvent;
 }
 
+const TAB_LABELS: Record<FilterTab, string> = {
+  major: "⭐ Major Events",
+  mine: "🎮 My Country",
+  military: "⚔️ Military & War",
+  all: "🌐 All Events",
+};
+
+const MAJOR_TYPES = new Set<string>([
+  "war.declared",
+  "war.combat-resolved",
+  "war.unit-destroyed",
+  "peace.declared",
+  "diplomacy.treaty-signed",
+  "sabotage.executed",
+  "sabotage.failed",
+  "ai.decision",
+  "turn.advanced",
+  "policy.tax-set",
+  "policy.readiness-set",
+  "policy.posture-set",
+  "aid.sent",
+]);
+
+const MILITARY_TYPES = new Set<string>([
+  "war.declared",
+  "war.combat-resolved",
+  "war.unit-destroyed",
+  "peace.declared",
+  "military.recruitment",
+  "policy.readiness-set",
+  "sabotage.executed",
+  "sabotage.failed",
+  "turn.advanced",
+]);
+
+/** Noise filter — suppresses routine economic updates and minor tension bumps
+ *  from the "All Events" and "Major Events" feeds. */
+function isNoise(evt: GameEvent): boolean {
+  if (evt.type === "turn.economy-growth") return true;
+  if (evt.type === "economy.indicator") return true;
+  if (evt.type === "turn.stability-shift") {
+    return Math.abs(evt.delta) < 10;
+  }
+  if (evt.type === "turn.tension-shift") {
+    return Math.abs(evt.delta) < 15;
+  }
+  return false;
+}
+
+/** Map an event to a set of country codes it involves, for "My Country" filtering. */
+function eventCountries(evt: GameEvent): string[] {
+  const codes: string[] = [];
+  const push = (v?: string) => { if (v) codes.push(v); };
+  switch (evt.type) {
+    case "war.declared": push(evt.aggressor); push(evt.target); break;
+    case "peace.declared": push(evt.initiator); push(evt.target); break;
+    case "war.combat-resolved": push(evt.attacker); push(evt.defender); push(evt.victor); break;
+    case "war.unit-destroyed": push(evt.ownerCode); push(evt.by); break;
+    case "diplomacy.treaty-signed": for (const p of evt.parties) push(p); break;
+    case "ai.decision": push(evt.country); break;
+    case "policy.tax-set":
+    case "policy.readiness-set":
+    case "policy.posture-set": push(evt.country); break;
+    case "turn.advanced": break;
+    case "turn.tension-shift": push(evt.countryA); push(evt.countryB); break;
+    case "turn.economy-growth":
+    case "turn.stability-shift": push(evt.country); break;
+    case "military.recruitment": push(evt.country); break;
+    case "aid.sent": push(evt.from); push(evt.target); break;
+    case "intel.gathered": push(evt.player); push(evt.target); break;
+    case "sabotage.executed":
+    case "sabotage.failed": push(evt.from); push(evt.target); break;
+    case "economy.indicator": push(evt.country); break;
+  }
+  return codes;
+}
+
+function matchesTab(evt: GameEvent, tab: FilterTab, playerCode: string): boolean {
+  if (tab === "all") return !isNoise(evt);
+  if (tab === "major") return MAJOR_TYPES.has(evt.type);
+  if (tab === "military") return MILITARY_TYPES.has(evt.type);
+  if (tab === "mine") {
+    const codes = eventCountries(evt);
+    return codes.includes(playerCode);
+  }
+  return true;
+}
+
+const MAX_ENTRIES = 100;
+
 export function EventLog() {
-  const [entries, setEntries] = useState<FeedEntry[]>([]);
-  const [paused, setPaused] = useState(false);
-  const pausedRef = useRef(false);
+  const [allEntries, setAllEntries] = useState<FeedEntry[]>([]);
+  const [tab, setTab] = useState<FilterTab>("major");
+  const [playerCode, setPlayerCode] = useState(gameSocket.getPlayerCode());
   const listRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
 
-  useEffect(() => {
-    pausedRef.current = paused;
-  }, [paused]);
-
-  const bufferRef = useRef<FeedEntry[]>([]);
+  useEffect(() => gameSocket.onPlayerChange(setPlayerCode), []);
 
   useEffect(() => {
     return gameSocket.onEvent((evt) => {
-      // market updates go to the ticker, not the log
       if (evt.type === "economy.market-update") return;
       const entry = { id: `${evt.at}-${Math.random().toString(36).slice(2, 7)}`, evt };
-      if (pausedRef.current) {
-        bufferRef.current.push(entry);
-        return;
-      }
-      setEntries((prev) => {
+      setAllEntries((prev) => {
         const next = [...prev, entry];
-        return next.length > 200 ? next.slice(next.length - 200) : next;
+        return next.length > MAX_ENTRIES ? next.slice(next.length - MAX_ENTRIES) : next;
       });
     });
   }, []);
+
+  const filtered = allEntries.filter((e) => matchesTab(e.evt, tab, playerCode));
 
   useEffect(() => {
     const el = listRef.current;
     if (el && stickToBottom.current) {
       el.scrollTop = el.scrollHeight;
     }
-  }, [entries]);
+  }, [filtered]);
 
   const onScroll = () => {
     const el = listRef.current;
@@ -54,17 +140,8 @@ export function EventLog() {
     stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
   };
 
-  const onResume = () => {
-    setPaused(false);
-    if (bufferRef.current.length) {
-      setEntries((prev) => [...prev, ...bufferRef.current].slice(-200));
-      bufferRef.current = [];
-    }
-  };
-
   const onClear = () => {
-    setEntries([]);
-    bufferRef.current = [];
+    setAllEntries([]);
   };
 
   return (
@@ -72,22 +149,36 @@ export function EventLog() {
       <header className="panel-header">
         <h2>Event &amp; Diplomatic Log</h2>
         <div className="panel-actions">
-          <button
-            className={paused ? "chip chip-warn" : "chip"}
-            onClick={() => (paused ? onResume() : setPaused(true))}
-          >
-            {paused ? "Resume" : "Pause"}
-          </button>
           <button className="chip" onClick={onClear}>
             Clear
           </button>
         </div>
       </header>
+
+      <nav className="feed-tabs" role="tablist">
+        {(Object.keys(TAB_LABELS) as FilterTab[]).map((t) => (
+          <button
+            key={t}
+            role="tab"
+            aria-selected={tab === t}
+            className={tab === t ? "feed-tab feed-tab-active" : "feed-tab"}
+            onClick={() => { setTab(t); stickToBottom.current = true; }}
+          >
+            {TAB_LABELS[t]}
+          </button>
+        ))}
+      </nav>
+
       <div className="feed" ref={listRef} onScroll={onScroll}>
-        {entries.length === 0 && (
-          <div className="feed-empty">Awaiting telemetry from the world…</div>
+        {filtered.length === 0 && (
+          <div className="feed-empty">
+            {tab === "major" ? "No critical events yet. The world is quiet…" :
+             tab === "mine" ? `No events involving ${playerCode}.` :
+             tab === "military" ? "No military activity reported." :
+             "Awaiting telemetry from the world…"}
+          </div>
         )}
-        {entries.map((e) => (
+        {filtered.map((e) => (
           <EventRow key={e.id} evt={e.evt} />
         ))}
       </div>
