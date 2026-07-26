@@ -32,7 +32,7 @@ const WILDCARD = '*';
 export class EventBus implements IEventBus {
   private readonly subscribers: Map<string, Subscription[]> = new Map();
   private readonly wildcardSubscribers: Subscription[] = [];
-  private readonly pendingEvents: ITypedEvent<unknown>[] = [];
+  private pendingEvents: ITypedEvent<unknown>[] = [];
   private currentTick: TickNumber = 0 as TickNumber;
   private readonly timeline: ITimeline;
   private readonly maxEventsPerFlush: number;
@@ -114,19 +114,24 @@ export class EventBus implements IEventBus {
   }
 
   flush(): void {
+    if (this.pendingEvents.length === 0) return;
+
     let processedCount = 0;
     const eventTrail: string[] = [];
+    let index = 0;
 
-    // Drain the queue — process events in FIFO (emission) order.
-    // Includes maxEventsPerFlush guard to prevent infinite event cascade loops (Fail Fast).
-    while (this.pendingEvents.length > 0) {
+    // Index-based drain — O(N) instead of O(N^2) from shift().
+    // Events published by handlers during iteration are appended to
+    // pendingEvents and picked up by the while condition, preserving
+    // cascade behavior. The queue is cleared once after all processing.
+    while (index < this.pendingEvents.length) {
       if (processedCount >= this.maxEventsPerFlush) {
         throw new Error(
           `EventBus cascade loop limit exceeded! Processed ${processedCount} events in a single flush cycle. Event trail sample: ${eventTrail.slice(-5).join(' -> ')}`,
         );
       }
 
-      const event = this.pendingEvents.shift()!;
+      const event = this.pendingEvents[index]!;
       processedCount++;
       eventTrail.push(event.type);
 
@@ -147,7 +152,11 @@ export class EventBus implements IEventBus {
           sub.handler(event);
         }
       }
+
+      index++;
     }
+
+    this.pendingEvents = [];
   }
 
   setCurrentTick(tick: TickNumber): void {
