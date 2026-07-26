@@ -78,6 +78,7 @@ function toEntitySeed(c: RawCountry): IEntitySeed {
     name: c.name,
     entityType: 'country',
     components: toComponents(c),
+    position: { lat: c.latlng[0], lng: c.latlng[1] },
   };
 }
 

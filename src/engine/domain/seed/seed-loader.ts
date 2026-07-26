@@ -1,9 +1,11 @@
 import { IWorldState } from '../../core/interfaces/world-state.interface.js';
 import { IWorldSeed } from '../../core/interfaces/world-seed.interface.js';
 import { IDeltaSeedPayload, ISanitizationReport } from '../../core/interfaces/seed-delta.interface.js';
+import { IComponent } from '../../core/interfaces/component.interface.js';
 import { DIPLOMATIC_RELATION_TYPE, RelationComponent } from '../diplomacy/components/relation.component.js';
 import { SeedSanitizer } from '../../core/utils/seed-sanitizer.js';
 import { EntityId } from '../../core/interfaces/entity.interface.js';
+import { GEO_POSITION_TYPE } from '../../scenarios/scenario.loader.js';
 
 /**
  * Utility to populate a WorldState instance from an IWorldSeed configuration (Base Seed)
@@ -34,7 +36,15 @@ export function loadWorldSeed(
   // 1. Instantiate base entities and components
   for (const entitySeed of baseSeed.initialEntities) {
     if (!worldState.hasEntity(entitySeed.id)) {
-      worldState.createEntity(entitySeed.id, entitySeed.components);
+      const components = [...entitySeed.components];
+      if (entitySeed.position) {
+        components.push({
+          type: GEO_POSITION_TYPE,
+          lat: entitySeed.position.lat,
+          lng: entitySeed.position.lng,
+        } as unknown as IComponent);
+      }
+      worldState.createEntity(entitySeed.id, components);
     }
   }
 

@@ -6,6 +6,7 @@ import { TickEngine } from '../core/tick-engine/tick-engine.js';
 import { APIGatewayRouter } from './gateway-router.js';
 import { TickBroadcaster } from './broadcaster.js';
 import { EntityId } from '../core/interfaces/entity.interface.js';
+import { MapViewDTO } from '../core/interfaces/dto/map-view.dto.interface.js';
 import { ECONOMIC_INDICATOR_TYPE } from '../domain/economy/components/economy.components.js';
 
 describe('Phase 5: API Gateway & Headless Exposure (ADR-001 / ADR-002)', () => {
@@ -230,5 +231,31 @@ describe('Phase 5: API Gateway & Headless Exposure (ADR-001 / ADR-002)', () => {
     // Cleanup
     fs.unlinkSync(scenarioPath);
     fs.rmdirSync(tempDir);
+  });
+
+  it('should return map view data on GET /api/v1/map', async () => {
+    const { engine, worldState } = createEngine();
+    const router = new APIGatewayRouter({ engine });
+
+    worldState.createEntity('country-ru' as EntityId, [
+      { type: 'geo.position', lat: 55, lng: 37 } as never,
+      { type: 'economy.indicator', gdp: 4000n, inflationRate: 0.05, treasury: 500n, taxRate: 0.2 } as never,
+      { type: 'military.forces', ownerCountryId: 'country-ru', totalPersonnel: 900000, forceLimit: 300000, readiness: 0.8, morale: 0.7, fuelReserves: 1000 } as never,
+      { type: 'politics.stability', stabilityIndex: 0.5, approvalRating: 0.5, militaryLoyalty: 0.7 } as never,
+      { type: 'diplomacy.relation', targetCountryId: 'country-us' as EntityId, affinity: -0.8, tension: 0.9, recognition: 'full', activeTreaties: [] } as never,
+    ]);
+
+    const response = await router.dispatch({ path: '/api/v1/map', method: 'GET' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.success).toBe(true);
+    const data = response.data as MapViewDTO;
+    expect(data.entities.length).toBeGreaterThanOrEqual(1);
+    const ru = data.entities.find((e) => e.id === 'country-ru');
+    expect(ru).toBeDefined();
+    expect(ru!.coordinates.lat).toBe(55);
+    expect(ru!.militaryPresence).toBe('high');
+    expect(ru!.economicStatus).toBe('stable');
+    expect(data.activeConflicts.length).toBeGreaterThanOrEqual(1);
   });
 });

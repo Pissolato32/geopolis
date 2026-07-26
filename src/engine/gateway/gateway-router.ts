@@ -23,6 +23,20 @@ import {
   MilitaryUnitComponent,
 } from '../domain/war/components/war.components.js';
 import {
+  MILITARY_FORCES_TYPE,
+} from '../domain/war/components/military-forces.component.js';
+import {
+  GOVERNMENT_STABILITY_TYPE,
+} from '../domain/politics/components/politics.components.js';
+import {
+  DIPLOMATIC_RELATION_TYPE,
+} from '../domain/diplomacy/components/relation.component.js';
+import {
+  MapViewDTO,
+  MapEntityDTO,
+  MapConflictDTO,
+} from '../core/interfaces/dto/map-view.dto.interface.js';
+import {
   WAR_MOVE_ORDERED_EVENT,
   WAR_PEACE_REQUESTED_EVENT,
 } from '../domain/war/events/war.events.js';
@@ -122,6 +136,10 @@ export class APIGatewayRouter {
 
       if (path === '/api/v1/military/peace' && method === 'POST') {
         return this.handlePostMilitaryPeace(payload) as IGatewayResponse<TRes>;
+      }
+
+      if (path === '/api/v1/map' && method === 'GET') {
+        return this.handleGetMap() as IGatewayResponse<TRes>;
       }
 
       return {
@@ -554,6 +572,76 @@ export class APIGatewayRouter {
         status: 'deployed',
       },
     };
+  }
+
+  private handleGetMap(): IGatewayResponse {
+    const worldState = this.engine.getWorldState();
+    const metadata = worldState.getMetadata();
+
+    const entities: MapEntityDTO[] = [];
+    const activeConflicts: MapConflictDTO[] = [];
+
+    for (const eid of worldState.getEntityIds()) {
+      const entity = worldState.getEntity(eid);
+      if (!entity) continue;
+
+      const position = entity.getComponent(GEO_POSITION_TYPE) as GeoPositionComponent | undefined;
+      if (!position) continue;
+
+      const forces = entity.getComponent(MILITARY_FORCES_TYPE) as
+        | { totalPersonnel: number; readiness: number }
+        | undefined;
+      const stability = entity.getComponent(GOVERNMENT_STABILITY_TYPE) as
+        | { stabilityIndex: number }
+        | undefined;
+      const relation = entity.getComponent(DIPLOMATIC_RELATION_TYPE) as
+        | { targetCountryId: EntityId; tension: number; affinity: number }
+        | undefined;
+
+      const personnel = forces?.totalPersonnel ?? 0;
+      const milPresence: 'low' | 'medium' | 'high' =
+        personnel > 500000 ? 'high' : personnel > 50000 ? 'medium' : 'low';
+
+      const stabilityIdx = stability?.stabilityIndex ?? 0.5;
+      const econStatus: 'booming' | 'stable' | 'crisis' =
+        stabilityIdx > 0.7 ? 'booming' : stabilityIdx > 0.4 ? 'stable' : 'crisis';
+
+      const color = relation
+        ? relation.affinity > 0.3
+          ? '#22c55e'
+          : relation.affinity < -0.3
+            ? '#ef4444'
+            : '#64748b'
+        : '#64748b';
+
+      entities.push({
+        id: eid,
+        name: eid,
+        coordinates: { lat: position.lat, lng: position.lng },
+        color,
+        militaryPresence: milPresence,
+        economicStatus: econStatus,
+      });
+
+      if (relation && relation.tension > 0.7) {
+        activeConflicts.push({
+          source: eid,
+          target: relation.targetCountryId,
+          intensity: relation.tension,
+          region: String(eid),
+        });
+      }
+    }
+
+    const dto: MapViewDTO = {
+      tick: metadata.currentTick,
+      scenarioId: metadata.scenarioId,
+      entities,
+      activeTradeRoutes: [],
+      activeConflicts,
+    };
+
+    return { statusCode: 200, success: true, data: dto };
   }
 
   private handlePostMilitaryPeace(payload: unknown): IGatewayResponse {

@@ -27,6 +27,7 @@ export interface IEntitySeed {
   readonly name: string;
   readonly entityType: string;
   readonly components: ReadonlyArray<IComponent>;
+  readonly position?: { lat: number; lng: number };
 }
 
 /** Complete scenario seed configuration shape (e.g. world-seed-2026.json). */
