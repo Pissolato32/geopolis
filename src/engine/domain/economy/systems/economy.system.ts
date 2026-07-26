@@ -65,8 +65,11 @@ export class EconomySystem implements ISystem {
 
       const currentGdp = typeof indicator.gdp === 'bigint' ? Number(indicator.gdp) : indicator.gdp;
 
-      // Base GDP calculation with production capacity impact
-      const growthFactor = (totalOutput / 500) * 0.001 - indicator.inflationRate * 0.0005;
+      // GDP growth: realistic annual rate ~2-5%, scaled per-tick.
+      // Production capacity provides a small bonus, inflation subtracts.
+      // The growth factor is capped to prevent hyperinflation in mass simulations.
+      const productionBonus = Math.min(0.02, (totalOutput / 500) * 0.0001);
+      const growthFactor = Math.max(-0.02, Math.min(0.05, productionBonus - indicator.inflationRate * 0.0005));
       const newGdp = Math.max(1, currentGdp * (1 + growthFactor));
 
       eventBus.publish<IEconomyGdpUpdatedPayload>(

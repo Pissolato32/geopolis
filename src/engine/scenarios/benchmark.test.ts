@@ -4,7 +4,7 @@ import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ScenarioSchemaValidator } from './scenario.validator.js';
 import { ScenarioLoader } from './scenario.loader.js';
-import { runBenchmark, runBalanceSimulation, formatBalanceReport, IBenchmarkReport } from './benchmark.runner.js';
+import { runBenchmark, runBalanceSimulation, formatBalanceReport, IBenchmarkReport, runMassCalibration, formatMassCalibrationReport, buildMassCalibrationEngine } from './benchmark.runner.js';
 import { EconomySystem } from '../domain/economy/systems/economy.system.js';
 import { TradeSystem } from '../domain/economy/systems/trade.system.js';
 import { MarketSystem } from '../domain/economy/systems/market.system.js';
@@ -179,4 +179,48 @@ describe('Escalation Ladder Benchmark — No Early Wars', () => {
       expect(report.trend.collapsedEntities).toBe(0);
     });
   }
+});
+
+describe('Mass Calibration — 246 Nations (Phase 5)', () => {
+  it('should load all 246 nations into the mass calibration engine', () => {
+    const { engine } = buildMassCalibrationEngine();
+    const entityCount = engine.getWorldState().getMetadata().entityCount;
+    expect(entityCount).toBeGreaterThanOrEqual(200);
+  });
+
+  it('should run 100-tick mass calibration without NaN or Infinity', () => {
+    const report = runMassCalibration(100, 10);
+
+    console.log(formatMassCalibrationReport(report));
+
+    expect(report.nanDetected).toBe(false);
+    expect(report.infinityDetected).toBe(false);
+    expect(report.collapsedEntities.length).toBe(0);
+    expect(report.nationCount).toBeGreaterThanOrEqual(200);
+    expect(report.snapshots.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('should not trigger premature war cascades in first 10 ticks', () => {
+    const report = runMassCalibration(100, 10);
+
+    expect(report.warCascadeDetected).toBe(false);
+  });
+
+  it('should produce a GDP growth rate within plausible bounds (-50% to +200%)', () => {
+    const report = runMassCalibration(100, 10);
+
+    expect(report.gdpGrowthRate).toBeGreaterThan(-50);
+    expect(report.gdpGrowthRate).toBeLessThan(200);
+  });
+
+  it('should format mass calibration report with key sections', () => {
+    const report = runMassCalibration(50, 10);
+    const formatted = formatMassCalibrationReport(report);
+
+    console.log(formatted);
+    expect(formatted).toContain('Mass Calibration Report');
+    expect(formatted).toContain('GDP Growth Rate');
+    expect(formatted).toContain('Anomalies');
+    expect(formatted).toContain('Snapshots');
+  });
 });
