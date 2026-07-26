@@ -29,6 +29,7 @@ import { PeaceSystem } from './domain/war/systems/peace.system.js';
 import { IntelligenceSystem } from './domain/intelligence/systems/intelligence.system.js';
 import { AgentActionSystem } from './agents/systems/agent-action.system.js';
 import { AgentSystem } from './agents/systems/agent.system.js';
+import { HeuristicAgentProvider } from './agents/llm/heuristic.provider.js';
 import { ISystem } from './core/interfaces/system.interface.js';
 import { EntityId } from './core/interfaces/entity.interface.js';
 import { AchievementManager } from './scenarios/achievement-manager.js';
@@ -36,7 +37,7 @@ import { AchievementManager } from './scenarios/achievement-manager.js';
 const achievementManager = new AchievementManager();
 
 const DOMAIN_SYSTEMS = [
-  new AgentSystem(),
+  new AgentSystem({ provider: new HeuristicAgentProvider(), defaultIntelLevel: 0.7 }),
   new AgentActionSystem(),
   new SanctionSystem(),
   new TradeSystem(),

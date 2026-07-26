@@ -125,6 +125,9 @@ export class AgentSystem implements ISystem {
       if (this.evaluator) {
         const rawResponse = this.evaluator(prompt, systemPrompt);
         this.processResponse(rawResponse, agent, state, eventBus, tick);
+      } else if (this.provider instanceof HeuristicAgentProvider) {
+        const rawResponse = this.provider.decideSync(prompt, systemPrompt);
+        this.processResponse(rawResponse, agent, state, eventBus, tick);
       } else if (this.provider) {
         void this.provider.evaluate(prompt, systemPrompt).then((rawResponse) => {
           this.processResponse(rawResponse, agent, state, eventBus, tick);
