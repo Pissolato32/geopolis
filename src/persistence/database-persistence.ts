@@ -3,14 +3,20 @@ import { join, resolve } from 'node:path';
 import { ITickEngine } from '../core/interfaces/tick-engine.interface.js';
 import { SaveGameSerializer } from './serializer.js';
 import { ISaveGamePayload } from './interfaces/save-game.interface.js';
+import { ILogger, defaultLogger } from './logger.js';
 
 export class DatabasePersistenceProvider {
   private readonly saveDir: string;
   private readonly latestSaveFile: string;
+  private readonly logger: ILogger;
 
-  constructor(customDir?: string) {
+  constructor(
+    customDir?: string,
+    logger: ILogger = defaultLogger,
+  ) {
     this.saveDir = customDir ?? resolve(process.cwd(), 'data', 'savegames');
     this.latestSaveFile = join(this.saveDir, 'latest-world-state.json');
+    this.logger = logger;
     this.ensureDirectory();
   }
 
@@ -20,9 +26,6 @@ export class DatabasePersistenceProvider {
     }
   }
 
-  /**
-   * Save the current active simulation state with SHA-256 verification hash.
-   */
   public async saveWorldState(engine: ITickEngine): Promise<string> {
     this.ensureDirectory();
     const savePayload = SaveGameSerializer.createSaveGame(engine);
@@ -30,25 +33,18 @@ export class DatabasePersistenceProvider {
 
     writeFileSync(this.latestSaveFile, serialized, 'utf-8');
 
-    // Also write a timestamped snapshot
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const timestampFile = join(this.saveDir, `save-${timestamp}.json`);
     writeFileSync(timestampFile, serialized, 'utf-8');
 
-    console.log(`[Persistence] World state saved at tick ${savePayload.tick} (Hash: ${savePayload.payloadHash.slice(0, 8)}...)`);
+    this.logger.info(`[Persistence] World state saved at tick ${savePayload.tick} (Hash: ${savePayload.payloadHash.slice(0, 8)}...)`);
     return savePayload.payloadHash;
   }
 
-  /**
-   * Check if a valid save game exists.
-   */
   public hasSave(): boolean {
     return existsSync(this.latestSaveFile);
   }
 
-  /**
-   * Load the latest save game payload.
-   */
   public async loadLatestSave(): Promise<ISaveGamePayload | null> {
     if (!this.hasSave()) {
       return null;
@@ -57,17 +53,14 @@ export class DatabasePersistenceProvider {
     try {
       const raw = readFileSync(this.latestSaveFile, 'utf-8');
       const payload = JSON.parse(raw) as ISaveGamePayload;
-      console.log(`[Persistence] Hydrated save game from tick ${payload.tick}`);
+      this.logger.info(`[Persistence] Hydrated save game from tick ${payload.tick}`);
       return payload;
     } catch (err) {
-      console.error(`[Persistence] Failed to read save file: ${err instanceof Error ? err.message : String(err)}`);
+      this.logger.error(`[Persistence] Failed to read save file: ${err instanceof Error ? err.message : String(err)}`);
       return null;
     }
   }
 
-  /**
-   * List all available save files.
-   */
   public listSaves(): string[] {
     this.ensureDirectory();
     return readdirSync(this.saveDir).filter((f) => f.endsWith('.json'));

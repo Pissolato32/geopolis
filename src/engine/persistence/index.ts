@@ -7,3 +7,5 @@ export type { ISaveGamePayload, IRehydrationResult } from './interfaces/save-gam
 export { SaveGameSerializer } from './serializer.js';
 export { TimelineArchiver } from './timeline-archiver.js';
 export { DatabasePersistenceProvider } from './database-persistence.js';
+export type { ILogger } from './logger.js';
+export { defaultLogger } from './logger.js';
