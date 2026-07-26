@@ -6,8 +6,78 @@
 // responsible for persisting the mutated countries/relationships/units back
 // to Supabase.
 
-import type { Country, GameEvent, Relationship, TurnSummary, Unit } from "./shared/types.js";
+import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard } from "./shared/types.js";
 import { runAIDirector } from "./aiDirector.js";
+
+/** Evaluate the player country state and generate 0–3 dynamic cabinet cards. */
+function generateCabinetCards(player: Country): CabinetCard[] {
+  const cards: CabinetCard[] = [];
+
+  if (player.economy.stability < 40 || player.military.militaryLoyalty < 40) {
+    cards.push({
+      id: "military-faction-unrest",
+      title: "Military Faction Unrest & Coup Warning",
+      description: `Military loyalty is at ${player.military.militaryLoyalty.toFixed(0)}% and stability is ${player.economy.stability.toFixed(0)}%. The junta grows restless. Failure to act may trigger a coup d'état.`,
+      category: "Internal Politics",
+      options: [
+        {
+          id: "concessions-to-junta",
+          label: "Concessions to Junta",
+          effects: { militaryLoyaltyDelta: 15, stabilityDelta: -5, treasuryDelta: -500 },
+        },
+        {
+          id: "crackdown",
+          label: "Crackdown on Dissent",
+          effects: { militaryLoyaltyDelta: -10, stabilityDelta: 10, readinessDelta: 5 },
+        },
+      ],
+    });
+  }
+
+  if (player.economy.treasury < 0) {
+    cards.push({
+      id: "emergency-financial-bailout",
+      title: "Emergency Financial Bailout",
+      description: `The national treasury is in deficit at ${player.economy.treasury.toLocaleString()}B. Immediate action is required to avoid economic collapse.`,
+      category: "Economy",
+      options: [
+        {
+          id: "austerity-cut",
+          label: "Austerity Cut",
+          effects: { treasuryDelta: 800, stabilityDelta: -10, legislativeSupportDelta: -0.1 },
+        },
+        {
+          id: "international-loan",
+          label: "International Loan",
+          effects: { treasuryDelta: 1200, stabilityDelta: -3, tensionDelta: 5 },
+        },
+      ],
+    });
+  }
+
+  if (player.economy.legislativeSupport < 0.4) {
+    cards.push({
+      id: "congressional-tax-reform-deadlock",
+      title: "Congressional Tax & Reform Deadlock",
+      description: `Legislative support has fallen to ${(player.economy.legislativeSupport * 100).toFixed(0)}%. The assembly is blocking key reforms and tax legislation.`,
+      category: "Internal Politics",
+      options: [
+        {
+          id: "negotiate-with-oligarchs",
+          label: "Negotiate with Oligarchs",
+          effects: { legislativeSupportDelta: 0.2, treasuryDelta: -300, stabilityDelta: 3 },
+        },
+        {
+          id: "executive-order",
+          label: "Executive Order",
+          effects: { legislativeSupportDelta: -0.15, stabilityDelta: 5, tensionDelta: 3 },
+        },
+      ],
+    });
+  }
+
+  return cards.slice(0, 3);
+}
 
 const at = () => new Date().toISOString();
 
@@ -23,8 +93,9 @@ function clamp(n: number, lo: number, hi: number): number {
 export function processTurn(
   countries: Country[],
   units: Unit[],
-  tick: number
-): { countries: Country[]; units: Unit[]; events: GameEvent[] } {
+  tick: number,
+  playerCode?: string,
+): { countries: Country[]; units: Unit[]; events: GameEvent[]; cabinetCards: CabinetCard[] } {
   const events: GameEvent[] = [];
   const byCode = new Map(countries.map((c) => [c.id, c]));
 
@@ -265,7 +336,11 @@ export function processTurn(
     }
   }
 
-  // ---- 5. Summary event ---------------------------------------------------
+  // ---- 5. Cabinet cards: evaluate player country state -------------------
+  const playerCountry = playerCode ? updated.find((c) => c.id === playerCode) : undefined;
+  const cabinetCards = playerCountry ? generateCabinetCards(playerCountry) : [];
+
+  // ---- 6. Summary event ---------------------------------------------------
   const summary: TurnSummary = {
     tick,
     countriesProcessed: updated.length,
@@ -276,6 +351,7 @@ export function processTurn(
     treaties,
     globalGdpDelta,
     aiDecisions: aiDecisionsMade,
+    cabinetCards,
   };
   events.unshift({
     type: "turn.advanced",
@@ -284,5 +360,5 @@ export function processTurn(
     summary,
   });
 
-  return { countries: updated, units: survivingUnits, events };
+  return { countries: updated, units: survivingUnits, events, cabinetCards };
 }

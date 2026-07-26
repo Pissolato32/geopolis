@@ -27,12 +27,14 @@ function makeCountry(overrides: Partial<Country> = {}): Country {
       treasury: 50e9,
       taxRate: 0.25,
       stability: 70,
+      legislativeSupport: 0.55,
     },
     military: {
       totalPersonnel: 100_000,
       readiness: 80,
       morale: 70,
       forceLimit: 100_000,
+      militaryLoyalty: 70,
     },
     posture: 'diplomatic',
     relationships: [],
@@ -198,7 +200,7 @@ describe('AI Director — Turn 1-5 War Prevention', () => {
       name: 'Honduras',
       region: 'Americas',
       subregion: 'Central America',
-      military: { totalPersonnel: 20000, readiness: 50, morale: 60, forceLimit: 20000 },
+      military: { totalPersonnel: 20000, readiness: 50, morale: 60, forceLimit: 20000, militaryLoyalty: 70 },
       relationships: [
         { countryCode: 'ABW', affinity: -80, tension: 99 },
       ],
@@ -208,7 +210,7 @@ describe('AI Director — Turn 1-5 War Prevention', () => {
       name: 'Aruba',
       region: 'Americas',
       subregion: 'Caribbean',
-      military: { totalPersonnel: 5000, readiness: 40, morale: 50, forceLimit: 5000 },
+      military: { totalPersonnel: 5000, readiness: 40, morale: 50, forceLimit: 5000, militaryLoyalty: 70 },
       relationships: [
         { countryCode: 'HND', affinity: -80, tension: 99 },
       ],

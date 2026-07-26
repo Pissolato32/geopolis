@@ -8,10 +8,11 @@ import { WorldMap } from "./WorldMap.js";
 import { CountryProfile } from "./CountryProfile.js";
 import { GlobalSearch } from "./GlobalSearch.js";
 import { MarketTicker } from "./MarketTicker.js";
+import { CabinetModal } from "./CabinetModal.js";
 import { gameSocket } from "./gameSocket.js";
 import { loadOrSeedWorld } from "./gameStore.js";
 import type { SimSpeed } from "./gameSocket.js";
-import type { WorldSeed } from "./shared/types.js";
+import type { CabinetCard, WorldSeed } from "./shared/types.js";
 import seedData from "../data/world-seed-2026.json";
 
 const SEED = seedData as WorldSeed;
@@ -35,6 +36,7 @@ export default function App() {
   const [playerOpen, setPlayerOpen] = useState(false);
   const [simPaused, setSimPaused] = useState(true);
   const [simSpeed, setSimSpeed] = useState<SimSpeed>(0);
+  const [cabinetCards, setCabinetCards] = useState<CabinetCard[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,6 +81,8 @@ export default function App() {
     setSimPaused(s.paused);
     setSimSpeed(s.speed);
   }), []);
+
+  useEffect(() => gameSocket.onCabinetCards(setCabinetCards), []);
 
   const advanceTurn = async () => {
     if (turnBusy) return;
@@ -266,6 +270,13 @@ export default function App() {
         </section>
         <CountryProfile />
       </main>
+
+      {cabinetCards.length > 0 && (
+        <CabinetModal
+          cards={cabinetCards}
+          onResolved={() => setCabinetCards([])}
+        />
+      )}
     </div>
   );
 }

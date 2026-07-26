@@ -6,6 +6,7 @@ export interface CountryEconomy {
   treasury: number; // current treasury in USD
   taxRate: number; // 0..1
   stability: number; // 0..100
+  legislativeSupport: number; // 0..1 (democracies only)
 }
 
 export interface CountryMilitary {
@@ -13,7 +14,10 @@ export interface CountryMilitary {
   readiness: number; // 0..100
   morale: number; // 0..100
   forceLimit: number; // max deployable troops
+  militaryLoyalty: number; // 0..100 (faction loyalty to regime)
 }
+
+
 
 export interface Relationship {
   countryCode: string; // alpha-3 code of the counterpart
@@ -102,6 +106,30 @@ export interface TurnSummary {
   treaties: number;
   globalGdpDelta: number;
   aiDecisions: number;
+  cabinetCards?: CabinetCard[];
+}
+
+export interface CardOptionEffects {
+  treasuryDelta?: number;
+  stabilityDelta?: number;
+  readinessDelta?: number;
+  tensionDelta?: number;
+  militaryLoyaltyDelta?: number;
+  legislativeSupportDelta?: number;
+}
+
+export interface CardOption {
+  id: string;
+  label: string;
+  effects: CardOptionEffects;
+}
+
+export interface CabinetCard {
+  id: string;
+  title: string;
+  description: string;
+  category: "Economy" | "Defense" | "Diplomacy" | "Internal Politics";
+  options: CardOption[];
 }
 
 export type DiplomaticPosture = "isolationist" | "diplomatic" | "assertive" | "expansionist";
@@ -125,7 +153,8 @@ export type StrictIntent =
   | { intent: "send-aid"; from: string; target: string; amount: number }
   | { intent: "gather-intel"; from: string; target: string; cost: number }
   | { intent: "fund-sabotage"; from: string; target: string; cost: number }
-  | { intent: "recruit-unit"; from: string; unitType: UnitType; cost: number };
+  | { intent: "recruit-unit"; from: string; unitType: UnitType; cost: number }
+  | { intent: "resolve-cabinet-card"; from: string; cardId: string; optionId?: string; delegated: boolean };
 
 export type IntentResponse =
   | { ok: true; acknowledged: StrictIntent; events: GameEvent[] }

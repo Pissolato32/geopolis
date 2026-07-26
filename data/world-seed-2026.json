@@ -20,13 +20,15 @@
         "gdpPerCapita": 34736,
         "treasury": 78841253257,
         "taxRate": 0.219,
-        "stability": 92
+        "stability": 92,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 420925,
         "readiness": 75,
         "morale": 63,
-        "forceLimit": 138905
+        "forceLimit": 138905,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -78,13 +80,15 @@
         "gdpPerCapita": 17929,
         "treasury": 11221456,
         "taxRate": 0.261,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 206,
         "readiness": 41,
         "morale": 71,
-        "forceLimit": 68
+        "forceLimit": 68,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -136,13 +140,15 @@
         "gdpPerCapita": 16793,
         "treasury": 663151174,
         "taxRate": 0.183,
-        "stability": 92
+        "stability": 92,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 16163,
         "readiness": 70,
         "morale": 52,
-        "forceLimit": 5334
+        "forceLimit": 5334,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -194,13 +200,15 @@
         "gdpPerCapita": 18161,
         "treasury": 46643208145,
         "taxRate": 0.189,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1088892,
         "readiness": 50,
         "morale": 66,
-        "forceLimit": 359334
+        "forceLimit": 359334,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -252,13 +260,15 @@
         "gdpPerCapita": 20017,
         "treasury": 51375988,
         "taxRate": 0.335,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1162,
         "readiness": 54,
         "morale": 80,
-        "forceLimit": 383
+        "forceLimit": 383,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -310,13 +320,15 @@
         "gdpPerCapita": 30680,
         "treasury": 105078657,
         "taxRate": 0.225,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 708,
         "readiness": 49,
         "morale": 84,
-        "forceLimit": 234
+        "forceLimit": 234,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -368,13 +380,15 @@
         "gdpPerCapita": 23318,
         "treasury": 16019904699,
         "taxRate": 0.378,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 684721,
         "readiness": 89,
         "morale": 64,
-        "forceLimit": 225958
+        "forceLimit": 225958,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -426,13 +440,15 @@
         "gdpPerCapita": 29566,
         "treasury": 10398679,
         "taxRate": 0.367,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 268,
         "readiness": 88,
         "morale": 61,
-        "forceLimit": 88
+        "forceLimit": 88,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -484,13 +500,15 @@
         "gdpPerCapita": 22134,
         "treasury": 620819,
         "taxRate": 0.315,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 25,
         "readiness": 54,
         "morale": 91,
-        "forceLimit": 8
+        "forceLimit": 8,
+        "militaryLoyalty": 70
       },
       "relationships": []
     },
@@ -511,13 +529,15 @@
         "gdpPerCapita": 21640,
         "treasury": 36105285,
         "taxRate": 0.199,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 903,
         "readiness": 54,
         "morale": 85,
-        "forceLimit": 298
+        "forceLimit": 298,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -569,13 +589,15 @@
         "gdpPerCapita": 34654,
         "treasury": 20187248984,
         "taxRate": 0.241,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 815969,
         "readiness": 70,
         "morale": 67,
-        "forceLimit": 269270
+        "forceLimit": 269270,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -627,13 +649,15 @@
         "gdpPerCapita": 35648,
         "treasury": 5708804901,
         "taxRate": 0.26,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 29416,
         "readiness": 34,
         "morale": 58,
-        "forceLimit": 9707
+        "forceLimit": 9707,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -685,13 +709,15 @@
         "gdpPerCapita": 24507,
         "treasury": 57955546,
         "taxRate": 0.274,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2208,
         "readiness": 36,
         "morale": 86,
-        "forceLimit": 729
+        "forceLimit": 729,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -743,13 +769,15 @@
         "gdpPerCapita": 21518,
         "treasury": 6352318027,
         "taxRate": 0.381,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 522171,
         "readiness": 30,
         "morale": 44,
-        "forceLimit": 172316
+        "forceLimit": 172316,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -801,13 +829,15 @@
         "gdpPerCapita": 23115,
         "treasury": 2228794724,
         "taxRate": 0.29,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 149026,
         "readiness": 85,
         "morale": 57,
-        "forceLimit": 49179
+        "forceLimit": 49179,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -859,13 +889,15 @@
         "gdpPerCapita": 28165,
         "treasury": 5788930956,
         "taxRate": 0.125,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 46965,
         "readiness": 44,
         "morale": 43,
-        "forceLimit": 15498
+        "forceLimit": 15498,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -917,13 +949,15 @@
         "gdpPerCapita": 45927,
         "treasury": 860849028,
         "taxRate": 0.264,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 6936,
         "readiness": 53,
         "morale": 93,
-        "forceLimit": 2289
+        "forceLimit": 2289,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -975,13 +1009,15 @@
         "gdpPerCapita": 44773,
         "treasury": 1099037155,
         "taxRate": 0.289,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 24683,
         "readiness": 77,
         "morale": 86,
-        "forceLimit": 8145
+        "forceLimit": 8145,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1033,13 +1069,15 @@
         "gdpPerCapita": 37517,
         "treasury": 87693245829,
         "taxRate": 0.246,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1792872,
         "readiness": 48,
         "morale": 54,
-        "forceLimit": 591648
+        "forceLimit": 591648,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1091,13 +1129,15 @@
         "gdpPerCapita": 49262,
         "treasury": 660009943,
         "taxRate": 0.182,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 929,
         "readiness": 65,
         "morale": 53,
-        "forceLimit": 307
+        "forceLimit": 307,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1149,13 +1189,15 @@
         "gdpPerCapita": 44534,
         "treasury": 4337889873,
         "taxRate": 0.149,
-        "stability": 87
+        "stability": 87,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 47447,
         "readiness": 90,
         "morale": 51,
-        "forceLimit": 15658
+        "forceLimit": 15658,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1207,13 +1249,15 @@
         "gdpPerCapita": 29864,
         "treasury": 13009192804,
         "taxRate": 0.152,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 44318,
         "readiness": 75,
         "morale": 42,
-        "forceLimit": 14625
+        "forceLimit": 14625,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1265,13 +1309,15 @@
         "gdpPerCapita": 46087,
         "treasury": 1033944699,
         "taxRate": 0.37,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1918,
         "readiness": 59,
         "morale": 82,
-        "forceLimit": 633
+        "forceLimit": 633,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1323,13 +1369,15 @@
         "gdpPerCapita": 30164,
         "treasury": 13941669709,
         "taxRate": 0.296,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 245075,
         "readiness": 46,
         "morale": 52,
-        "forceLimit": 80875
+        "forceLimit": 80875,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1381,13 +1429,15 @@
         "gdpPerCapita": 37614,
         "treasury": 58665974,
         "taxRate": 0.371,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1062,
         "readiness": 32,
         "morale": 58,
-        "forceLimit": 350
+        "forceLimit": 350,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1439,13 +1489,15 @@
         "gdpPerCapita": 32222,
         "treasury": 1285383892,
         "taxRate": 0.397,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 14637,
         "readiness": 37,
         "morale": 69,
-        "forceLimit": 4830
+        "forceLimit": 4830,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1497,13 +1549,15 @@
         "gdpPerCapita": 4244,
         "treasury": 2043614996,
         "taxRate": 0.383,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 188731,
         "readiness": 39,
         "morale": 43,
-        "forceLimit": 62281
+        "forceLimit": 62281,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1555,13 +1609,15 @@
         "gdpPerCapita": 35102,
         "treasury": 18991914,
         "taxRate": 0.288,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 54,
         "readiness": 71,
         "morale": 63,
-        "forceLimit": 18
+        "forceLimit": 18,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1613,13 +1669,15 @@
         "gdpPerCapita": 42145,
         "treasury": 7226576535,
         "taxRate": 0.311,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 55524,
         "readiness": 85,
         "morale": 86,
-        "forceLimit": 18323
+        "forceLimit": 18323,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1671,13 +1729,15 @@
         "gdpPerCapita": 36477,
         "treasury": 2046494873,
         "taxRate": 0.173,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 5972,
         "readiness": 45,
         "morale": 47,
-        "forceLimit": 1971
+        "forceLimit": 1971,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1729,13 +1789,15 @@
         "gdpPerCapita": 42391,
         "treasury": 174661451793,
         "taxRate": 0.277,
-        "stability": 67
+        "stability": 67,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2690391,
         "readiness": 68,
         "morale": 73,
-        "forceLimit": 887829
+        "forceLimit": 887829,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1787,13 +1849,15 @@
         "gdpPerCapita": 5327,
         "treasury": 769770,
         "taxRate": 0.347,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 58,
         "readiness": 35,
         "morale": 76,
-        "forceLimit": 19
+        "forceLimit": 19,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1845,13 +1909,15 @@
         "gdpPerCapita": 4285,
         "treasury": 38153893,
         "taxRate": 0.243,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 7823,
         "readiness": 93,
         "morale": 61,
-        "forceLimit": 2582
+        "forceLimit": 2582,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1903,13 +1969,15 @@
         "gdpPerCapita": 43146,
         "treasury": 16075192923,
         "taxRate": 0.249,
-        "stability": 86
+        "stability": 86,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 72040,
         "readiness": 35,
         "morale": 41,
-        "forceLimit": 23773
+        "forceLimit": 23773,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -1961,13 +2029,15 @@
         "gdpPerCapita": 4392,
         "treasury": 1292675244,
         "taxRate": 0.392,
-        "stability": 86
+        "stability": 86,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 92327,
         "readiness": 59,
         "morale": 62,
-        "forceLimit": 30468
+        "forceLimit": 30468,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2019,13 +2089,15 @@
         "gdpPerCapita": 35268,
         "treasury": 6029681422,
         "taxRate": 0.297,
-        "stability": 92
+        "stability": 92,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 267139,
         "readiness": 70,
         "morale": 43,
-        "forceLimit": 88156
+        "forceLimit": 88156,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2077,13 +2149,15 @@
         "gdpPerCapita": 14054,
         "treasury": 452653127,
         "taxRate": 0.176,
-        "stability": 86
+        "stability": 86,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 10723,
         "readiness": 90,
         "morale": 74,
-        "forceLimit": 3539
+        "forceLimit": 3539,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2135,13 +2209,15 @@
         "gdpPerCapita": 39951,
         "treasury": 14613393968,
         "taxRate": 0.138,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 342753,
         "readiness": 31,
         "morale": 54,
-        "forceLimit": 113108
+        "forceLimit": 113108,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2193,13 +2269,15 @@
         "gdpPerCapita": 27113,
         "treasury": 9266720969,
         "taxRate": 0.224,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 463178,
         "readiness": 67,
         "morale": 79,
-        "forceLimit": 152849
+        "forceLimit": 152849,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2251,13 +2329,15 @@
         "gdpPerCapita": 12198,
         "treasury": 20810615076,
         "taxRate": 0.315,
-        "stability": 90
+        "stability": 90,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 776664,
         "readiness": 44,
         "morale": 68,
-        "forceLimit": 256299
+        "forceLimit": 256299,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2309,13 +2389,15 @@
         "gdpPerCapita": 30555,
         "treasury": 21075962,
         "taxRate": 0.185,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1555,
         "readiness": 84,
         "morale": 81,
-        "forceLimit": 513
+        "forceLimit": 513,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2367,13 +2449,15 @@
         "gdpPerCapita": 13944,
         "treasury": 703683552,
         "taxRate": 0.373,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 113669,
         "readiness": 87,
         "morale": 88,
-        "forceLimit": 37511
+        "forceLimit": 37511,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2425,13 +2509,15 @@
         "gdpPerCapita": 38746,
         "treasury": 23624540711,
         "taxRate": 0.298,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 335316,
         "readiness": 77,
         "morale": 58,
-        "forceLimit": 110654
+        "forceLimit": 110654,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2483,13 +2569,15 @@
         "gdpPerCapita": 12343,
         "treasury": 6114147568,
         "taxRate": 0.176,
-        "stability": 66
+        "stability": 66,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 98207,
         "readiness": 84,
         "morale": 51,
-        "forceLimit": 32408
+        "forceLimit": 32408,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2541,13 +2629,15 @@
         "gdpPerCapita": 11271,
         "treasury": 630712847454,
         "taxRate": 0.229,
-        "stability": 71
+        "stability": 71,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 17348935,
         "readiness": 86,
         "morale": 82,
-        "forceLimit": 5725149
+        "forceLimit": 5725149,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2599,13 +2689,15 @@
         "gdpPerCapita": 19239,
         "treasury": 1225010,
         "taxRate": 0.291,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 32,
         "readiness": 52,
         "morale": 88,
-        "forceLimit": 11
+        "forceLimit": 11,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2657,13 +2749,15 @@
         "gdpPerCapita": 26325,
         "treasury": 658684,
         "taxRate": 0.166,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1,
         "readiness": 57,
         "morale": 42,
-        "forceLimit": 0
+        "forceLimit": 0,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2715,13 +2809,15 @@
         "gdpPerCapita": 12473,
         "treasury": 34063321383,
         "taxRate": 0.214,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 203489,
         "readiness": 48,
         "morale": 77,
-        "forceLimit": 67151
+        "forceLimit": 67151,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2773,13 +2869,15 @@
         "gdpPerCapita": 13131,
         "treasury": 658108470,
         "taxRate": 0.276,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 7663,
         "readiness": 76,
         "morale": 50,
-        "forceLimit": 2529
+        "forceLimit": 2529,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2831,13 +2929,15 @@
         "gdpPerCapita": 11089,
         "treasury": 2540774754,
         "taxRate": 0.271,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 87467,
         "readiness": 46,
         "morale": 40,
-        "forceLimit": 28864
+        "forceLimit": 28864,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2889,13 +2989,15 @@
         "gdpPerCapita": 11106,
         "treasury": 55834342970,
         "taxRate": 0.356,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1788711,
         "readiness": 50,
         "morale": 70,
-        "forceLimit": 590275
+        "forceLimit": 590275,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -2947,13 +3049,15 @@
         "gdpPerCapita": 14285,
         "treasury": 15197915,
         "taxRate": 0.136,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 46,
         "readiness": 88,
         "morale": 67,
-        "forceLimit": 15
+        "forceLimit": 15,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3005,13 +3109,15 @@
         "gdpPerCapita": 22107,
         "treasury": 4660499327,
         "taxRate": 0.222,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 88106,
         "readiness": 86,
         "morale": 54,
-        "forceLimit": 29075
+        "forceLimit": 29075,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3063,13 +3169,15 @@
         "gdpPerCapita": 23886,
         "treasury": 8005779855,
         "taxRate": 0.312,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 368748,
         "readiness": 88,
         "morale": 52,
-        "forceLimit": 121687
+        "forceLimit": 121687,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3121,13 +3229,15 @@
         "gdpPerCapita": 26463,
         "treasury": 4071257578,
         "taxRate": 0.314,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 100006,
         "readiness": 85,
         "morale": 69,
-        "forceLimit": 33002
+        "forceLimit": 33002,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3179,13 +3289,15 @@
         "gdpPerCapita": 22281,
         "treasury": 7373609767,
         "taxRate": 0.18,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 105729,
         "readiness": 51,
         "morale": 94,
-        "forceLimit": 34891
+        "forceLimit": 34891,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3237,13 +3349,15 @@
         "gdpPerCapita": 26096,
         "treasury": 76058026,
         "taxRate": 0.131,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2867,
         "readiness": 94,
         "morale": 68,
-        "forceLimit": 946
+        "forceLimit": 946,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3295,13 +3409,15 @@
         "gdpPerCapita": 24278,
         "treasury": 806287432,
         "taxRate": 0.122,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 22370,
         "readiness": 53,
         "morale": 83,
-        "forceLimit": 7382
+        "forceLimit": 7382,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3353,13 +3469,15 @@
         "gdpPerCapita": 29056,
         "treasury": 7406483986,
         "taxRate": 0.168,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 125787,
         "readiness": 87,
         "morale": 76,
-        "forceLimit": 41510
+        "forceLimit": 41510,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3411,13 +3529,15 @@
         "gdpPerCapita": 18546,
         "treasury": 6208610209,
         "taxRate": 0.295,
-        "stability": 87
+        "stability": 87,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 90930,
         "readiness": 86,
         "morale": 62,
-        "forceLimit": 30007
+        "forceLimit": 30007,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3469,13 +3589,15 @@
         "gdpPerCapita": 12529,
         "treasury": 366219704,
         "taxRate": 0.345,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 12918,
         "readiness": 48,
         "morale": 77,
-        "forceLimit": 4263
+        "forceLimit": 4263,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3527,13 +3649,15 @@
         "gdpPerCapita": 26261,
         "treasury": 87854389,
         "taxRate": 0.128,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 605,
         "readiness": 57,
         "morale": 42,
-        "forceLimit": 200
+        "forceLimit": 200,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3585,13 +3709,15 @@
         "gdpPerCapita": 12083,
         "treasury": 5896425047,
         "taxRate": 0.196,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 99476,
         "readiness": 88,
         "morale": 93,
-        "forceLimit": 32827
+        "forceLimit": 32827,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3643,13 +3769,15 @@
         "gdpPerCapita": 45030,
         "treasury": 19304549645,
         "taxRate": 0.139,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 49992,
         "readiness": 51,
         "morale": 42,
-        "forceLimit": 16497
+        "forceLimit": 16497,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3701,13 +3829,15 @@
         "gdpPerCapita": 32732,
         "treasury": 86223039791,
         "taxRate": 0.304,
-        "stability": 87
+        "stability": 87,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1046894,
         "readiness": 63,
         "morale": 66,
-        "forceLimit": 345475
+        "forceLimit": 345475,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3759,13 +3889,15 @@
         "gdpPerCapita": 18835,
         "treasury": 2284266261,
         "taxRate": 0.334,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 83893,
         "readiness": 70,
         "morale": 88,
-        "forceLimit": 27685
+        "forceLimit": 27685,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3817,13 +3949,15 @@
         "gdpPerCapita": 40196,
         "treasury": 2648897386,
         "taxRate": 0.369,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 8730,
         "readiness": 94,
         "morale": 68,
-        "forceLimit": 2881
+        "forceLimit": 2881,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3875,13 +4009,15 @@
         "gdpPerCapita": 38176,
         "treasury": 3661890036,
         "taxRate": 0.335,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 19209,
         "readiness": 34,
         "morale": 78,
-        "forceLimit": 6339
+        "forceLimit": 6339,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3933,13 +4069,15 @@
         "gdpPerCapita": 47723,
         "treasury": 1503666076,
         "taxRate": 0.237,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 23444,
         "readiness": 48,
         "morale": 68,
-        "forceLimit": 7737
+        "forceLimit": 7737,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -3991,13 +4129,15 @@
         "gdpPerCapita": 19087,
         "treasury": 569305791,
         "taxRate": 0.296,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 4436,
         "readiness": 85,
         "morale": 62,
-        "forceLimit": 1464
+        "forceLimit": 1464,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4049,13 +4189,15 @@
         "gdpPerCapita": 5139,
         "treasury": 16282726770,
         "taxRate": 0.137,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2756363,
         "readiness": 41,
         "morale": 87,
-        "forceLimit": 909600
+        "forceLimit": 909600,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4107,13 +4249,15 @@
         "gdpPerCapita": 13590,
         "treasury": 416250,
         "taxRate": 0.334,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 60,
         "readiness": 51,
         "morale": 78,
-        "forceLimit": 20
+        "forceLimit": 20,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4165,13 +4309,15 @@
         "gdpPerCapita": 18208,
         "treasury": 43303098,
         "taxRate": 0.163,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 154,
         "readiness": 51,
         "morale": 74,
-        "forceLimit": 51
+        "forceLimit": 51,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4223,13 +4369,15 @@
         "gdpPerCapita": 44182,
         "treasury": 501363289,
         "taxRate": 0.286,
-        "stability": 81
+        "stability": 81,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 15271,
         "readiness": 87,
         "morale": 78,
-        "forceLimit": 5039
+        "forceLimit": 5039,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4281,13 +4429,15 @@
         "gdpPerCapita": 5963,
         "treasury": 1888916607,
         "taxRate": 0.223,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 44789,
         "readiness": 34,
         "morale": 55,
-        "forceLimit": 14780
+        "forceLimit": 14780,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4339,13 +4489,15 @@
         "gdpPerCapita": 13880,
         "treasury": 39736016954,
         "taxRate": 0.124,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1011046,
         "readiness": 79,
         "morale": 57,
-        "forceLimit": 333645
+        "forceLimit": 333645,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4397,13 +4549,15 @@
         "gdpPerCapita": 28525,
         "treasury": 419737468,
         "taxRate": 0.327,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 5034,
         "readiness": 85,
         "morale": 79,
-        "forceLimit": 1661
+        "forceLimit": 1661,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4455,13 +4609,15 @@
         "gdpPerCapita": 40447,
         "treasury": 648033022,
         "taxRate": 0.255,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 4693,
         "readiness": 35,
         "morale": 58,
-        "forceLimit": 1549
+        "forceLimit": 1549,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4513,13 +4669,15 @@
         "gdpPerCapita": 23854,
         "treasury": 105662,
         "taxRate": 0.269,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 3,
         "readiness": 67,
         "morale": 78,
-        "forceLimit": 1
+        "forceLimit": 1,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4571,13 +4729,15 @@
         "gdpPerCapita": 36241,
         "treasury": 1480180078,
         "taxRate": 0.386,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 6854,
         "readiness": 85,
         "morale": 72,
-        "forceLimit": 2262
+        "forceLimit": 2262,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4629,13 +4789,15 @@
         "gdpPerCapita": 40275,
         "treasury": 1981236392,
         "taxRate": 0.283,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 6622,
         "readiness": 37,
         "morale": 42,
-        "forceLimit": 2185
+        "forceLimit": 2185,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4687,13 +4849,15 @@
         "gdpPerCapita": 30972,
         "treasury": 4183827170,
         "taxRate": 0.123,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 16571,
         "readiness": 56,
         "morale": 58,
-        "forceLimit": 5468
+        "forceLimit": 5468,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4745,13 +4909,15 @@
         "gdpPerCapita": 18590,
         "treasury": 62564373568,
         "taxRate": 0.153,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1985298,
         "readiness": 31,
         "morale": 87,
-        "forceLimit": 655148
+        "forceLimit": 655148,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4803,13 +4969,15 @@
         "gdpPerCapita": 35790,
         "treasury": 30517152971,
         "taxRate": 0.268,
-        "stability": 86
+        "stability": 86,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 262215,
         "readiness": 91,
         "morale": 43,
-        "forceLimit": 86531
+        "forceLimit": 86531,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4861,13 +5029,15 @@
         "gdpPerCapita": 48245,
         "treasury": 36940245,
         "taxRate": 0.299,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 796,
         "readiness": 75,
         "morale": 48,
-        "forceLimit": 263
+        "forceLimit": 263,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4919,13 +5089,15 @@
         "gdpPerCapita": 32327,
         "treasury": 17274033581,
         "taxRate": 0.332,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 35590,
         "readiness": 34,
         "morale": 54,
-        "forceLimit": 11745
+        "forceLimit": 11745,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -4977,13 +5149,15 @@
         "gdpPerCapita": 33011,
         "treasury": 31022583,
         "taxRate": 0.393,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 794,
         "readiness": 35,
         "morale": 53,
-        "forceLimit": 262
+        "forceLimit": 262,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5035,13 +5209,15 @@
         "gdpPerCapita": 34052,
         "treasury": 82664919,
         "taxRate": 0.143,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 762,
         "readiness": 55,
         "morale": 87,
-        "forceLimit": 251
+        "forceLimit": 251,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5093,13 +5269,15 @@
         "gdpPerCapita": 31815,
         "treasury": 298339091,
         "taxRate": 0.341,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 9563,
         "readiness": 75,
         "morale": 79,
-        "forceLimit": 3156
+        "forceLimit": 3156,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5151,13 +5329,15 @@
         "gdpPerCapita": 26754,
         "treasury": 192694565,
         "taxRate": 0.336,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 3984,
         "readiness": 83,
         "morale": 43,
-        "forceLimit": 1315
+        "forceLimit": 1315,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5209,13 +5389,15 @@
         "gdpPerCapita": 40821,
         "treasury": 23963152106,
         "taxRate": 0.272,
-        "stability": 69
+        "stability": 69,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 341164,
         "readiness": 90,
         "morale": 59,
-        "forceLimit": 112584
+        "forceLimit": 112584,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5267,13 +5449,15 @@
         "gdpPerCapita": 41940,
         "treasury": 68095480,
         "taxRate": 0.189,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1552,
         "readiness": 69,
         "morale": 64,
-        "forceLimit": 512
+        "forceLimit": 512,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5325,13 +5509,15 @@
         "gdpPerCapita": 40868,
         "treasury": 18397587134,
         "taxRate": 0.389,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 150167,
         "readiness": 72,
         "morale": 45,
-        "forceLimit": 49555
+        "forceLimit": 49555,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5383,13 +5569,15 @@
         "gdpPerCapita": 42833,
         "treasury": 2189127711,
         "taxRate": 0.207,
-        "stability": 81
+        "stability": 81,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 29345,
         "readiness": 71,
         "morale": 94,
-        "forceLimit": 9684
+        "forceLimit": 9684,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5441,13 +5629,15 @@
         "gdpPerCapita": 28108,
         "treasury": 506215205,
         "taxRate": 0.301,
-        "stability": 70
+        "stability": 70,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 5187,
         "readiness": 69,
         "morale": 81,
-        "forceLimit": 1712
+        "forceLimit": 1712,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5499,13 +5689,15 @@
         "gdpPerCapita": 15575,
         "treasury": 5442885504,
         "taxRate": 0.133,
-        "stability": 67
+        "stability": 67,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 179400,
         "readiness": 90,
         "morale": 50,
-        "forceLimit": 59202
+        "forceLimit": 59202,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5557,13 +5749,15 @@
         "gdpPerCapita": 29007,
         "treasury": 13520494438,
         "taxRate": 0.358,
-        "stability": 67
+        "stability": 67,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 54237,
         "readiness": 35,
         "morale": 81,
-        "forceLimit": 17898
+        "forceLimit": 17898,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5615,13 +5809,15 @@
         "gdpPerCapita": 26020,
         "treasury": 6467635982,
         "taxRate": 0.165,
-        "stability": 68
+        "stability": 68,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 119674,
         "readiness": 30,
         "morale": 49,
-        "forceLimit": 39492
+        "forceLimit": 39492,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5673,13 +5869,15 @@
         "gdpPerCapita": 11161,
         "treasury": 3935413875,
         "taxRate": 0.156,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 241963,
         "readiness": 89,
         "morale": 92,
-        "forceLimit": 79848
+        "forceLimit": 79848,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5731,13 +5929,15 @@
         "gdpPerCapita": 43572,
         "treasury": 399900051,
         "taxRate": 0.197,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 3316,
         "readiness": 46,
         "morale": 41,
-        "forceLimit": 1094
+        "forceLimit": 1094,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5789,13 +5989,15 @@
         "gdpPerCapita": 38278,
         "treasury": 2860384241283,
         "taxRate": 0.285,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 29380222,
         "readiness": 84,
         "morale": 71,
-        "forceLimit": 9695473
+        "forceLimit": 9695473,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5847,13 +6049,15 @@
         "gdpPerCapita": 42767,
         "treasury": 389078406420,
         "taxRate": 0.143,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2096047,
         "readiness": 71,
         "morale": 66,
-        "forceLimit": 691696
+        "forceLimit": 691696,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5905,13 +6109,15 @@
         "gdpPerCapita": 33919,
         "treasury": 93053173130,
         "taxRate": 0.251,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1008525,
         "readiness": 58,
         "morale": 87,
-        "forceLimit": 332813
+        "forceLimit": 332813,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -5963,13 +6169,15 @@
         "gdpPerCapita": 35574,
         "treasury": 50327603632,
         "taxRate": 0.387,
-        "stability": 86
+        "stability": 86,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 461542,
         "readiness": 55,
         "morale": 88,
-        "forceLimit": 152309
+        "forceLimit": 152309,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6021,13 +6229,15 @@
         "gdpPerCapita": 36316,
         "treasury": 4768411544,
         "taxRate": 0.146,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 38260,
         "readiness": 63,
         "morale": 88,
-        "forceLimit": 12626
+        "forceLimit": 12626,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6079,13 +6289,15 @@
         "gdpPerCapita": 39299,
         "treasury": 106373705,
         "taxRate": 0.277,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1146,
         "readiness": 45,
         "morale": 46,
-        "forceLimit": 378
+        "forceLimit": 378,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6137,13 +6349,15 @@
         "gdpPerCapita": 37848,
         "treasury": 10889874545,
         "taxRate": 0.389,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 30384,
         "readiness": 45,
         "morale": 52,
-        "forceLimit": 10027
+        "forceLimit": 10027,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6195,13 +6409,15 @@
         "gdpPerCapita": 37164,
         "treasury": 52984345392,
         "taxRate": 0.317,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1393858,
         "readiness": 35,
         "morale": 43,
-        "forceLimit": 459973
+        "forceLimit": 459973,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6253,13 +6469,15 @@
         "gdpPerCapita": 10381,
         "treasury": 1625232809,
         "taxRate": 0.207,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 29859,
         "readiness": 92,
         "morale": 48,
-        "forceLimit": 9853
+        "forceLimit": 9853,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6311,13 +6529,15 @@
         "gdpPerCapita": 20217,
         "treasury": 52452682151,
         "taxRate": 0.358,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2800924,
         "readiness": 89,
         "morale": 87,
-        "forceLimit": 924305
+        "forceLimit": 924305,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6369,13 +6589,15 @@
         "gdpPerCapita": 7212,
         "treasury": 22117898,
         "taxRate": 0.344,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 267,
         "readiness": 79,
         "morale": 72,
-        "forceLimit": 88
+        "forceLimit": 88,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6427,13 +6649,15 @@
         "gdpPerCapita": 7056,
         "treasury": 2081762082,
         "taxRate": 0.37,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 34059,
         "readiness": 85,
         "morale": 59,
-        "forceLimit": 11239
+        "forceLimit": 11239,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6485,13 +6709,15 @@
         "gdpPerCapita": 31257,
         "treasury": 23134091471,
         "taxRate": 0.304,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 213277,
         "readiness": 60,
         "morale": 79,
-        "forceLimit": 70381
+        "forceLimit": 70381,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6543,13 +6769,15 @@
         "gdpPerCapita": 33756,
         "treasury": 56024088755,
         "taxRate": 0.169,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 880016,
         "readiness": 72,
         "morale": 43,
-        "forceLimit": 290405
+        "forceLimit": 290405,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6601,13 +6829,15 @@
         "gdpPerCapita": 47580,
         "treasury": 88964407,
         "taxRate": 0.229,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 596,
         "readiness": 62,
         "morale": 80,
-        "forceLimit": 197
+        "forceLimit": 197,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6659,13 +6889,15 @@
         "gdpPerCapita": 39025,
         "treasury": 27876286912,
         "taxRate": 0.244,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 293884,
         "readiness": 93,
         "morale": 65,
-        "forceLimit": 96982
+        "forceLimit": 96982,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6717,13 +6949,15 @@
         "gdpPerCapita": 33134,
         "treasury": 70559752591,
         "taxRate": 0.24,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 314224,
         "readiness": 68,
         "morale": 68,
-        "forceLimit": 103694
+        "forceLimit": 103694,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6775,13 +7009,15 @@
         "gdpPerCapita": 42661,
         "treasury": 3301436780,
         "taxRate": 0.234,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 92624,
         "readiness": 44,
         "morale": 81,
-        "forceLimit": 30566
+        "forceLimit": 30566,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6833,13 +7069,15 @@
         "gdpPerCapita": 43918,
         "treasury": 3646191377,
         "taxRate": 0.293,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 68963,
         "readiness": 44,
         "morale": 59,
-        "forceLimit": 22758
+        "forceLimit": 22758,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6891,13 +7129,15 @@
         "gdpPerCapita": 29618,
         "treasury": 2900774601,
         "taxRate": 0.139,
-        "stability": 73
+        "stability": 73,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 62435,
         "readiness": 46,
         "morale": 43,
-        "forceLimit": 20604
+        "forceLimit": 20604,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -6949,13 +7189,15 @@
         "gdpPerCapita": 24619,
         "treasury": 947187300,
         "taxRate": 0.301,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 13793,
         "readiness": 71,
         "morale": 50,
-        "forceLimit": 4552
+        "forceLimit": 4552,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7007,13 +7249,15 @@
         "gdpPerCapita": 24497,
         "treasury": 7539831737,
         "taxRate": 0.39,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 155660,
         "readiness": 45,
         "morale": 95,
-        "forceLimit": 51368
+        "forceLimit": 51368,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7065,13 +7309,15 @@
         "gdpPerCapita": 35828,
         "treasury": 1775106616,
         "taxRate": 0.171,
-        "stability": 66
+        "stability": 66,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 18421,
         "readiness": 65,
         "morale": 51,
-        "forceLimit": 6079
+        "forceLimit": 6079,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7123,13 +7369,15 @@
         "gdpPerCapita": 27989,
         "treasury": 3361423526,
         "taxRate": 0.383,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 124106,
         "readiness": 58,
         "morale": 86,
-        "forceLimit": 40955
+        "forceLimit": 40955,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7181,13 +7429,15 @@
         "gdpPerCapita": 26656,
         "treasury": 6036246676,
         "taxRate": 0.249,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 33984,
         "readiness": 94,
         "morale": 70,
-        "forceLimit": 11215
+        "forceLimit": 11215,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7239,13 +7489,15 @@
         "gdpPerCapita": 25627,
         "treasury": 56437208,
         "taxRate": 0.341,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 714,
         "readiness": 73,
         "morale": 40,
-        "forceLimit": 236
+        "forceLimit": 236,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7297,13 +7549,15 @@
         "gdpPerCapita": 39385,
         "treasury": 1387678780,
         "taxRate": 0.336,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 63847,
         "readiness": 63,
         "morale": 48,
-        "forceLimit": 21070
+        "forceLimit": 21070,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7355,13 +7609,15 @@
         "gdpPerCapita": 27760,
         "treasury": 641199574,
         "taxRate": 0.333,
-        "stability": 81
+        "stability": 81,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 11415,
         "readiness": 63,
         "morale": 86,
-        "forceLimit": 3767
+        "forceLimit": 3767,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7413,13 +7669,15 @@
         "gdpPerCapita": 12654,
         "treasury": 194189566,
         "taxRate": 0.322,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 13946,
         "readiness": 89,
         "morale": 45,
-        "forceLimit": 4602
+        "forceLimit": 4602,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7471,13 +7729,15 @@
         "gdpPerCapita": 10017,
         "treasury": 14351847906,
         "taxRate": 0.345,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 216561,
         "readiness": 38,
         "morale": 81,
-        "forceLimit": 71465
+        "forceLimit": 71465,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7529,13 +7789,15 @@
         "gdpPerCapita": 11674,
         "treasury": 6948448675,
         "taxRate": 0.154,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 44514,
         "readiness": 65,
         "morale": 89,
-        "forceLimit": 14690
+        "forceLimit": 14690,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7587,13 +7849,15 @@
         "gdpPerCapita": 6745,
         "treasury": 5403873272,
         "taxRate": 0.278,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 531889,
         "readiness": 62,
         "morale": 62,
-        "forceLimit": 175523
+        "forceLimit": 175523,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7645,13 +7909,15 @@
         "gdpPerCapita": 7587,
         "treasury": 86588792,
         "taxRate": 0.264,
-        "stability": 92
+        "stability": 92,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 6694,
         "readiness": 95,
         "morale": 65,
-        "forceLimit": 2209
+        "forceLimit": 2209,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7703,13 +7969,15 @@
         "gdpPerCapita": 22052,
         "treasury": 5674960583,
         "taxRate": 0.235,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 441359,
         "readiness": 45,
         "morale": 70,
-        "forceLimit": 145648
+        "forceLimit": 145648,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7761,13 +8029,15 @@
         "gdpPerCapita": 21317,
         "treasury": 385972012,
         "taxRate": 0.345,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 9146,
         "readiness": 34,
         "morale": 83,
-        "forceLimit": 3018
+        "forceLimit": 3018,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7819,13 +8089,15 @@
         "gdpPerCapita": 23607,
         "treasury": 37193961,
         "taxRate": 0.27,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 438,
         "readiness": 87,
         "morale": 85,
-        "forceLimit": 145
+        "forceLimit": 145,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7877,13 +8149,15 @@
         "gdpPerCapita": 19475,
         "treasury": 223927539,
         "taxRate": 0.322,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2226,
         "readiness": 46,
         "morale": 69,
-        "forceLimit": 735
+        "forceLimit": 735,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7935,13 +8209,15 @@
         "gdpPerCapita": 21151,
         "treasury": 3076958938,
         "taxRate": 0.146,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 98938,
         "readiness": 50,
         "morale": 42,
-        "forceLimit": 32650
+        "forceLimit": 32650,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -7993,13 +8269,15 @@
         "gdpPerCapita": 19419,
         "treasury": 348802730,
         "taxRate": 0.192,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 14809,
         "readiness": 84,
         "morale": 48,
-        "forceLimit": 4887
+        "forceLimit": 4887,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8051,13 +8329,15 @@
         "gdpPerCapita": 8326,
         "treasury": 34511006,
         "taxRate": 0.187,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2250,
         "readiness": 52,
         "morale": 76,
-        "forceLimit": 743
+        "forceLimit": 743,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8109,13 +8389,15 @@
         "gdpPerCapita": 19570,
         "treasury": 117030590830,
         "taxRate": 0.179,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1741262,
         "readiness": 91,
         "morale": 68,
-        "forceLimit": 574616
+        "forceLimit": 574616,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8167,13 +8449,15 @@
         "gdpPerCapita": 6673,
         "treasury": 25265558,
         "taxRate": 0.26,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2741,
         "readiness": 67,
         "morale": 46,
-        "forceLimit": 905
+        "forceLimit": 905,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8225,13 +8509,15 @@
         "gdpPerCapita": 10695,
         "treasury": 1547951554,
         "taxRate": 0.265,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 63352,
         "readiness": 80,
         "morale": 55,
-        "forceLimit": 20906
+        "forceLimit": 20906,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8283,13 +8569,15 @@
         "gdpPerCapita": 6487,
         "treasury": 3821047,
         "taxRate": 0.262,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 685,
         "readiness": 46,
         "morale": 43,
-        "forceLimit": 226
+        "forceLimit": 226,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8341,13 +8629,15 @@
         "gdpPerCapita": 15726,
         "treasury": 551940922,
         "taxRate": 0.197,
-        "stability": 87
+        "stability": 87,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 22782,
         "readiness": 90,
         "morale": 84,
-        "forceLimit": 7518
+        "forceLimit": 7518,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8399,13 +8689,15 @@
         "gdpPerCapita": 16518,
         "treasury": 592652082,
         "taxRate": 0.382,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1821,
         "readiness": 31,
         "morale": 86,
-        "forceLimit": 601
+        "forceLimit": 601,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8457,13 +8749,15 @@
         "gdpPerCapita": 7534,
         "treasury": 1094295,
         "taxRate": 0.228,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 47,
         "readiness": 59,
         "morale": 79,
-        "forceLimit": 16
+        "forceLimit": 16,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8515,13 +8809,15 @@
         "gdpPerCapita": 9492,
         "treasury": 16005600494,
         "taxRate": 0.151,
-        "stability": 88
+        "stability": 88,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 417206,
         "readiness": 77,
         "morale": 43,
-        "forceLimit": 137678
+        "forceLimit": 137678,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8573,13 +8869,15 @@
         "gdpPerCapita": 19784,
         "treasury": 36112424151,
         "taxRate": 0.251,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 422570,
         "readiness": 40,
         "morale": 76,
-        "forceLimit": 139448
+        "forceLimit": 139448,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8631,13 +8929,15 @@
         "gdpPerCapita": 10702,
         "treasury": 9878055689,
         "taxRate": 0.328,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1354110,
         "readiness": 81,
         "morale": 80,
-        "forceLimit": 446856
+        "forceLimit": 446856,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8689,13 +8989,15 @@
         "gdpPerCapita": 34078,
         "treasury": 1274063427,
         "taxRate": 0.182,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 33287,
         "readiness": 39,
         "morale": 69,
-        "forceLimit": 10985
+        "forceLimit": 10985,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8747,13 +9049,15 @@
         "gdpPerCapita": 36218,
         "treasury": 7693082,
         "taxRate": 0.379,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 244,
         "readiness": 39,
         "morale": 79,
-        "forceLimit": 81
+        "forceLimit": 81,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8805,13 +9109,15 @@
         "gdpPerCapita": 22918,
         "treasury": 21300182938,
         "taxRate": 0.355,
-        "stability": 92
+        "stability": 92,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 152623,
         "readiness": 90,
         "morale": 75,
-        "forceLimit": 50366
+        "forceLimit": 50366,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8863,13 +9169,15 @@
         "gdpPerCapita": 27099,
         "treasury": 18189481307,
         "taxRate": 0.267,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 220816,
         "readiness": 64,
         "morale": 91,
-        "forceLimit": 72869
+        "forceLimit": 72869,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8921,13 +9229,15 @@
         "gdpPerCapita": 24693,
         "treasury": 324374050,
         "taxRate": 0.312,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 6463,
         "readiness": 93,
         "morale": 46,
-        "forceLimit": 2133
+        "forceLimit": 2133,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -8979,13 +9289,15 @@
         "gdpPerCapita": 23049,
         "treasury": 2812929252,
         "taxRate": 0.377,
-        "stability": 85
+        "stability": 85,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 30179,
         "readiness": 39,
         "morale": 91,
-        "forceLimit": 9959
+        "forceLimit": 9959,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9037,13 +9349,15 @@
         "gdpPerCapita": 18461,
         "treasury": 2158887352,
         "taxRate": 0.348,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 98023,
         "readiness": 84,
         "morale": 42,
-        "forceLimit": 32348
+        "forceLimit": 32348,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9095,13 +9409,15 @@
         "gdpPerCapita": 32074,
         "treasury": 21132546858,
         "taxRate": 0.193,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 284233,
         "readiness": 36,
         "morale": 49,
-        "forceLimit": 93797
+        "forceLimit": 93797,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9153,13 +9469,15 @@
         "gdpPerCapita": 24981,
         "treasury": 257229960961,
         "taxRate": 0.165,
-        "stability": 81
+        "stability": 81,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 874318,
         "readiness": 31,
         "morale": 62,
-        "forceLimit": 288525
+        "forceLimit": 288525,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9211,13 +9529,15 @@
         "gdpPerCapita": 24833,
         "treasury": 2091517,
         "taxRate": 0.211,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 22,
         "readiness": 73,
         "morale": 68,
-        "forceLimit": 7
+        "forceLimit": 7,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9269,13 +9589,15 @@
         "gdpPerCapita": 40013,
         "treasury": 3430888,
         "taxRate": 0.151,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 5,
         "readiness": 91,
         "morale": 84,
-        "forceLimit": 2
+        "forceLimit": 2,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9327,13 +9649,15 @@
         "gdpPerCapita": 18405,
         "treasury": 1723089561,
         "taxRate": 0.367,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 34371,
         "readiness": 42,
         "morale": 68,
-        "forceLimit": 11342
+        "forceLimit": 11342,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9385,13 +9709,15 @@
         "gdpPerCapita": 19198,
         "treasury": 52258774,
         "taxRate": 0.333,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 696,
         "readiness": 74,
         "morale": 59,
-        "forceLimit": 230
+        "forceLimit": 230,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9443,13 +9769,15 @@
         "gdpPerCapita": 31753,
         "treasury": 2277564641,
         "taxRate": 0.331,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 87292,
         "readiness": 58,
         "morale": 45,
-        "forceLimit": 28806
+        "forceLimit": 28806,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9501,13 +9829,15 @@
         "gdpPerCapita": 42857,
         "treasury": 2984672566,
         "taxRate": 0.342,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 114760,
         "readiness": 54,
         "morale": 49,
-        "forceLimit": 37871
+        "forceLimit": 37871,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9559,13 +9889,15 @@
         "gdpPerCapita": 26198,
         "treasury": 299806031484,
         "taxRate": 0.221,
-        "stability": 91
+        "stability": 91,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 797907,
         "readiness": 45,
         "morale": 93,
-        "forceLimit": 263309
+        "forceLimit": 263309,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9617,13 +9949,15 @@
         "gdpPerCapita": 48793,
         "treasury": 45179804,
         "taxRate": 0.188,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 205,
         "readiness": 82,
         "morale": 57,
-        "forceLimit": 68
+        "forceLimit": 68,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9675,13 +10009,15 @@
         "gdpPerCapita": 32705,
         "treasury": 1763663584,
         "taxRate": 0.37,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 21759,
         "readiness": 52,
         "morale": 82,
-        "forceLimit": 7180
+        "forceLimit": 7180,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9733,13 +10069,15 @@
         "gdpPerCapita": 28887,
         "treasury": 1256545940,
         "taxRate": 0.202,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 53133,
         "readiness": 65,
         "morale": 73,
-        "forceLimit": 17534
+        "forceLimit": 17534,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9791,13 +10129,15 @@
         "gdpPerCapita": 32585,
         "treasury": 13237641844,
         "taxRate": 0.312,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 137236,
         "readiness": 37,
         "morale": 84,
-        "forceLimit": 45288
+        "forceLimit": 45288,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9849,13 +10189,15 @@
         "gdpPerCapita": 43084,
         "treasury": 18084920859,
         "taxRate": 0.331,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 121149,
         "readiness": 61,
         "morale": 52,
-        "forceLimit": 39979
+        "forceLimit": 39979,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9907,13 +10249,15 @@
         "gdpPerCapita": 42478,
         "treasury": 69553343433,
         "taxRate": 0.399,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 795378,
         "readiness": 57,
         "morale": 85,
-        "forceLimit": 262475
+        "forceLimit": 262475,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -9965,13 +10309,15 @@
         "gdpPerCapita": 27044,
         "treasury": 91727991217,
         "taxRate": 0.176,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1462590,
         "readiness": 69,
         "morale": 48,
-        "forceLimit": 482655
+        "forceLimit": 482655,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10023,13 +10369,15 @@
         "gdpPerCapita": 48772,
         "treasury": 38094,
         "taxRate": 0.183,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1,
         "readiness": 77,
         "morale": 79,
-        "forceLimit": 0
+        "forceLimit": 0,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10081,13 +10429,15 @@
         "gdpPerCapita": 27314,
         "treasury": 47249288757,
         "taxRate": 0.163,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 180211,
         "readiness": 79,
         "morale": 51,
-        "forceLimit": 59470
+        "forceLimit": 59470,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10139,13 +10489,15 @@
         "gdpPerCapita": 40940,
         "treasury": 19856753560,
         "taxRate": 0.38,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 109709,
         "readiness": 78,
         "morale": 86,
-        "forceLimit": 36204
+        "forceLimit": 36204,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10197,13 +10549,15 @@
         "gdpPerCapita": 41099,
         "treasury": 2331701662,
         "taxRate": 0.136,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 22529,
         "readiness": 86,
         "morale": 66,
-        "forceLimit": 7435
+        "forceLimit": 7435,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10255,13 +10609,15 @@
         "gdpPerCapita": 12470,
         "treasury": 688910542,
         "taxRate": 0.283,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 8395,
         "readiness": 89,
         "morale": 78,
-        "forceLimit": 2770
+        "forceLimit": 2770,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10313,13 +10669,15 @@
         "gdpPerCapita": 24366,
         "treasury": 850646850,
         "taxRate": 0.224,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 7685,
         "readiness": 82,
         "morale": 79,
-        "forceLimit": 2536
+        "forceLimit": 2536,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10371,13 +10729,15 @@
         "gdpPerCapita": 26230,
         "treasury": 14963733755,
         "taxRate": 0.224,
-        "stability": 88
+        "stability": 88,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 318006,
         "readiness": 55,
         "morale": 78,
-        "forceLimit": 104942
+        "forceLimit": 104942,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10429,13 +10789,15 @@
         "gdpPerCapita": 31634,
         "treasury": 229135307912,
         "taxRate": 0.25,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 3310928,
         "readiness": 79,
         "morale": 84,
-        "forceLimit": 1092606
+        "forceLimit": 1092606,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10487,13 +10849,15 @@
         "gdpPerCapita": 21811,
         "treasury": 13502007020,
         "taxRate": 0.176,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 116667,
         "readiness": 59,
         "morale": 80,
-        "forceLimit": 38500
+        "forceLimit": 38500,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10545,13 +10909,15 @@
         "gdpPerCapita": 47381,
         "treasury": 13423501,
         "taxRate": 0.13,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 153,
         "readiness": 37,
         "morale": 51,
-        "forceLimit": 50
+        "forceLimit": 50,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10603,13 +10969,15 @@
         "gdpPerCapita": 10428,
         "treasury": 1188065,
         "taxRate": 0.197,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 88,
         "readiness": 43,
         "morale": 43,
-        "forceLimit": 29
+        "forceLimit": 29,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10661,13 +11029,15 @@
         "gdpPerCapita": 34455,
         "treasury": 86780665,
         "taxRate": 0.148,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1148,
         "readiness": 37,
         "morale": 42,
-        "forceLimit": 379
+        "forceLimit": 379,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10719,13 +11089,15 @@
         "gdpPerCapita": 43679,
         "treasury": 148862854,
         "taxRate": 0.179,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1387,
         "readiness": 55,
         "morale": 74,
-        "forceLimit": 458
+        "forceLimit": 458,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10777,13 +11149,15 @@
         "gdpPerCapita": 14117,
         "treasury": 20644970,
         "taxRate": 0.181,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 506,
         "readiness": 80,
         "morale": 51,
-        "forceLimit": 167
+        "forceLimit": 167,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10835,13 +11209,15 @@
         "gdpPerCapita": 23344,
         "treasury": 7809546,
         "taxRate": 0.221,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 97,
         "readiness": 33,
         "morale": 62,
-        "forceLimit": 32
+        "forceLimit": 32,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10893,13 +11269,15 @@
         "gdpPerCapita": 42430,
         "treasury": 98595233,
         "taxRate": 0.235,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 597,
         "readiness": 78,
         "morale": 69,
-        "forceLimit": 197
+        "forceLimit": 197,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -10951,13 +11329,15 @@
         "gdpPerCapita": 23958,
         "treasury": 170314242,
         "taxRate": 0.289,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1625,
         "readiness": 51,
         "morale": 66,
-        "forceLimit": 536
+        "forceLimit": 536,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11009,13 +11389,15 @@
         "gdpPerCapita": 21747,
         "treasury": 34756328,
         "taxRate": 0.304,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 607,
         "readiness": 69,
         "morale": 86,
-        "forceLimit": 200
+        "forceLimit": 200,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11067,13 +11449,15 @@
         "gdpPerCapita": 5283,
         "treasury": 66697924,
         "taxRate": 0.166,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 4634,
         "readiness": 36,
         "morale": 46,
-        "forceLimit": 1529
+        "forceLimit": 1529,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11125,13 +11509,15 @@
         "gdpPerCapita": 7837,
         "treasury": 14944598756,
         "taxRate": 0.323,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 623445,
         "readiness": 79,
         "morale": 44,
-        "forceLimit": 205737
+        "forceLimit": 205737,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11183,13 +11569,15 @@
         "gdpPerCapita": 14916,
         "treasury": 14787681098,
         "taxRate": 0.395,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 315228,
         "readiness": 65,
         "morale": 72,
-        "forceLimit": 104025
+        "forceLimit": 104025,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11241,13 +11629,15 @@
         "gdpPerCapita": 7507,
         "treasury": 666310102,
         "taxRate": 0.155,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 139652,
         "readiness": 34,
         "morale": 43,
-        "forceLimit": 46085
+        "forceLimit": 46085,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11299,13 +11689,15 @@
         "gdpPerCapita": 13895,
         "treasury": 77024541,
         "taxRate": 0.307,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1569,
         "readiness": 37,
         "morale": 74,
-        "forceLimit": 518
+        "forceLimit": 518,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11357,13 +11749,15 @@
         "gdpPerCapita": 16609,
         "treasury": 7063905937,
         "taxRate": 0.213,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 83000,
         "readiness": 38,
         "morale": 59,
-        "forceLimit": 27390
+        "forceLimit": 27390,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11415,13 +11809,15 @@
         "gdpPerCapita": 20201,
         "treasury": 4979463322,
         "taxRate": 0.187,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 47032,
         "readiness": 45,
         "morale": 89,
-        "forceLimit": 15521
+        "forceLimit": 15521,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11473,13 +11869,15 @@
         "gdpPerCapita": 4779,
         "treasury": 3818492,
         "taxRate": 0.214,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 340,
         "readiness": 35,
         "morale": 75,
-        "forceLimit": 112
+        "forceLimit": 112,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11531,13 +11929,15 @@
         "gdpPerCapita": 10376,
         "treasury": 2671231547,
         "taxRate": 0.253,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 49797,
         "readiness": 83,
         "morale": 77,
-        "forceLimit": 16433
+        "forceLimit": 16433,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11589,13 +11989,15 @@
         "gdpPerCapita": 9661,
         "treasury": 543165344,
         "taxRate": 0.261,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 12879,
         "readiness": 56,
         "morale": 72,
-        "forceLimit": 4250
+        "forceLimit": 4250,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11647,13 +12049,15 @@
         "gdpPerCapita": 16097,
         "treasury": 651652522,
         "taxRate": 0.304,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 9631,
         "readiness": 41,
         "morale": 47,
-        "forceLimit": 3178
+        "forceLimit": 3178,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11705,13 +12109,15 @@
         "gdpPerCapita": 9883,
         "treasury": 7843516803,
         "taxRate": 0.217,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 249086,
         "readiness": 67,
         "morale": 84,
-        "forceLimit": 82198
+        "forceLimit": 82198,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11763,13 +12169,15 @@
         "gdpPerCapita": 5868,
         "treasury": 10400809467,
         "taxRate": 0.388,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1338747,
         "readiness": 46,
         "morale": 85,
-        "forceLimit": 441787
+        "forceLimit": 441787,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11821,13 +12229,15 @@
         "gdpPerCapita": 24070,
         "treasury": 19168,
         "taxRate": 0.365,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1,
         "readiness": 58,
         "morale": 76,
-        "forceLimit": 0
+        "forceLimit": 0,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11879,13 +12289,15 @@
         "gdpPerCapita": 14048,
         "treasury": 4081129220,
         "taxRate": 0.152,
-        "stability": 69
+        "stability": 69,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 78691,
         "readiness": 70,
         "morale": 76,
-        "forceLimit": 25968
+        "forceLimit": 25968,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11937,13 +12349,15 @@
         "gdpPerCapita": 43625,
         "treasury": 84619042487,
         "taxRate": 0.151,
-        "stability": 87
+        "stability": 87,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 246746,
         "readiness": 55,
         "morale": 69,
-        "forceLimit": 81426
+        "forceLimit": 81426,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -11995,13 +12409,15 @@
         "gdpPerCapita": 31866,
         "treasury": 12071914552,
         "taxRate": 0.263,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 155961,
         "readiness": 66,
         "morale": 88,
-        "forceLimit": 51467
+        "forceLimit": 51467,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12053,13 +12469,15 @@
         "gdpPerCapita": 9254,
         "treasury": 17662853671,
         "taxRate": 0.281,
-        "stability": 90
+        "stability": 90,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 374503,
         "readiness": 83,
         "morale": 43,
-        "forceLimit": 123586
+        "forceLimit": 123586,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12111,13 +12529,15 @@
         "gdpPerCapita": 6664,
         "treasury": 183222567,
         "taxRate": 0.275,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 10091,
         "readiness": 61,
         "morale": 47,
-        "forceLimit": 3330
+        "forceLimit": 3330,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12169,13 +12589,15 @@
         "gdpPerCapita": 22870,
         "treasury": 2485394,
         "taxRate": 0.183,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 45,
         "readiness": 51,
         "morale": 85,
-        "forceLimit": 15
+        "forceLimit": 15,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12227,13 +12649,15 @@
         "gdpPerCapita": 16545,
         "treasury": 3066016306,
         "taxRate": 0.354,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 157414,
         "readiness": 78,
         "morale": 73,
-        "forceLimit": 51947
+        "forceLimit": 51947,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12285,13 +12709,15 @@
         "gdpPerCapita": 13989,
         "treasury": 2495541113,
         "taxRate": 0.2,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 22218,
         "readiness": 50,
         "morale": 69,
-        "forceLimit": 7332
+        "forceLimit": 7332,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12343,13 +12769,15 @@
         "gdpPerCapita": 15587,
         "treasury": 12028576751,
         "taxRate": 0.361,
-        "stability": 82
+        "stability": 82,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 159248,
         "readiness": 82,
         "morale": 53,
-        "forceLimit": 52552
+        "forceLimit": 52552,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12401,13 +12829,15 @@
         "gdpPerCapita": 14242,
         "treasury": 16421548801,
         "taxRate": 0.234,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 92622,
         "readiness": 33,
         "morale": 65,
-        "forceLimit": 30565
+        "forceLimit": 30565,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12459,13 +12889,15 @@
         "gdpPerCapita": 8666,
         "treasury": 2179431161,
         "taxRate": 0.184,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 82651,
         "readiness": 62,
         "morale": 43,
-        "forceLimit": 27275
+        "forceLimit": 27275,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12517,13 +12949,15 @@
         "gdpPerCapita": 5015,
         "treasury": 14754197224,
         "taxRate": 0.353,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 243552,
         "readiness": 64,
         "morale": 69,
-        "forceLimit": 80372
+        "forceLimit": 80372,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12575,13 +13009,15 @@
         "gdpPerCapita": 42149,
         "treasury": 66917634484,
         "taxRate": 0.145,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1154708,
         "readiness": 32,
         "morale": 60,
-        "forceLimit": 381054
+        "forceLimit": 381054,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12633,13 +13069,15 @@
         "gdpPerCapita": 47562,
         "treasury": 1398649804,
         "taxRate": 0.374,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 4543,
         "readiness": 61,
         "morale": 85,
-        "forceLimit": 1499
+        "forceLimit": 1499,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12691,13 +13129,15 @@
         "gdpPerCapita": 41133,
         "treasury": 13229680074,
         "taxRate": 0.184,
-        "stability": 83
+        "stability": 83,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 48387,
         "readiness": 65,
         "morale": 83,
-        "forceLimit": 15968
+        "forceLimit": 15968,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12749,13 +13189,15 @@
         "gdpPerCapita": 54351,
         "treasury": 2213596,
         "taxRate": 0.155,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 4,
         "readiness": 89,
         "morale": 56,
-        "forceLimit": 1
+        "forceLimit": 1,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12807,13 +13249,15 @@
         "gdpPerCapita": 9705,
         "treasury": 41297020,
         "taxRate": 0.155,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2334,
         "readiness": 79,
         "morale": 53,
-        "forceLimit": 770
+        "forceLimit": 770,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12865,13 +13309,15 @@
         "gdpPerCapita": 15104,
         "treasury": 408134905,
         "taxRate": 0.31,
-        "stability": 89
+        "stability": 89,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 32647,
         "readiness": 67,
         "morale": 63,
-        "forceLimit": 10774
+        "forceLimit": 10774,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12923,13 +13369,15 @@
         "gdpPerCapita": 9157,
         "treasury": 1089927998,
         "taxRate": 0.162,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 55507,
         "readiness": 78,
         "morale": 53,
-        "forceLimit": 18317
+        "forceLimit": 18317,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -12981,13 +13429,15 @@
         "gdpPerCapita": 9548,
         "treasury": 42509886151,
         "taxRate": 0.241,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2077838,
         "readiness": 44,
         "morale": 95,
-        "forceLimit": 685687
+        "forceLimit": 685687,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13039,13 +13489,15 @@
         "gdpPerCapita": 46416,
         "treasury": 14487856943,
         "taxRate": 0.18,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 105512,
         "readiness": 37,
         "morale": 68,
-        "forceLimit": 34819
+        "forceLimit": 34819,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13097,13 +13549,15 @@
         "gdpPerCapita": 43123,
         "treasury": 21762918,
         "taxRate": 0.344,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 541,
         "readiness": 79,
         "morale": 69,
-        "forceLimit": 179
+        "forceLimit": 179,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13155,13 +13609,15 @@
         "gdpPerCapita": 11512,
         "treasury": 4344169,
         "taxRate": 0.22,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 92,
         "readiness": 71,
         "morale": 58,
-        "forceLimit": 30
+        "forceLimit": 30,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13213,13 +13669,15 @@
         "gdpPerCapita": 26686,
         "treasury": 24696627440,
         "taxRate": 0.379,
-        "stability": 79
+        "stability": 79,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 955156,
         "readiness": 70,
         "morale": 62,
-        "forceLimit": 315201
+        "forceLimit": 315201,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13271,13 +13729,15 @@
         "gdpPerCapita": 33558,
         "treasury": 46919876595,
         "taxRate": 0.143,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 626977,
         "readiness": 79,
         "morale": 60,
-        "forceLimit": 206902
+        "forceLimit": 206902,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13329,13 +13789,15 @@
         "gdpPerCapita": 36107,
         "treasury": 8822846993,
         "taxRate": 0.319,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 21819,
         "readiness": 33,
         "morale": 74,
-        "forceLimit": 7200
+        "forceLimit": 7200,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13387,13 +13849,15 @@
         "gdpPerCapita": 38500,
         "treasury": 112852734711,
         "taxRate": 0.133,
-        "stability": 84
+        "stability": 84,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1590372,
         "readiness": 53,
         "morale": 89,
-        "forceLimit": 524823
+        "forceLimit": 524823,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13445,13 +13909,15 @@
         "gdpPerCapita": 26791,
         "treasury": 393303019271,
         "taxRate": 0.212,
-        "stability": 72
+        "stability": 72,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 4165017,
         "readiness": 49,
         "morale": 56,
-        "forceLimit": 1374456
+        "forceLimit": 1374456,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13503,13 +13969,15 @@
         "gdpPerCapita": 27382,
         "treasury": 3105052735,
         "taxRate": 0.312,
-        "stability": 75
+        "stability": 75,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 85035,
         "readiness": 81,
         "morale": 80,
-        "forceLimit": 28062
+        "forceLimit": 28062,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13561,13 +14029,15 @@
         "gdpPerCapita": 29547,
         "treasury": 60026642753,
         "taxRate": 0.123,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 628711,
         "readiness": 33,
         "morale": 79,
-        "forceLimit": 207475
+        "forceLimit": 207475,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13619,13 +14089,15 @@
         "gdpPerCapita": 49480,
         "treasury": 470083054,
         "taxRate": 0.38,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 7599,
         "readiness": 60,
         "morale": 68,
-        "forceLimit": 2508
+        "forceLimit": 2508,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13677,13 +14149,15 @@
         "gdpPerCapita": 7048,
         "treasury": 173108,
         "taxRate": 0.31,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 8,
         "readiness": 46,
         "morale": 70,
-        "forceLimit": 3
+        "forceLimit": 3,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13735,13 +14209,15 @@
         "gdpPerCapita": 33771,
         "treasury": 23958372811,
         "taxRate": 0.39,
-        "stability": 70
+        "stability": 70,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 521687,
         "readiness": 35,
         "morale": 42,
-        "forceLimit": 172157
+        "forceLimit": 172157,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13793,13 +14269,15 @@
         "gdpPerCapita": 42731,
         "treasury": 81759938076,
         "taxRate": 0.13,
-        "stability": 81
+        "stability": 81,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 2229129,
         "readiness": 70,
         "morale": 94,
-        "forceLimit": 735613
+        "forceLimit": 735613,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13851,13 +14329,15 @@
         "gdpPerCapita": 51344,
         "treasury": 90339527,
         "taxRate": 0.232,
-        "stability": 80
+        "stability": 80,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 252,
         "readiness": 38,
         "morale": 68,
-        "forceLimit": 83
+        "forceLimit": 83,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13909,13 +14389,15 @@
         "gdpPerCapita": 50102,
         "treasury": 115173299,
         "taxRate": 0.392,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 1799,
         "readiness": 34,
         "morale": 92,
-        "forceLimit": 594
+        "forceLimit": 594,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -13967,13 +14449,15 @@
         "gdpPerCapita": 32252,
         "treasury": 7518180,
         "taxRate": 0.368,
-        "stability": 78
+        "stability": 78,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 229,
         "readiness": 69,
         "morale": 51,
-        "forceLimit": 76
+        "forceLimit": 76,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -14025,13 +14509,15 @@
         "gdpPerCapita": 43716,
         "treasury": 491091325,
         "taxRate": 0.148,
-        "stability": 77
+        "stability": 77,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 10564,
         "readiness": 64,
         "morale": 85,
-        "forceLimit": 3486
+        "forceLimit": 3486,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -14083,13 +14569,15 @@
         "gdpPerCapita": 27356,
         "treasury": 33323335160,
         "taxRate": 0.143,
-        "stability": 73
+        "stability": 73,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 220744,
         "readiness": 45,
         "morale": 83,
-        "forceLimit": 72846
+        "forceLimit": 72846,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -14141,13 +14629,15 @@
         "gdpPerCapita": 36463,
         "treasury": 8821860254,
         "taxRate": 0.277,
-        "stability": 74
+        "stability": 74,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 247441,
         "readiness": 47,
         "morale": 60,
-        "forceLimit": 81656
+        "forceLimit": 81656,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {
@@ -14199,13 +14689,15 @@
         "gdpPerCapita": 9057,
         "treasury": 4804986506,
         "taxRate": 0.34,
-        "stability": 76
+        "stability": 76,
+        "legislativeSupport": 0.55
       },
       "military": {
         "totalPersonnel": 209103,
         "readiness": 60,
         "morale": 83,
-        "forceLimit": 69004
+        "forceLimit": 69004,
+        "militaryLoyalty": 70
       },
       "relationships": [
         {

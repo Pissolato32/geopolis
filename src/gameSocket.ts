@@ -4,9 +4,10 @@
 // dashboard gets a live event feed, a live unit roster, a fluctuating
 // global market, and acknowledged responses to all action-button intents.
 
-import type { Country, GameEvent, IntentResponse, MarketPrice, PlayerPolicy, StrictIntent, Unit, WorldSeed } from "./shared/types.js";
+import type { Country, GameEvent, IntentResponse, MarketPrice, PlayerPolicy, StrictIntent, Unit, WorldSeed, CabinetCard } from "./shared/types.js";
 import { persistEvent, persistMarket, persistPlayerPolicy, persistTurnResults, persistUnitDisband, persistUnitMove, type PersistedWorld } from "./gameStore.js";
 import { processTurn } from "./turnEngine.js";
+import { selectOptionForPosture } from "./ministerAI.js";
 
 type EventListener = (evt: GameEvent) => void;
 type IntentListener = (res: IntentResponse) => void;
@@ -14,6 +15,7 @@ type UnitsListener = (units: Unit[]) => void;
 type TickListener = (tick: number) => void;
 type PlayerListener = (code: string) => void;
 type SimStateListener = (state: SimState) => void;
+type CabinetCardsListener = (cards: CabinetCard[]) => void;
 
 export type SimSpeed = 0 | 1 | 2 | 5;
 export interface SimState { paused: boolean; speed: SimSpeed; }
@@ -43,6 +45,8 @@ class GameSocket {
   private playerListeners = new Set<PlayerListener>();
   private simState: SimState = { paused: true, speed: 0 };
   private simStateListeners = new Set<SimStateListener>();
+  private cabinetCardsListeners = new Set<CabinetCardsListener>();
+  private pendingCabinetCards: CabinetCard[] = [];
   private intelMap = new Map<string, number>();
   private intelListeners = new Set<(target: string, level: number) => void>();
 
@@ -136,6 +140,20 @@ class GameSocket {
     this.simStateListeners.add(l);
     l(this.simState);
     return () => this.simStateListeners.delete(l);
+  }
+
+  onCabinetCards(l: CabinetCardsListener): () => void {
+    this.cabinetCardsListeners.add(l);
+    l(this.pendingCabinetCards);
+    return () => this.cabinetCardsListeners.delete(l);
+  }
+
+  getCabinetCards(): CabinetCard[] {
+    return this.pendingCabinetCards;
+  }
+
+  private broadcastCabinetCards(): void {
+    for (const l of this.cabinetCardsListeners) l(this.pendingCabinetCards);
   }
 
   setPaused(paused: boolean): void {
@@ -311,6 +329,8 @@ class GameSocket {
     // Recruitment creates a unit locally immediately
     if (intent.intent === "recruit-unit") { this.handleRecruitUnit(intent); return; }
 
+    if (intent.intent === "resolve-cabinet-card") { this.handleResolveCabinetCard(intent); return; }
+
     // Covert ops in sim mode: generate events locally
     if (intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage") {
       if (this.mode === "sim") { this.handleCovertOpSim(intent); return; }
@@ -455,6 +475,61 @@ class GameSocket {
     }
   }
 
+  /** Resolve a cabinet card: apply the chosen option's effects to the
+   *  player country, or delegate to the minister AI for automatic selection. */
+  private handleResolveCabinetCard(intent: Extract<StrictIntent, { intent: "resolve-cabinet-card" }>): void {
+    const card = this.pendingCabinetCards.find((c) => c.id === intent.cardId);
+    if (!card) return;
+
+    const playerIdx = this.countries.findIndex((c) => c.id === intent.from);
+    if (playerIdx < 0) return;
+    const player = this.countries[playerIdx]!;
+
+    let chosenOption = card.options.find((o) => o.id === intent.optionId);
+    let delegated = intent.delegated;
+
+    if (delegated || !chosenOption) {
+      chosenOption = selectOptionForPosture(card, player.posture);
+      delegated = true;
+    }
+
+    if (!chosenOption) return;
+    const eff = chosenOption.effects;
+    const clamped = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
+
+    const updated: Country = {
+      ...player,
+      economy: {
+        ...player.economy,
+        treasury: player.economy.treasury + (eff.treasuryDelta ?? 0),
+        stability: clamped(player.economy.stability + (eff.stabilityDelta ?? 0), 0, 100),
+        legislativeSupport: clamped(player.economy.legislativeSupport + (eff.legislativeSupportDelta ?? 0), 0, 1),
+      },
+      military: {
+        ...player.military,
+        readiness: clamped(player.military.readiness + (eff.readinessDelta ?? 0), 0, 100),
+        militaryLoyalty: clamped(player.military.militaryLoyalty + (eff.militaryLoyaltyDelta ?? 0), 0, 100),
+      },
+    };
+
+    this.countries = this.countries.map((c, i) => (i === playerIdx ? updated : c));
+
+    // remove resolved card from queue
+    this.pendingCabinetCards = this.pendingCabinetCards.filter((c) => c.id !== intent.cardId);
+    this.broadcastCabinetCards();
+
+    const evt: GameEvent = {
+      type: "politics.cabinet-resolved",
+      at: new Date().toISOString(),
+      country: intent.from,
+      cardTitle: card.title,
+      optionLabel: chosenOption.label,
+      delegated,
+    } as unknown as GameEvent;
+    this.emit(evt);
+    if (this.gameId) void persistEvent(this.gameId, evt);
+  }
+
   // ---- simulator ----------------------------------------------------------
 
   private startSim(): void {
@@ -513,12 +588,15 @@ class GameSocket {
         if (ok) return; // events will arrive over WS
       }
       const nextTick = this.currentTick + 1;
-      const result = processTurn(this.countries, this.units, nextTick);
+      const result = processTurn(this.countries, this.units, nextTick, this.playerCode);
       this.countries = result.countries;
       this.units = result.units;
       this.currentTick = nextTick;
       this.broadcastUnits();
       this.broadcastTick();
+      // queue any cabinet cards for the player
+      this.pendingCabinetCards = result.cabinetCards;
+      this.broadcastCabinetCards();
       // emit events with a small stagger so the log feels alive
       for (let i = 0; i < result.events.length; i++) {
         const evt = result.events[i];
@@ -657,7 +735,7 @@ function simulateIntent(intent: StrictIntent, seed: WorldSeed | null, units: Uni
   if (
     intent.intent === "set-tax" || intent.intent === "set-readiness" || intent.intent === "set-posture" ||
     intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage" ||
-    intent.intent === "recruit-unit"
+    intent.intent === "recruit-unit" || intent.intent === "resolve-cabinet-card"
   ) {
     return { ok: true, acknowledged: intent, events: [] };
   }

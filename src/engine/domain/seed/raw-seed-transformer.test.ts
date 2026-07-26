@@ -32,12 +32,14 @@ function makeCountry(overrides: Partial<Country> = {}): Country {
       treasury: 500000000000,
       taxRate: 0.27,
       stability: 72,
+      legislativeSupport: 0.55,
     },
     military: {
       totalPersonnel: 1400000,
       readiness: 85,
       morale: 75,
       forceLimit: 462000,
+      militaryLoyalty: 70,
     },
     posture: 'diplomatic',
     relationships: [
@@ -57,8 +59,8 @@ describe('Raw Seed Transformer', () => {
       countries: [makeCountry(), makeCountry({
         id: 'CAN', numericCode: '124', name: 'Canada',
         latlng: [56, -106], region: 'Americas', population: 38000000,
-        economy: { gdp: 1800000000000, gdpPerCapita: 47368, treasury: 40000000000, taxRate: 0.31, stability: 88 },
-        military: { totalPersonnel: 90000, readiness: 70, morale: 80, forceLimit: 29700 },
+        economy: { gdp: 1800000000000, gdpPerCapita: 47368, treasury: 40000000000, taxRate: 0.31, stability: 88, legislativeSupport: 0.6 },
+        military: { totalPersonnel: 90000, readiness: 70, morale: 80, forceLimit: 29700, militaryLoyalty: 75 },
         posture: 'diplomatic',
         relationships: [{ countryCode: 'USA', affinity: 80, tension: 10 }],
       })],
@@ -117,7 +119,7 @@ describe('Raw Seed Transformer', () => {
       generatedAt: '2026-07-25T00:00:00Z',
       source: 'test',
       countryCount: 1,
-      countries: [makeCountry({ economy: { gdp: 1000, gdpPerCapita: 10, treasury: 100, taxRate: 0.2, stability: 72 } })],
+      countries: [makeCountry({ economy: { gdp: 1000, gdpPerCapita: 10, treasury: 100, taxRate: 0.2, stability: 72, legislativeSupport: 0.5 } })],
     };
 
     const seed = transformRawSeed(raw);
@@ -133,7 +135,7 @@ describe('Raw Seed Transformer', () => {
       generatedAt: '2026-07-25T00:00:00Z',
       source: 'test',
       countryCount: 1,
-      countries: [makeCountry({ military: { totalPersonnel: 1000, readiness: 85, morale: 60, forceLimit: 330 } })],
+      countries: [makeCountry({ military: { totalPersonnel: 1000, readiness: 85, morale: 60, forceLimit: 330, militaryLoyalty: 70 } })],
     };
 
     const seed = transformRawSeed(raw);
@@ -193,8 +195,8 @@ describe('Raw Seed Transformer', () => {
       source: 'test',
       countryCount: 1,
       countries: [makeCountry({
-        economy: { gdp: 1000, gdpPerCapita: 10, treasury: 100, taxRate: 0.2, stability: 150 },
-        military: { totalPersonnel: 100, readiness: 200, morale: -20, forceLimit: 33 },
+        economy: { gdp: 1000, gdpPerCapita: 10, treasury: 100, taxRate: 0.2, stability: 150, legislativeSupport: 0.5 },
+        military: { totalPersonnel: 100, readiness: 200, morale: -20, forceLimit: 33, militaryLoyalty: 70 },
       })],
     };
 
