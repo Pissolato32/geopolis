@@ -129,9 +129,13 @@ export class AgentSystem implements ISystem {
         const rawResponse = this.provider.decideSync(prompt, systemPrompt);
         this.processResponse(rawResponse, agent, state, eventBus, tick);
       } else if (this.provider) {
-        void this.provider.evaluate(prompt, systemPrompt).then((rawResponse) => {
-          this.processResponse(rawResponse, agent, state, eventBus, tick);
-        });
+        void this.provider.evaluate(prompt, systemPrompt)
+          .then((rawResponse) => {
+            this.processResponse(rawResponse, agent, state, eventBus, tick);
+          })
+          .catch(() => {
+            // Silently ignore or handle provider network/evaluation failures
+          });
       }
     }
   }

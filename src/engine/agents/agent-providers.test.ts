@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { WorldState } from '../core/world-state/world-state.js';
 import { EventBus } from '../core/event-bus/event-bus.js';
 import { Timeline } from '../core/timeline/timeline.js';
@@ -76,6 +76,14 @@ function runWithProvider(provider: ILlmProvider): { engine: TickEngine; agentSys
 }
 
 describe('AgentSystem with all AI providers', () => {
+  beforeEach(() => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(() => Promise.reject(new Error('Network failure')));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should work with HeuristicAgentProvider (sync path)', () => {
     const { engine, agentSystem, eventBus } = runWithProvider(new HeuristicAgentProvider());
 
