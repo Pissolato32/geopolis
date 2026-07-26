@@ -18,6 +18,11 @@ const COUNTRIES_URL =
   "https://raw.githubusercontent.com/apilayer/restcountries/master/src/main/resources/countriesV2.json";
 const OUTPUT_PATH = resolve(process.cwd(), "data", "world-seed-2026.json");
 
+const QUIET = process.env.QUIET === "true";
+function logSeed(msg: string): void {
+  if (!QUIET) console.log(msg);
+}
+
 interface RestCountryV2 {
   alpha3Code: string;
   numericCode: string | null;
@@ -118,13 +123,13 @@ function buildRelationships(self: Country, all: Country[]): Relationship[] {
 // ---- fetch + transform -----------------------------------------------------
 
 async function fetchCountries(): Promise<RestCountryV2[]> {
-  console.log(`[seed] fetching real-world country data from\n  ${COUNTRIES_URL}`);
+  logSeed(`[seed] Fetching real-world country data from REST Countries API...`);
   const res = await fetch(COUNTRIES_URL);
   if (!res.ok) {
     throw new Error(`country fetch failed: HTTP ${res.status} ${res.statusText}`);
   }
   const data = (await res.json()) as RestCountryV2[];
-  console.log(`[seed] received ${data.length} country records`);
+  logSeed(`[seed] Received ${data.length} country records successfully.`);
   return data;
 }
 
@@ -172,7 +177,7 @@ async function main(): Promise<void> {
     .filter((c): c is Country => c !== null)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  console.log(`[seed] ${countries.length} usable countries after filtering`);
+  logSeed(`[seed] ${countries.length} usable countries after filtering.`);
 
   // second pass: relationships need the full list
   for (const c of countries) {
@@ -190,10 +195,10 @@ async function main(): Promise<void> {
   await writeFile(OUTPUT_PATH, JSON.stringify(seed, null, 2), "utf8");
 
   const sample = countries.find((c) => c.id === "USA") ?? countries[0];
-  console.log(`[seed] wrote ${OUTPUT_PATH}`);
-  console.log(
-    `[seed] sample ${sample.id} (${sample.name}): pop=${sample.population.toLocaleString()} ` +
-      `gdp=$${sample.economy.gdp.toLocaleString()} treasury=$${sample.economy.treasury.toLocaleString()} ` +
+  logSeed(`[seed] Wrote ${OUTPUT_PATH}`);
+  logSeed(
+    `[seed] Sample ${sample.id} (${sample.name}): pop=${sample.population.toLocaleString()} ` +
+      `gdp=${sample.economy.gdp.toLocaleString()} treasury=${sample.economy.treasury.toLocaleString()} ` +
       `troops=${sample.military.totalPersonnel.toLocaleString()}`
   );
 }
