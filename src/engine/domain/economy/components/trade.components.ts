@@ -4,7 +4,7 @@ import { TickNumber } from '../../../core/interfaces/event-bus.interface.js';
 
 export const ECONOMY_TRADE_ROUTE_TYPE = 'economy.trade-route' as ComponentType;
 
-export type ResourceType = 'energy' | 'food' | 'minerals' | 'industrial' | 'technology';
+export type ResourceType = 'energy' | 'food' | 'minerals' | 'industrial' | 'technology' | 'rare-earth';
 
 export interface TradeRouteComponent extends IComponent {
   readonly type: typeof ECONOMY_TRADE_ROUTE_TYPE;
@@ -14,4 +14,5 @@ export interface TradeRouteComponent extends IComponent {
   readonly volumePerTick: number;
   readonly isActive: boolean;
   readonly establishedTick: TickNumber;
+  readonly blockadeLevel: number; // 0.0 = open, 1.0 = fully blockaded
 }

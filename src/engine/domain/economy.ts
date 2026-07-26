@@ -10,3 +10,4 @@ export * from './economy/systems/economy.system.js';
 export * from './economy/systems/trade.system.js';
 export * from './economy/systems/market.system.js';
 export * from './economy/systems/sanction.system.js';
+export * from './economy/systems/commodity-impact.system.js';

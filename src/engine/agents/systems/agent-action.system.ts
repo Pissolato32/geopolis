@@ -89,6 +89,8 @@ export class AgentActionSystem implements ISystem {
       'economy.close-trade-route',
       'economy.impose-sanction',
       'economy.lift-sanction',
+      'economy.swift-disconnect',
+      'economy.asset-freeze',
       'economy.adjust-tax',
       'military.deploy-unit',
       'diplomacy.propose-treaty',
@@ -138,6 +140,8 @@ export class AgentActionSystem implements ISystem {
     this.bindCloseTradeRoute();
     this.bindImposeSanction();
     this.bindLiftSanction();
+    this.bindSwiftDisconnect();
+    this.bindAssetFreeze();
     this.bindAdjustTax();
     this.bindDeployUnit();
     this.bindProposeTreaty();
@@ -280,6 +284,46 @@ export class AgentActionSystem implements ISystem {
         { sanctionId, sourceCountryId: sanction.sourceCountryId, targetCountryId: sanction.targetCountryId, sanctionType: sanction.sanctionType },
         AGENT_ACTION_SYSTEM_ID, countryId,
       );
+    });
+  }
+
+  private bindSwiftDisconnect(): void {
+    this.eventBus.subscribe<Record<string, unknown>>('economy.swift-disconnect', (event) => {
+      const countryId = event.entityId;
+      if (!countryId || !this.worldState.hasEntity(countryId)) return;
+      const params = event.payload;
+      const targetId = (params as Record<string, unknown>)['targetCountryId'] as string | undefined;
+      if (!targetId || !this.worldState.hasEntity(targetId as EntityId)) return;
+      const severity = (params as Record<string, unknown>)['severity'] as number | undefined;
+      const sanctionId = `sanction-swift-${countryId}-${targetId}-${this.worldState.getMetadata().currentTick}` as EntityId;
+      if (this.worldState.hasEntity(sanctionId)) return;
+      this.worldState.createEntity(sanctionId, [{
+        type: ECONOMY_SANCTION_TYPE,
+        sourceCountryId: countryId, targetCountryId: targetId as EntityId,
+        sanctionType: 'swift-disconnect', severity: severity ?? 0.8,
+        startTick: this.worldState.getMetadata().currentTick,
+        isSwiftDisconnect: true, frozenAssetAmount: 0,
+      } as unknown as IComponent]);
+    });
+  }
+
+  private bindAssetFreeze(): void {
+    this.eventBus.subscribe<Record<string, unknown>>('economy.asset-freeze', (event) => {
+      const countryId = event.entityId;
+      if (!countryId || !this.worldState.hasEntity(countryId)) return;
+      const params = event.payload;
+      const targetId = (params as Record<string, unknown>)['targetCountryId'] as string | undefined;
+      if (!targetId || !this.worldState.hasEntity(targetId as EntityId)) return;
+      const frozenAmount = (params as Record<string, unknown>)['frozenAmount'] as number | undefined;
+      const sanctionId = `sanction-freeze-${countryId}-${targetId}-${this.worldState.getMetadata().currentTick}` as EntityId;
+      if (this.worldState.hasEntity(sanctionId)) return;
+      this.worldState.createEntity(sanctionId, [{
+        type: ECONOMY_SANCTION_TYPE,
+        sourceCountryId: countryId, targetCountryId: targetId as EntityId,
+        sanctionType: 'asset-freeze', severity: 0.7,
+        startTick: this.worldState.getMetadata().currentTick,
+        isSwiftDisconnect: false, frozenAssetAmount: frozenAmount ?? 0,
+      } as unknown as IComponent]);
     });
   }
 
