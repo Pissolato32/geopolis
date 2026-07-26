@@ -19,6 +19,17 @@ const ISO3_TO_ISO2: Record<string, string> = {
   TZA: 'tz', THA: 'th', TLS: 'tl', TGO: 'tg', TON: 'to', TTO: 'tt', TUN: 'tn', TUR: 'tr', TKM: 'tm', TUV: 'tv',
   UGA: 'ug', UKR: 'ua', ARE: 'ae', GBR: 'gb', USA: 'us', URY: 'uy', UZB: 'uz', VUT: 'vu', VEN: 've', VNM: 'vn',
   YEM: 'ye', ZMB: 'zm', ZWE: 'zw', SUN: 'su', ATA: 'aq',
+  AIA: 'ai', ALA: 'ax', ASM: 'as', ATF: 'tf', ABW: 'aw',
+  BES: 'bq', BLM: 'bl', BMU: 'bm', BVT: 'bv', CCK: 'cc',
+  COK: 'ck', CUW: 'cw', CXR: 'cx', CYM: 'ky', ESH: 'eh',
+  FLK: 'fk', FRO: 'fo', GIB: 'gi', GLP: 'gp', GUF: 'gf',
+  GUM: 'gu', GGY: 'gg', HKG: 'hk', HMD: 'hm', IMN: 'im',
+  IOT: 'io', JEY: 'je', MAC: 'mo', MAF: 'mf', MDI: 'mv',
+  MNP: 'mp', MSR: 'ms', MTQ: 'mq', MYT: 'yt', NCL: 'nc',
+  NFK: 'nf', NIU: 'nu', PCN: 'pn', PRI: 'pr',
+  PYF: 'pf', REU: 're', SGS: 'gs', SHN: 'sh', SJM: 'sj',
+  SPM: 'pm', SXM: 'sx', TCA: 'tc', TKL: 'tk', UMI: 'um',
+  VAT: 'va', VGB: 'vg', VIR: 'vi', WLF: 'wf', XKX: 'xk',
 };
 
 export function getFlagUrl(iso2: string): string {

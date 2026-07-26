@@ -65,7 +65,7 @@
       "id": "ALA",
       "numericCode": "248",
       "name": "Åland Islands",
-      "flag": "https://flagcdn.com/w320/al.png",
+      "flag": "https://flagcdn.com/w320/ax.png",
       "latlng": [
         60.116667,
         19.9
@@ -672,7 +672,7 @@
       "id": "ABW",
       "numericCode": "533",
       "name": "Aruba",
-      "flag": "https://flagcdn.com/w320/ab.png",
+      "flag": "https://flagcdn.com/w320/aw.png",
       "latlng": [
         12.5,
         -69.96666666
@@ -1542,7 +1542,7 @@
       "id": "BES",
       "numericCode": "535",
       "name": "Bonaire, Sint Eustatius and Saba",
-      "flag": "https://flagcdn.com/w320/be.png",
+      "flag": "https://flagcdn.com/w320/bq.png",
       "latlng": [
         12.15,
         -68.266667
@@ -2296,7 +2296,7 @@
       "id": "CYM",
       "numericCode": "136",
       "name": "Cayman Islands",
-      "flag": "https://flagcdn.com/w320/cy.png",
+      "flag": "https://flagcdn.com/w320/ky.png",
       "latlng": [
         19.5,
         -80.5
@@ -2934,7 +2934,7 @@
       "id": "COK",
       "numericCode": "184",
       "name": "Cook Islands",
-      "flag": "https://flagcdn.com/w320/co.png",
+      "flag": "https://flagcdn.com/w320/ck.png",
       "latlng": [
         -21.23333333,
         -159.76666666
@@ -3224,7 +3224,7 @@
       "id": "CUW",
       "numericCode": "531",
       "name": "Curaçao",
-      "flag": "https://flagcdn.com/w320/cu.png",
+      "flag": "https://flagcdn.com/w320/cw.png",
       "latlng": [
         12.116667,
         -68.933333
@@ -4094,7 +4094,7 @@
       "id": "FLK",
       "numericCode": "238",
       "name": "Falkland Islands (Malvinas)",
-      "flag": "https://flagcdn.com/w320/fl.png",
+      "flag": "https://flagcdn.com/w320/fk.png",
       "latlng": [
         -51.75,
         -59
@@ -4152,7 +4152,7 @@
       "id": "FRO",
       "numericCode": "234",
       "name": "Faroe Islands",
-      "flag": "https://flagcdn.com/w320/fr.png",
+      "flag": "https://flagcdn.com/w320/fo.png",
       "latlng": [
         62,
         -7
@@ -4384,7 +4384,7 @@
       "id": "GUF",
       "numericCode": "254",
       "name": "French Guiana",
-      "flag": "https://flagcdn.com/w320/gu.png",
+      "flag": "https://flagcdn.com/w320/gf.png",
       "latlng": [
         4,
         -53
@@ -4442,7 +4442,7 @@
       "id": "PYF",
       "numericCode": "258",
       "name": "French Polynesia",
-      "flag": "https://flagcdn.com/w320/py.png",
+      "flag": "https://flagcdn.com/w320/pf.png",
       "latlng": [
         -15,
         -140
@@ -4500,7 +4500,7 @@
       "id": "ATF",
       "numericCode": "260",
       "name": "French Southern Territories",
-      "flag": "https://flagcdn.com/w320/at.png",
+      "flag": "https://flagcdn.com/w320/tf.png",
       "latlng": [
         -49.25,
         69.167
@@ -5080,7 +5080,7 @@
       "id": "GLP",
       "numericCode": "312",
       "name": "Guadeloupe",
-      "flag": "https://flagcdn.com/w320/gl.png",
+      "flag": "https://flagcdn.com/w320/gp.png",
       "latlng": [
         16.25,
         -61.583333
@@ -7400,7 +7400,7 @@
       "id": "MAC",
       "numericCode": "446",
       "name": "Macao",
-      "flag": "https://flagcdn.com/w320/ma.png",
+      "flag": "https://flagcdn.com/w320/mo.png",
       "latlng": [
         22.16666666,
         113.55
@@ -7864,7 +7864,7 @@
       "id": "MTQ",
       "numericCode": "474",
       "name": "Martinique",
-      "flag": "https://flagcdn.com/w320/mt.png",
+      "flag": "https://flagcdn.com/w320/mq.png",
       "latlng": [
         14.666667,
         -61
@@ -8038,7 +8038,7 @@
       "id": "MYT",
       "numericCode": "175",
       "name": "Mayotte",
-      "flag": "https://flagcdn.com/w320/my.png",
+      "flag": "https://flagcdn.com/w320/yt.png",
       "latlng": [
         -12.83333333,
         45.16666666
@@ -9198,7 +9198,7 @@
       "id": "NIU",
       "numericCode": "570",
       "name": "Niue",
-      "flag": "https://flagcdn.com/w320/ni.png",
+      "flag": "https://flagcdn.com/w320/nu.png",
       "latlng": [
         -19.03333333,
         -169.86666666
@@ -9372,7 +9372,7 @@
       "id": "MNP",
       "numericCode": "580",
       "name": "Northern Mariana Islands",
-      "flag": "https://flagcdn.com/w320/mn.png",
+      "flag": "https://flagcdn.com/w320/mp.png",
       "latlng": [
         15.2,
         145.75
@@ -10010,7 +10010,7 @@
       "id": "PCN",
       "numericCode": "612",
       "name": "Pitcairn",
-      "flag": "https://flagcdn.com/w320/pc.png",
+      "flag": "https://flagcdn.com/w320/pn.png",
       "latlng": [
         -25.06666666,
         -130.1
@@ -10764,7 +10764,7 @@
       "id": "MAF",
       "numericCode": "663",
       "name": "Saint Martin (French part)",
-      "flag": "https://flagcdn.com/w320/ma.png",
+      "flag": "https://flagcdn.com/w320/mf.png",
       "latlng": [
         18.08333333,
         -63.95
@@ -10822,7 +10822,7 @@
       "id": "SPM",
       "numericCode": "666",
       "name": "Saint Pierre and Miquelon",
-      "flag": "https://flagcdn.com/w320/sp.png",
+      "flag": "https://flagcdn.com/w320/pm.png",
       "latlng": [
         46.83333333,
         -56.33333333
@@ -11808,7 +11808,7 @@
       "id": "SGS",
       "numericCode": "239",
       "name": "South Georgia and the South Sandwich Islands",
-      "flag": "https://flagcdn.com/w320/sg.png",
+      "flag": "https://flagcdn.com/w320/gs.png",
       "latlng": [
         -54.5,
         -37
@@ -13954,7 +13954,7 @@
       "id": "WLF",
       "numericCode": "876",
       "name": "Wallis and Futuna",
-      "flag": "https://flagcdn.com/w320/wl.png",
+      "flag": "https://flagcdn.com/w320/wf.png",
       "latlng": [
         -13.3,
         -176.2
@@ -14012,7 +14012,7 @@
       "id": "ESH",
       "numericCode": "732",
       "name": "Western Sahara",
-      "flag": "https://flagcdn.com/w320/es.png",
+      "flag": "https://flagcdn.com/w320/eh.png",
       "latlng": [
         24.5,
         -13
