@@ -170,7 +170,9 @@ Choose from these action types:
 - diplomacy.propose-treaty
 - diplomacy.improve-relations
 - war.move-ordered
-- war.request-peace`;
+- war.request-peace
+- military.set-supply-source
+- military.order-garrison`;
   }
 
   private collectHeuristicContext(

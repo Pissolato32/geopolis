@@ -1,6 +1,6 @@
 import { EntityId } from '../../core/interfaces/entity.interface.js';
 import { ITimeline, ITimelineEntry } from '../../core/interfaces/timeline.interface.js';
-import { IAgentMemoryStore, IAgentDecision } from './memory-store.interface.js';
+import { IAgentMemoryStore, IAgentDecision, IAgentEpisode } from './memory-store.interface.js';
 import { InMemoryAgentMemoryStore } from './in-memory-memory-store.js';
 
 export interface IAgentPersonality {
@@ -15,6 +15,8 @@ export interface IAgentStrategicGoal {
   readonly targetCountryId?: EntityId;
   readonly priority: number;
 }
+
+const EPISODE_SUMMARY_THRESHOLD = 10;
 
 /**
  * Manages short-term decision history, long-term Timeline queries, personality profiles,
@@ -91,5 +93,51 @@ export class AgentMemory {
     const risk = this.personality.riskTolerance > 0.7 ? 'risk-seeking' : this.personality.riskTolerance < 0.3 ? 'risk-averse' : 'balanced';
     const trust = this.personality.trustPropensity > 0.7 ? 'trusting' : this.personality.trustPropensity < 0.3 ? 'suspicious' : 'pragmatic';
     return `Personality: ${aggr}, ${risk}, ${trust} (aggressiveness=${this.personality.aggressiveness.toFixed(2)}, riskTolerance=${this.personality.riskTolerance.toFixed(2)}, trustPropensity=${this.personality.trustPropensity.toFixed(2)})`;
+  }
+
+  /**
+   * Compress recent decisions into an episodic memory summary.
+   * When the decision history exceeds EPISODE_SUMMARY_THRESHOLD, older decisions
+   * are collapsed into a single narrative episode and persisted via the store.
+   */
+  public summarizeEpisodes(currentTick: number): IAgentEpisode | undefined {
+    const decisions = this.getRecentDecisionRecords(EPISODE_SUMMARY_THRESHOLD + 5);
+    if (decisions.length < EPISODE_SUMMARY_THRESHOLD) return undefined;
+
+    const toCompress = decisions.slice(0, -EPISODE_SUMMARY_THRESHOLD);
+    if (toCompress.length === 0) return undefined;
+
+    const actionTypes = toCompress.map((d) => d.actionType);
+    const uniqueTypes = [...new Set(actionTypes)];
+    const tickRange = `${toCompress[0]!.tick}-${toCompress[toCompress.length - 1]!.tick}`;
+    const summary = `Episode [${tickRange}]: ${toCompress.length} decisions (${uniqueTypes.join(', ')}). Dominant: ${this.dominantActionType(actionTypes)}.`;
+
+    const episode: IAgentEpisode = {
+      episodeId: `ep-${this.countryId}-${currentTick}`,
+      summary,
+      startTick: toCompress[0]!.tick,
+      endTick: toCompress[toCompress.length - 1]!.tick,
+      createdAt: Date.now(),
+    };
+
+    this.store.saveEpisode(this.countryId, episode);
+    return episode;
+  }
+
+  public queryEpisodes(sinceTick: number = 0, limit: number = 10): readonly IAgentEpisode[] {
+    const result = this.store.queryEpisodes({ countryId: this.countryId, sinceTick, limit });
+    if (Array.isArray(result)) return result;
+    return [];
+  }
+
+  private dominantActionType(types: readonly string[]): string {
+    const counts = new Map<string, number>();
+    for (const t of types) counts.set(t, (counts.get(t) ?? 0) + 1);
+    let max = 0;
+    let dominant = 'unknown';
+    for (const [type, count] of counts) {
+      if (count > max) { max = count; dominant = type; }
+    }
+    return dominant;
   }
 }

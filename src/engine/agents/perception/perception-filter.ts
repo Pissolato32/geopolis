@@ -81,7 +81,15 @@ export class PerceptionFilter {
         }
 
         if (intelLevel < 0.2) {
-          // Very low intel: classify as ranges instead of exact values
+          // Very low intel: redact sensitive numeric fields, classify the rest
+          const lowerLine = line.toLowerCase();
+          if (lowerLine.includes('treasury') || lowerLine.includes('fuelreserves') || lowerLine.includes('morale')) {
+            const key = line.match(/^(\s*[\w-]+:)/)?.[1];
+            if (key) {
+              distorted.push(`${key} [REDACTED]`);
+              continue;
+            }
+          }
           const classified = PerceptionFilter.classifyValue(line, rawValue);
           distorted.push(`${prefix}${classified}${suffix}`);
         } else {

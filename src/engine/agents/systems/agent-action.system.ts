@@ -42,7 +42,13 @@ import {
 import {
   DIPLOMATIC_RELATION_TYPE,
   RelationComponent,
-} from '../../domain/diplomacy/components/relation.component.js';import {
+} from '../../domain/diplomacy/components/relation.component.js';
+import {
+  PROVINCE_TYPE,
+  ProvinceComponent,
+  ProvinceData,
+} from '../../domain/war/components/province.components.js';
+import {
   DIPLOMACY_TREATY_SIGNED_EVENT,
   IDiplomacyTreatySignedPayload,
 } from '../../domain/diplomacy/events/diplomacy.events.js';
@@ -68,6 +74,8 @@ export class AgentActionSystem implements ISystem {
       'diplomacy.improve-relations',
       'war.move-ordered',
       'war.request-peace',
+      'military.set-supply-source',
+      'military.order-garrison',
     ],
     emittedEvents: [
       POLITICS_STABILITY_CHANGED_EVENT,
@@ -113,6 +121,8 @@ export class AgentActionSystem implements ISystem {
     this.bindImproveRelations();
     this.bindMoveUnit();
     this.bindRequestPeace();
+    this.bindSetSupplySource();
+    this.bindOrderGarrison();
   }
 
   private bindMaintainStability(): void {
@@ -361,6 +371,56 @@ export class AgentActionSystem implements ISystem {
           return;
         }
       }
+    });
+  }
+
+  private bindSetSupplySource(): void {
+    this.eventBus.subscribe<Record<string, unknown>>('military.set-supply-source', (event) => {
+      const countryId = event.entityId;
+      if (!countryId || !this.worldState.hasEntity(countryId)) return;
+      const params = event.payload;
+      const provinceId = (params as Record<string, unknown>)['provinceId'] as string | undefined;
+      if (!provinceId) return;
+
+      for (const eid of this.worldState.getEntityIds()) {
+        const entity = this.worldState.getEntity(eid);
+        if (!entity) continue;
+        const provComp = entity.getComponent<ProvinceComponent>(PROVINCE_TYPE);
+        if (!provComp) continue;
+        const provinces = provComp.provinces as ReadonlyArray<ProvinceData>;
+        const updated = provinces.map((p) =>
+          p.ownerId === countryId && p.provinceId === provinceId
+            ? { ...p, isSupplySource: true }
+            : p,
+        );
+        const changed = updated.some((p, i) => p.isSupplySource !== provinces[i]!.isSupplySource);
+        if (changed) {
+          this.worldState.updateComponent(eid, { ...provComp, provinces: updated } as unknown as IComponent);
+        }
+      }
+    });
+  }
+
+  private bindOrderGarrison(): void {
+    this.eventBus.subscribe<Record<string, unknown>>('military.order-garrison', (event) => {
+      const countryId = event.entityId;
+      if (!countryId || !this.worldState.hasEntity(countryId)) return;
+      const params = event.payload;
+      const provinceId = (params as Record<string, unknown>)['provinceId'] as string | undefined;
+      const personnel = (params as Record<string, unknown>)['personnel'] as number | undefined;
+      if (!provinceId || !personnel || personnel <= 0) return;
+
+      const unitId = `garrison-${countryId}-${provinceId}-${Date.now()}` as EntityId;
+      this.worldState.createEntity(unitId, [{
+        type: MILITARY_UNIT_TYPE,
+        ownerCountryId: countryId,
+        unitName: `Garrison Force ${provinceId}`,
+        personnel,
+        readiness: 0.7,
+        morale: 0.8,
+        fuelReserves: 20,
+        currentProvinceId: provinceId,
+      } as unknown as IComponent]);
     });
   }
 }

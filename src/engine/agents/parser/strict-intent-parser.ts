@@ -82,7 +82,7 @@ export class StrictIntentParser implements IIntentParser {
         if (!params['unitId']) errors.push('move-ordered requires unitId parameter');
         if (!params['targetProvinceId']) errors.push('move-ordered requires targetProvinceId parameter');
         break;
-      case 'war.deploy-unit':
+      case 'military.deploy-unit':
         if (!params['countryId']) errors.push('deploy-unit requires countryId parameter');
         if (!params['provinceId']) errors.push('deploy-unit requires provinceId parameter');
         if (typeof params['personnel'] !== 'number' || params['personnel'] <= 0) {
@@ -116,6 +116,15 @@ export class StrictIntentParser implements IIntentParser {
       case 'economy.invest':
         if (typeof params['amount'] !== 'number' || params['amount'] < 0) {
           errors.push('invest requires non-negative amount');
+        }
+        break;
+      case 'military.set-supply-source':
+        if (!params['provinceId']) errors.push('set-supply-source requires provinceId');
+        break;
+      case 'military.order-garrison':
+        if (!params['provinceId']) errors.push('order-garrison requires provinceId');
+        if (typeof params['personnel'] !== 'number' || params['personnel'] <= 0) {
+          errors.push('order-garrison requires positive personnel count');
         }
         break;
     }
