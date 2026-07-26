@@ -8,6 +8,8 @@ import { IComponent } from '../core/interfaces/component.interface.js';
 import { AgentSystem } from './systems/agent.system.js';
 import { AgentActionSystem } from './systems/agent-action.system.js';
 import { HeuristicAgentProvider } from './llm/heuristic.provider.js';
+import { buildProviderChain } from './llm/provider.factory.js';
+import { InMemoryAgentMemoryStore } from './memory/in-memory-memory-store.js';
 import { EconomySystem } from '../domain/economy/systems/economy.system.js';
 import { PoliticsSystem } from '../domain/politics/systems/politics.system.js';
 import { DiplomacySystem } from '../domain/diplomacy/systems/diplomacy.system.js';
@@ -207,5 +209,36 @@ describe('Agent Stress Test (10 agents, 100 ticks)', () => {
 
     const results = engine.runTicks(50);
     expect(results.length).toBe(50);
+  });
+
+  it('should work with full provider chain from buildProviderChain', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = buildStressWorld(10);
+    const { heuristic } = buildProviderChain({ includeMock: true });
+    const memoryStore = new InMemoryAgentMemoryStore();
+
+    const agentSystem = new AgentSystem({
+      provider: heuristic,
+      defaultIntelLevel: 0.7,
+      memoryStore,
+    });
+    const actionSystem = new AgentActionSystem();
+
+    const engine = new TickEngine(worldState, eventBus, timeline);
+    engine.registerSystem(agentSystem);
+    engine.registerSystem(actionSystem);
+
+    agentSystem.discoverAgents(worldState);
+    engine.runTicks(20);
+    eventBus.flush();
+
+    expect(agentSystem.getAgentCount()).toBe(10);
+    const agents = agentSystem.getAgents();
+    const totalDecisions = agents.reduce(
+      (sum, a) => sum + a.memory.getRecentDecisionRecords(50).length,
+      0,
+    );
+    expect(totalDecisions).toBeGreaterThan(0);
   });
 });

@@ -29,15 +29,26 @@ import { PeaceSystem } from './domain/war/systems/peace.system.js';
 import { IntelligenceSystem } from './domain/intelligence/systems/intelligence.system.js';
 import { AgentActionSystem } from './agents/systems/agent-action.system.js';
 import { AgentSystem } from './agents/systems/agent.system.js';
-import { HeuristicAgentProvider } from './agents/llm/heuristic.provider.js';
+import { buildProviderChain } from './agents/llm/provider.factory.js';
+import { createSupabaseMemoryStore } from './agents/memory/supabase-memory-store.js';
 import { ISystem } from './core/interfaces/system.interface.js';
 import { EntityId } from './core/interfaces/entity.interface.js';
 import { AchievementManager } from './scenarios/achievement-manager.js';
 
 const achievementManager = new AchievementManager();
 
+const { heuristic: heuristicProvider } = buildProviderChain({
+  openaiApiKey: process.env['OPENAI_API_KEY'],
+  ollamaEndpoint: process.env['OLLAMA_ENDPOINT'],
+});
+const agentMemoryStore = createSupabaseMemoryStore();
+
 const DOMAIN_SYSTEMS = [
-  new AgentSystem({ provider: new HeuristicAgentProvider(), defaultIntelLevel: 0.7 }),
+  new AgentSystem({
+    provider: heuristicProvider,
+    defaultIntelLevel: 0.7,
+    memoryStore: agentMemoryStore,
+  }),
   new AgentActionSystem(),
   new SanctionSystem(),
   new TradeSystem(),
