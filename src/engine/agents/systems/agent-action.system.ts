@@ -5,12 +5,17 @@ import { IComponent } from '../../core/interfaces/component.interface.js';
 import { EntityId } from '../../core/interfaces/entity.interface.js';
 import {
   GOVERNMENT_STABILITY_TYPE,
+  LEGISLATIVE_ASSEMBLY_TYPE,
   GovernmentStabilityComponent,
+  LegislativeAssemblyComponent,
 } from '../../domain/politics/components/politics.components.js';
 import {
   POLITICS_STABILITY_CHANGED_EVENT,
+  POLITICS_LEGISLATIVE_VOTE_EVENT,
   IPoliticsStabilityChangedPayload,
+  IPoliticsLegislativeVotePayload,
 } from '../../domain/politics/events/politics.events.js';
+import { PoliticsSystem } from '../../domain/politics/systems/politics.system.js';
 import {
   ECONOMIC_INDICATOR_TYPE,
   EconomicIndicatorComponent,
@@ -56,6 +61,7 @@ import {
   MILITARY_FORCES_TYPE,
   MilitaryForcesComponent,
 } from '../../domain/war/components/military-forces.component.js';
+
 import {
   canDeclareWar,
   accumulateCasusBelli,
@@ -337,6 +343,36 @@ export class AgentActionSystem implements ISystem {
       const indicator = this.worldState.getEntity(countryId)
         ?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
       if (!indicator) return;
+
+      const stabilityComp = this.worldState.getEntity(countryId)
+        ?.getComponent<GovernmentStabilityComponent>(GOVERNMENT_STABILITY_TYPE);
+      const assemblyId = `${countryId}-legislative-assembly` as EntityId;
+      const assemblyEntity = this.worldState.getEntity(assemblyId);
+      const assembly = assemblyEntity?.getComponent<LegislativeAssemblyComponent>(LEGISLATIVE_ASSEMBLY_TYPE);
+
+      const isTaxHike = newTaxRate > indicator.taxRate;
+      if (isTaxHike) {
+        const taxGate = PoliticsSystem.checkTaxHikeApproval(
+          assembly,
+          stabilityComp?.governmentType ?? 'authoritarian',
+        );
+        if (!taxGate.approved) {
+          this.eventBus.publish<IPoliticsLegislativeVotePayload>(
+            POLITICS_LEGISLATIVE_VOTE_EVENT,
+            {
+              countryId,
+              voteType: 'tax-hike',
+              supportPercent: assembly?.taxHikeSupport ?? 0,
+              passed: false,
+              reason: taxGate.reason,
+            },
+            AGENT_ACTION_SYSTEM_ID,
+            countryId,
+          );
+          return;
+        }
+      }
+
       this.worldState.updateComponent(countryId, {
         ...indicator, taxRate: newTaxRate,
       } as unknown as IComponent);
@@ -519,6 +555,48 @@ export class AgentActionSystem implements ISystem {
         }
         return;
       }
+
+      const aggressor = this.worldState.getEntity(countryId);
+      const stabilityComp = aggressor?.getComponent<GovernmentStabilityComponent>(GOVERNMENT_STABILITY_TYPE);
+      const assemblyId = `${countryId}-legislative-assembly` as EntityId;
+      const assemblyEntity = this.worldState.getEntity(assemblyId);
+      const assembly = assemblyEntity?.getComponent<LegislativeAssemblyComponent>(LEGISLATIVE_ASSEMBLY_TYPE);
+
+      const ultimatumExpired = ultimatumTick !== null && tick >= ultimatumTick + 3;
+      const legislativeGate = PoliticsSystem.checkWarDeclarationApproval(
+        assembly,
+        stabilityComp?.governmentType ?? 'authoritarian',
+        ultimatumExpired,
+      );
+
+      if (!legislativeGate.approved) {
+        this.eventBus.publish<IPoliticsLegislativeVotePayload>(
+          POLITICS_LEGISLATIVE_VOTE_EVENT,
+          {
+            countryId,
+            voteType: 'war-declaration',
+            supportPercent: assembly?.warSupport ?? 0,
+            passed: false,
+            reason: legislativeGate.reason,
+          },
+          AGENT_ACTION_SYSTEM_ID,
+          countryId,
+        );
+        return;
+      }
+
+      this.eventBus.publish<IPoliticsLegislativeVotePayload>(
+        POLITICS_LEGISLATIVE_VOTE_EVENT,
+        {
+          countryId,
+          voteType: 'war-declaration',
+          supportPercent: assembly?.warSupport ?? 100,
+          passed: true,
+          reason: legislativeGate.reason,
+        },
+        AGENT_ACTION_SYSTEM_ID,
+        countryId,
+      );
 
       if (relationEntity) {
         this.worldState.updateComponent(relationEntity.id, {
