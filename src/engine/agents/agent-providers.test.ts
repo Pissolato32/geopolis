@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { WorldState } from '../core/world-state/world-state.js';
 import { EventBus } from '../core/event-bus/event-bus.js';
 import { Timeline } from '../core/timeline/timeline.js';

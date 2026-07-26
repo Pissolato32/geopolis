@@ -136,3 +136,47 @@ describe('Balance Simulation (100 ticks)', () => {
     });
   }
 });
+
+describe('Escalation Ladder Benchmark — No Early Wars', () => {
+  const presetFiles = discoverPresets();
+  if (presetFiles.length === 0) return;
+
+  for (const filePath of presetFiles) {
+    const fileName = filePath.split(/[\\/]/).pop()!;
+
+    it(`should produce zero war.declared events on ticks 1-5 for ${fileName}`, () => {
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+
+      const loader = new ScenarioLoader();
+      const { engine, eventBus } = loader.loadFromPreset(data, { systems: ALL_SYSTEMS });
+
+      let earlyWarCount = 0;
+      eventBus.subscribe('war.declared', () => {
+        const tick = engine.getWorldState().getMetadata().currentTick;
+        if (tick <= 5) earlyWarCount++;
+      });
+
+      for (let tick = 1; tick <= 5; tick++) {
+        engine.tick();
+        eventBus.flush();
+      }
+
+      expect(earlyWarCount).toBe(0);
+    });
+
+    it(`should log a clean balance report with no anomalies for ${fileName} (100 ticks)`, () => {
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+
+      const report = runBalanceSimulation(data, 100, 10);
+      const formatted = formatBalanceReport(report);
+
+      console.log(formatted);
+
+      expect(report.trend.nanDetected).toBe(false);
+      expect(report.trend.infinityDetected).toBe(false);
+      expect(report.trend.collapsedEntities).toBe(0);
+    });
+  }
+});

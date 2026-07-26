@@ -52,6 +52,27 @@ import {
   DIPLOMACY_TREATY_SIGNED_EVENT,
   IDiplomacyTreatySignedPayload,
 } from '../../domain/diplomacy/events/diplomacy.events.js';
+import {
+  MILITARY_FORCES_TYPE,
+  MilitaryForcesComponent,
+} from '../../domain/war/components/military-forces.component.js';
+import {
+  canDeclareWar,
+  accumulateCasusBelli,
+  type IEscalationContext,
+} from '../../domain/war/escalation-ladder.js';
+
+export const WAR_DECLARED_EVENT = 'war.declared';
+
+export interface IWarDeclaredPayload {
+  readonly aggressorId: EntityId;
+  readonly targetId: EntityId;
+  readonly reason: string;
+  readonly tick: number;
+}
+
+const ecsCasusBelli = new Map<string, number>();
+const ecsUltimatumTick = new Map<string, number>();
 
 export const AGENT_ACTION_SYSTEM_ID = 'agent.action-resolver';
 
@@ -74,6 +95,7 @@ export class AgentActionSystem implements ISystem {
       'diplomacy.improve-relations',
       'war.move-ordered',
       'war.request-peace',
+      'war.declared',
       'military.set-supply-source',
       'military.order-garrison',
     ],
@@ -84,6 +106,7 @@ export class AgentActionSystem implements ISystem {
       ECONOMY_SANCTION_IMPOSED_EVENT,
       ECONOMY_SANCTION_LIFTED_EVENT,
       DIPLOMACY_TREATY_SIGNED_EVENT,
+      WAR_DECLARED_EVENT,
     ],
   };
 
@@ -121,6 +144,7 @@ export class AgentActionSystem implements ISystem {
     this.bindImproveRelations();
     this.bindMoveUnit();
     this.bindRequestPeace();
+    this.bindDeclareWar();
     this.bindSetSupplySource();
     this.bindOrderGarrison();
   }
@@ -371,6 +395,109 @@ export class AgentActionSystem implements ISystem {
           return;
         }
       }
+    });
+  }
+
+  private bindDeclareWar(): void {
+    this.eventBus.subscribe<Record<string, unknown>>('war.declared', (event) => {
+      const countryId = event.entityId;
+      if (!countryId || !this.worldState.hasEntity(countryId)) return;
+
+      const params = event.payload;
+      const targetIdStr = (params as Record<string, unknown>)['targetId'] as string | undefined;
+      if (!targetIdStr) return;
+      const targetEntityId = targetIdStr as EntityId;
+
+      const tick = this.worldState.getMetadata().currentTick;
+      const key = `${countryId}-${targetIdStr}`;
+
+      const relations = this.worldState.getEntitiesByComponent(DIPLOMATIC_RELATION_TYPE);
+      let tension = 0;
+      let relationEntity: { id: EntityId; comp: RelationComponent } | null = null;
+
+      for (const r of relations) {
+        const comp = r.getComponent<RelationComponent>(DIPLOMATIC_RELATION_TYPE);
+        if (comp && comp.targetCountryId === targetEntityId) {
+          tension = comp.tension * 100;
+          relationEntity = { id: r.id, comp };
+          break;
+        }
+      }
+
+      const currentCasusBelli = ecsCasusBelli.get(key) ?? 0;
+      const updatedCasusBelli = accumulateCasusBelli(currentCasusBelli, tension);
+      ecsCasusBelli.set(key, updatedCasusBelli);
+
+      let hasSharedBorder = false;
+      let hasNavalProjection = false;
+
+      const aggressorEntity = this.worldState.getEntity(countryId);
+      const forces = aggressorEntity?.getComponent<MilitaryForcesComponent>(MILITARY_FORCES_TYPE);
+      if (forces) {
+        hasNavalProjection = forces.readiness >= 0.7 && forces.totalPersonnel >= 50000;
+      }
+
+      for (const eid of this.worldState.getEntityIds()) {
+        const entity = this.worldState.getEntity(eid);
+        if (!entity) continue;
+        const provComp = entity.getComponent<ProvinceComponent>(PROVINCE_TYPE);
+        if (!provComp) continue;
+        const provinces = provComp.provinces as ReadonlyArray<ProvinceData>;
+        const aggressorProvinces = provinces.filter((p) => p.ownerId === countryId);
+        const targetProvinces = provinces.filter((p) => p.ownerId === targetEntityId);
+        if (aggressorProvinces.length > 0 && targetProvinces.length > 0) {
+          const targetSet = new Set(targetProvinces.map((p) => p.provinceId));
+          for (const ap of aggressorProvinces) {
+            if (ap.neighborIds.some((nid) => targetSet.has(nid))) {
+              hasSharedBorder = true;
+              break;
+            }
+          }
+        }
+        if (hasSharedBorder) break;
+      }
+
+      const ultimatumTick = ecsUltimatumTick.get(key) ?? null;
+
+      const ctx: IEscalationContext = {
+        tick,
+        tension,
+        casusBelli: updatedCasusBelli,
+        ultimatumTick,
+        hasSharedBorder,
+        hasNavalProjection,
+      };
+
+      const gate = canDeclareWar(ctx);
+      if (!gate.allowed) {
+        if (tension >= 80 && !ecsUltimatumTick.has(key)) {
+          ecsUltimatumTick.set(key, tick);
+        }
+        return;
+      }
+
+      if (relationEntity) {
+        this.worldState.updateComponent(relationEntity.id, {
+          ...relationEntity.comp,
+          tension: 0.95,
+          affinity: -0.8,
+        } as unknown as IComponent);
+      }
+
+      ecsCasusBelli.delete(key);
+      ecsUltimatumTick.delete(key);
+
+      this.eventBus.publish<IWarDeclaredPayload>(
+        WAR_DECLARED_EVENT,
+        {
+          aggressorId: countryId,
+          targetId: targetEntityId,
+          reason: (params as Record<string, unknown>)['reason'] as string | undefined ?? 'escalation ladder fulfilled',
+          tick,
+        },
+        AGENT_ACTION_SYSTEM_ID,
+        countryId,
+      );
     });
   }
 
