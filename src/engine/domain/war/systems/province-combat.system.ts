@@ -8,9 +8,19 @@ import {
   MilitaryUnitComponent,
 } from '../components/war.components.js';
 import {
+  PROVINCE_TYPE,
+  ProvinceComponent,
+  ProvinceData,
+} from '../components/province.components.js';
+import { getTerrainModifiers, TerrainType } from '../components/terrain.components.js';
+import {
   WAR_COMBAT_RESOLVED_EVENT,
   IWarCombatResolvedPayload,
 } from '../events/war.events.js';
+import {
+  WAR_TERRAIN_BONUS_APPLIED_EVENT,
+  IWarTerrainBonusPayload,
+} from '../events/war-terrain.events.js';
 import {
   RelationComponent,
 } from '../../diplomacy/components/relation.component.js';
@@ -50,6 +60,8 @@ export class ProvinceCombatSystem implements ISystem {
   execute(state: Readonly<IWorldState>, eventBus: IEventBus): void {
     const units = state.getEntitiesByComponent(MILITARY_UNIT_TYPE);
     const provinceUnits = new Map<string, ProvinceUnitEntry[]>();
+    const provinceTerrain = this.buildProvinceTerrainMap(state);
+    const provinceOwner = this.buildProvinceOwnerMap(state);
 
     for (const unit of units) {
       const mil = unit.getComponent<MilitaryUnitComponent>(MILITARY_UNIT_TYPE);
@@ -69,6 +81,18 @@ export class ProvinceCombatSystem implements ISystem {
     for (const [provinceId, entries] of provinceUnits) {
       if (entries.length < 2) continue;
 
+      const terrain = provinceTerrain.get(provinceId) ?? 'plains';
+      const terrainMods = getTerrainModifiers(terrain);
+      const provOwnerId = provinceOwner.get(provinceId);
+
+      if (terrainMods.defenderBonus > 0 && provOwnerId) {
+        eventBus.publish<IWarTerrainBonusPayload>(
+          WAR_TERRAIN_BONUS_APPLIED_EVENT,
+          { provinceId, terrain, defenderBonus: terrainMods.defenderBonus, defenderId: provOwnerId },
+          PROVINCE_COMBAT_SYSTEM_ID, provOwnerId,
+        );
+      }
+
       const countryGroups = this.groupByCountry(entries);
       const countryIds = Array.from(countryGroups.keys());
 
@@ -84,8 +108,12 @@ export class ProvinceCombatSystem implements ISystem {
 
           const groupA = countryGroups.get(aId)!;
           const groupB = countryGroups.get(bId)!;
-          const powerA = groupA.reduce((s, e) => s + e.power, 0);
-          const powerB = groupB.reduce((s, e) => s + e.power, 0);
+          let powerA = groupA.reduce((s, e) => s + e.power, 0);
+          let powerB = groupB.reduce((s, e) => s + e.power, 0);
+
+          if (provOwnerId === aId) powerA *= (1 + terrainMods.defenderBonus);
+          if (provOwnerId === bId) powerB *= (1 + terrainMods.defenderBonus);
+
           const totalPower = powerA + powerB;
           if (totalPower <= 0) continue;
 
@@ -134,6 +162,34 @@ export class ProvinceCombatSystem implements ISystem {
         break;
       }
     }
+  }
+
+  private buildProvinceTerrainMap(state: Readonly<IWorldState>): Map<string, TerrainType> {
+    const map = new Map<string, TerrainType>();
+    for (const eid of state.getEntityIds()) {
+      const entity = state.getEntity(eid);
+      if (!entity) continue;
+      const provComp = entity.getComponent<ProvinceComponent>(PROVINCE_TYPE);
+      if (!provComp) continue;
+      for (const prov of provComp.provinces as ReadonlyArray<ProvinceData>) {
+        map.set(prov.provinceId, prov.terrain);
+      }
+    }
+    return map;
+  }
+
+  private buildProvinceOwnerMap(state: Readonly<IWorldState>): Map<string, EntityId> {
+    const map = new Map<string, EntityId>();
+    for (const eid of state.getEntityIds()) {
+      const entity = state.getEntity(eid);
+      if (!entity) continue;
+      const provComp = entity.getComponent<ProvinceComponent>(PROVINCE_TYPE);
+      if (!provComp) continue;
+      for (const prov of provComp.provinces as ReadonlyArray<ProvinceData>) {
+        map.set(prov.provinceId, prov.ownerId);
+      }
+    }
+    return map;
   }
 
   private groupByCountry(entries: ProvinceUnitEntry[]): Map<EntityId, ProvinceUnitEntry[]> {

@@ -8,6 +8,12 @@ import {
   MilitaryUnitComponent,
 } from '../components/war.components.js';
 import {
+  PROVINCE_TYPE,
+  ProvinceComponent,
+  ProvinceData,
+} from '../components/province.components.js';
+import { getTerrainModifiers, TerrainType } from '../components/terrain.components.js';
+import {
   WAR_UNIT_MOVED_EVENT,
   WAR_MOVE_ORDERED_EVENT,
   WAR_FUEL_CONSUMED_EVENT,
@@ -18,8 +24,7 @@ import {
 
 export const MOVEMENT_SYSTEM_ID = 'war.movement';
 
-const GEO_PROVINCE_TYPE = 'geo.province';
-const FUEL_PER_MOVE = 1;
+const BASE_FUEL_PER_MOVE = 1;
 
 export class MovementSystem implements ISystem {
   readonly descriptor = {
@@ -109,7 +114,10 @@ export class MovementSystem implements ISystem {
         nextProvinceId = step;
       }
 
-      const newFuel = Math.max(0, mil.fuelReserves - FUEL_PER_MOVE);
+      const destTerrain = this.getProvinceTerrain(state, nextProvinceId);
+      const terrainCost = getTerrainModifiers(destTerrain).movementCostMultiplier;
+      const fuelCost = Math.ceil(BASE_FUEL_PER_MOVE * terrainCost);
+      const newFuel = Math.max(0, mil.fuelReserves - fuelCost);
 
       eventBus.publish<IWarFuelConsumedPayload>(
         WAR_FUEL_CONSUMED_EVENT,
@@ -132,15 +140,27 @@ export class MovementSystem implements ISystem {
     }
   }
 
+  private getProvinceTerrain(state: Readonly<IWorldState>, provinceId: string): TerrainType {
+    for (const eid of state.getEntityIds()) {
+      const entity = state.getEntity(eid);
+      if (!entity) continue;
+      const provComp = entity.getComponent<ProvinceComponent>(PROVINCE_TYPE);
+      if (!provComp) continue;
+      const prov = (provComp.provinces as ReadonlyArray<ProvinceData>).find((p) => p.provinceId === provinceId);
+      if (prov) return prov.terrain;
+    }
+    return 'plains';
+  }
+
   private buildProvinceGraph(state: Readonly<IWorldState>): Map<string, ReadonlyArray<string>> {
     const graph = new Map<string, ReadonlyArray<string>>();
 
     for (const eid of state.getEntityIds()) {
       const entity = state.getEntity(eid);
       if (!entity) continue;
-      const provComponent = entity.getComponent(GEO_PROVINCE_TYPE) as { provinces: ReadonlyArray<{ provinceId: string; neighborIds: ReadonlyArray<string> }> } | undefined;
+      const provComponent = entity.getComponent<ProvinceComponent>(PROVINCE_TYPE);
       if (!provComponent) continue;
-      for (const prov of provComponent.provinces) {
+      for (const prov of provComponent.provinces as ReadonlyArray<ProvinceData>) {
         graph.set(prov.provinceId, prov.neighborIds);
       }
     }
