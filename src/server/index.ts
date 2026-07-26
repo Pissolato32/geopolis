@@ -115,10 +115,35 @@ function main() {
 
   const app = express();
   app.use(express.json());
-  app.use((_, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
+  const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+
+    if (origin) {
+      const isDevelopmentPreview =
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.endsWith(".replit.dev") ||
+        origin.endsWith(".repl.co") ||
+        origin.endsWith(".webcontainer.io");
+      const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
+      if (ALLOWED_ORIGINS.length === 0 || isDevelopmentPreview || isExplicitlyAllowed) {
+        res.header("Access-Control-Allow-Origin", origin);
+        res.header("Vary", "Origin");
+      }
+    } else {
+      // Direct requests / server-to-server fallback
+      res.header("Access-Control-Allow-Origin", "*");
+    }
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Client-Info, Apikey");
+    if (req.method === "OPTIONS") {
+      res.sendStatus(204);
+      return;
+    }
     next();
   });
   app.get("/health", (_req, res) => res.json({ ok: true, countries: seed.countryCount, tick: liveTick }));
