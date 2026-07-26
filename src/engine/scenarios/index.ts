@@ -2,6 +2,19 @@ export { ScenarioSchemaValidator } from './scenario.validator.js';
 export { ScenarioLoader, GEO_PROVINCE_TYPE, GEO_POSITION_TYPE } from './scenario.loader.js';
 export type { ProvinceEntry, ProvinceListComponent, GeoPositionComponent } from './scenario.loader.js';
 export { ScenarioTriggerSystem } from './scenario.trigger-system.js';
+export {
+  runBenchmark,
+  runBalanceSimulation,
+  formatBenchmarkReport,
+  formatBalanceReport,
+} from './benchmark.runner.js';
+export type {
+  IBenchmarkMetrics,
+  IBenchmarkReport,
+  IBalanceSnapshot,
+  IBalanceTrend,
+  IBalanceReport,
+} from './benchmark.runner.js';
 export type {
   IScenarioPreset,
   IScenarioMetadata,

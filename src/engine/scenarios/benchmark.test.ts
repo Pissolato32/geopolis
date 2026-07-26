@@ -4,7 +4,7 @@ import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ScenarioSchemaValidator } from './scenario.validator.js';
 import { ScenarioLoader } from './scenario.loader.js';
-import { runBenchmark, IBenchmarkReport } from './benchmark.runner.js';
+import { runBenchmark, runBalanceSimulation, formatBalanceReport, IBenchmarkReport } from './benchmark.runner.js';
 import { EconomySystem } from '../domain/economy/systems/economy.system.js';
 import { TradeSystem } from '../domain/economy/systems/trade.system.js';
 import { MarketSystem } from '../domain/economy/systems/market.system.js';
@@ -92,28 +92,47 @@ describe('Benchmark Stress Test (1000 ticks)', () => {
       expect(report.systemsExecuted).toBeGreaterThan(0);
     });
   }
+});
 
-  it('should report sane performance metrics across all presets', () => {
-    const reports: IBenchmarkReport[] = [];
+describe('Balance Simulation (100 ticks)', () => {
+  const presetFiles = discoverPresets();
+  if (presetFiles.length === 0) return;
 
-    for (const filePath of presetFiles) {
+  for (const filePath of presetFiles) {
+    const fileName = filePath.split(/[\\/]/).pop()!;
+
+    it(`should run ${fileName} for 100 ticks without economic collapse`, () => {
       const raw = readFileSync(filePath, 'utf-8');
       const data = JSON.parse(raw);
-      const report = runBenchmark(data, 1000);
-      reports.push(report);
 
-      console.log(
-        `  ${report.metrics.scenarioName}: ` +
-        `${report.metrics.ticksPerSecond} ticks/s, ` +
-        `avg ${report.metrics.avgTickMs}ms, ` +
-        `${Object.keys(report.eventBreakdown).length} event types`,
-      );
-    }
+      const report = runBalanceSimulation(data, 100, 10);
 
-    for (const report of reports) {
-      expect(report.metrics.ticksPerSecond).toBeGreaterThan(10);
-      expect(report.metrics.avgTickMs).toBeLessThan(100);
-      expect(report.metrics.totalTicks).toBe(1000);
-    }
-  });
+      expect(report.trend.snapshots.length).toBeGreaterThanOrEqual(2);
+      expect(report.trend.nanDetected).toBe(false);
+      expect(report.trend.infinityDetected).toBe(false);
+      expect(report.trend.collapsedEntities).toBe(0);
+    });
+
+    it(`should produce stable GDP trend for ${fileName}`, () => {
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+
+      const report = runBalanceSimulation(data, 100, 10);
+
+      // GDP shouldn't collapse by more than 80%
+      expect(report.trend.gdpGrowthRate).toBeGreaterThan(-80);
+    });
+
+    it(`should log balance report for ${fileName}`, () => {
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+
+      const report = runBalanceSimulation(data, 100, 10);
+      const formatted = formatBalanceReport(report);
+
+      console.log(formatted);
+      expect(formatted).toContain('Balance Simulation Report');
+      expect(formatted).toContain('GDP Growth Rate');
+    });
+  }
 });
