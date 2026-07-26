@@ -2,7 +2,8 @@
 // Military, Diplomacy tabs) or a Unit profile (Unit Mode) depending on what
 // the SelectionManager currently holds. Country names in the Diplomacy tab
 // are clickable links (cross-navigation). Action buttons dispatch strict
-// intent JSON via the WebSocket.
+// intent JSON via the WebSocket. Foreign country metrics are masked by
+// fog-of-war based on the player's intel level (ADR-001).
 
 import { useEffect, useState } from "react";
 import { selection } from "./selectionManager.js";
@@ -11,13 +12,19 @@ import type { Country, DiplomaticPosture, Relationship, StrictIntent, Unit, Unit
 
 type Tab = "economy" | "military" | "diplomacy";
 
-const PLAYER_CODE = "USA";
-
 const UNIT_COSTS: Record<UnitType, number> = {
   infantry: 50,
   armor: 120,
   navy: 200,
 };
+
+type IntelTier = "low" | "medium" | "high";
+
+function intelTier(level: number): IntelTier {
+  if (level >= 71) return "high";
+  if (level >= 31) return "medium";
+  return "low";
+}
 
 export function CountryProfile() {
   const [sel, setSel] = useState<ReturnType<typeof selection.getSelected>>(null);
@@ -79,10 +86,25 @@ function CountryProfileBody({
   setTab: (t: Tab) => void;
   toast: string | null;
 }) {
-  const isSelf = country.id === PLAYER_CODE;
+  const [playerCode, setPlayerCode] = useState(gameSocket.getPlayerCode());
+  const [intelLevel, setIntelLevel] = useState(gameSocket.getIntel(country.id));
+
+  useEffect(() => gameSocket.onPlayerChange(setPlayerCode), []);
+  useEffect(() => gameSocket.onIntelChange((target, level) => {
+    if (target === country.id) setIntelLevel(level);
+  }), [country.id]);
+
+  const isSelf = country.id === playerCode;
+  const tier = intelTier(intelLevel);
+
   const sendIntent = (intent: StrictIntent["intent"], extra?: { terms?: string }) => {
-    const payload = { intent, from: PLAYER_CODE, target: country.id, ...(extra ?? {}) } as StrictIntent;
+    const payload = { intent, from: playerCode, target: country.id, ...(extra ?? {}) } as StrictIntent;
     gameSocket.sendIntent(payload);
+  };
+
+  const takeCommand = () => {
+    gameSocket.setPlayerCountry(country.id);
+    setPlayerCode(country.id);
   };
 
   return (
@@ -95,6 +117,22 @@ function CountryProfileBody({
         </div>
         <button className="chip close" onClick={() => selection.selectCountry(null)} title="Close">✕</button>
       </header>
+
+      {!isSelf && (
+        <button className="btn btn-take-command" onClick={takeCommand} title={`Take control of ${country.name}`}>
+          🎮 Assumir Nação (Take Command)
+        </button>
+      )}
+
+      {!isSelf && (
+        <div className={`intel-banner intel-${tier}`}>
+          <span className="intel-label">Intel Level</span>
+          <div className="intel-bar-track">
+            <div className="intel-bar-fill" style={{ width: `${intelLevel}%` }} />
+          </div>
+          <span className="intel-value">{intelLevel}/100 · {tier.toUpperCase()}</span>
+        </div>
+      )}
 
       <nav className="tabs">
         {(["economy", "military", "diplomacy"] as Tab[]).map((t) => (
@@ -109,8 +147,8 @@ function CountryProfileBody({
       </nav>
 
       <div className="tab-body">
-        {tab === "economy" && <EconomyTab c={country} />}
-        {tab === "military" && <MilitaryTab c={country} />}
+        {tab === "economy" && <EconomyTab c={country} isSelf={isSelf} tier={tier} />}
+        {tab === "military" && <MilitaryTab c={country} isSelf={isSelf} tier={tier} />}
         {tab === "diplomacy" && <DiplomacyTab c={country} />}
       </div>
 
@@ -133,36 +171,115 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function EconomyTab({ c }: { c: Country }) {
+function fmtMoney(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
+  if (abs >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (abs >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
+  if (abs >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
+  return `$${n}`;
+}
+
+function estimateGdp(gdp: number): string {
+  const abs = Math.abs(gdp);
+  const rounded = abs >= 1e12 ? Math.round(gdp / 1e11) * 1e11 : Math.round(gdp / 1e10) * 1e10;
+  if (rounded >= 1e12) return `~$${(rounded / 1e12).toFixed(1)}T (est.)`;
+  return `~$${(rounded / 1e9).toFixed(0)}B (est.)`;
+}
+
+function estimateRange(value: number, spreadPct: number): string {
+  const spread = value * spreadPct;
+  const lo = Math.max(0, value - spread);
+  const hi = value + spread;
+  if (hi >= 1e12) return `$${(lo / 1e12).toFixed(1)}T – $${(hi / 1e12).toFixed(1)}T`;
+  if (hi >= 1e9) return `$${(lo / 1e9).toFixed(0)}B – $${(hi / 1e9).toFixed(0)}B`;
+  return `$${fmtMoney(lo)} – $${fmtMoney(hi)}`;
+}
+
+function stabilityLabel(s: number): string {
+  if (s >= 75) return "Strong";
+  if (s >= 50) return "Moderate";
+  if (s >= 25) return "Unstable";
+  return "Critical";
+}
+
+function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
   const e = c.economy;
-  return (
-    <div className="stats-grid">
-      <Stat label="GDP" value={fmtMoney(e.gdp)} />
-      <Stat label="GDP / capita" value={`$${fmtMoney(e.gdpPerCapita)}`} />
-      <Stat label="Treasury" value={`$${fmtMoney(e.treasury)}`} />
-      <Stat label="Tax Rate" value={`${(e.taxRate * 100).toFixed(1)}%`} />
-      <Stat label="Stability" value={`${e.stability}/100`} />
-      <Stat label="Population" value={c.population.toLocaleString()} />
-      <div className="bar">
-        <span className="bar-label">Stability</span>
-        <div className="bar-track">
-          <div className="bar-fill bar-fill-stab" style={{ width: `${e.stability}%` }} />
+  if (isSelf || tier === "high") {
+    return (
+      <div className="stats-grid">
+        <Stat label="GDP" value={fmtMoney(e.gdp)} />
+        <Stat label="GDP / capita" value={`$${fmtMoney(e.gdpPerCapita)}`} />
+        <Stat label="Treasury" value={`$${fmtMoney(e.treasury)}`} />
+        <Stat label="Tax Rate" value={`${(e.taxRate * 100).toFixed(1)}%`} />
+        <Stat label="Stability" value={`${e.stability}/100`} />
+        <Stat label="Population" value={c.population.toLocaleString()} />
+        <div className="bar">
+          <span className="bar-label">Stability</span>
+          <div className="bar-track">
+            <div className="bar-fill bar-fill-stab" style={{ width: `${e.stability}%` }} />
+          </div>
         </div>
       </div>
+    );
+  }
+  if (tier === "medium") {
+    return (
+      <div className="stats-grid">
+        <Stat label="GDP" value={estimateGdp(e.gdp)} />
+        <Stat label="Treasury" value={estimateRange(e.treasury, 0.2)} />
+        <Stat label="Stability" value={`${stabilityLabel(e.stability)} (${e.stability}±15)`} />
+        <Stat label="Population" value={c.population.toLocaleString()} />
+        <div className="bar">
+          <span className="bar-label">Stability (est.)</span>
+          <div className="bar-track">
+            <div className="bar-fill bar-fill-stab" style={{ width: `${Math.max(0, Math.min(100, e.stability))}%`, opacity: 0.6 }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // low intel
+  return (
+    <div className="stats-grid fog-masked">
+      <Stat label="GDP" value={estimateGdp(e.gdp)} />
+      <Stat label="Treasury" value="Classified" />
+      <Stat label="Tax Rate" value="Unknown" />
+      <Stat label="Stability" value={stabilityLabel(e.stability)} />
+      <Stat label="Population" value={c.population.toLocaleString()} />
     </div>
   );
 }
 
-function MilitaryTab({ c }: { c: Country }) {
+function MilitaryTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
   const m = c.military;
+  if (isSelf || tier === "high") {
+    return (
+      <div className="stats-grid">
+        <Stat label="Total Personnel" value={m.totalPersonnel.toLocaleString()} />
+        <Stat label="Force Limit" value={m.forceLimit.toLocaleString()} />
+        <Stat label="Readiness" value={`${m.readiness}/100`} />
+        <Stat label="Morale" value={`${m.morale}/100`} />
+        <Bar label="Readiness" value={m.readiness} cls="bar-fill-ready" />
+        <Bar label="Morale" value={m.morale} cls="bar-fill-morale" />
+      </div>
+    );
+  }
+  if (tier === "medium") {
+    return (
+      <div className="stats-grid">
+        <Stat label="Total Personnel" value={`~${(m.totalPersonnel * 0.9).toLocaleString(undefined, { maximumFractionDigits: 0 })} – ${(m.totalPersonnel * 1.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
+        <Stat label="Readiness" value={m.readiness >= 70 ? "High" : m.readiness >= 40 ? "Medium" : "Low"} />
+        <Stat label="Morale" value={m.morale >= 70 ? "High" : m.morale >= 40 ? "Medium" : "Low"} />
+      </div>
+    );
+  }
+  // low intel
   return (
-    <div className="stats-grid">
-      <Stat label="Total Personnel" value={m.totalPersonnel.toLocaleString()} />
-      <Stat label="Force Limit" value={m.forceLimit.toLocaleString()} />
-      <Stat label="Readiness" value={`${m.readiness}/100`} />
-      <Stat label="Morale" value={`${m.morale}/100`} />
-      <Bar label="Readiness" value={m.readiness} cls="bar-fill-ready" />
-      <Bar label="Morale" value={m.morale} cls="bar-fill-morale" />
+    <div className="stats-grid fog-masked">
+      <Stat label="Total Personnel" value="Classified" />
+      <Stat label="Readiness" value="Unknown" />
+      <Stat label="Morale" value="Unknown" />
     </div>
   );
 }
@@ -249,7 +366,7 @@ function UnitProfile({ unit, toast }: { unit: Unit; toast: string | null }) {
   const owner = (window as unknown as { __worldSeed?: { countries: Country[] } }).__worldSeed?.countries.find(
     (c) => c.id === unit.ownerCode
   );
-  const isPlayerUnit = unit.ownerCode === PLAYER_CODE;
+  const isPlayerUnit = unit.ownerCode === gameSocket.getPlayerCode();
 
   const disband = () => {
     const payload: StrictIntent = { intent: "disband-unit", unitId: unit.id, from: unit.ownerCode };
@@ -349,7 +466,7 @@ function ForeignActionPanel({
   );
 
   function sendIntentWithAmount(intent: "send-aid" | "gather-intel" | "fund-sabotage", amount: number) {
-    const payload = { intent, from: PLAYER_CODE, target: country.id, amount, cost: amount } as StrictIntent;
+    const payload = { intent, from: gameSocket.getPlayerCode(), target: country.id, amount, cost: amount } as StrictIntent;
     gameSocket.sendIntent(payload);
   }
 }
@@ -395,9 +512,6 @@ function GovernancePanel({ country }: { country: Country }) {
   const [posture, setPosture] = useState<DiplomaticPosture>(country.posture);
   const [taxFeedback, setTaxFeedback] = useState<string | null>(null);
 
-  // sync local state when the country object updates (e.g. after a turn)
-
-  // sync local state when the country object updates (e.g. after a turn)
   useEffect(() => {
     setTaxRate(country.economy.taxRate);
     setReadiness(country.military.readiness);
@@ -490,15 +604,6 @@ function GovernancePanel({ country }: { country: Country }) {
       <MilitaryProductionPanel country={country} />
     </footer>
   );
-}
-
-function fmtMoney(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
-  if (abs >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
-  if (abs >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
-  if (abs >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
-  return `$${n}`;
 }
 
 // referenced to keep the type import used in this module's surface

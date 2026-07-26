@@ -8,7 +8,7 @@ import { geoEqualEarth, geoPath } from "d3-geo";
 import type { GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ConflictZone, Country, IntelLevel, Relationship, Unit, UnitType, WorldSeed } from "./shared/types.js";
+import type { ConflictZone, Country, IntelLevel, Unit, UnitType, WorldSeed } from "./shared/types.js";
 import { gameSocket } from "./gameSocket.js";
 import { selection } from "./selectionManager.js";
 
@@ -37,10 +37,11 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   const [trajectories, setTrajectories] = useState<Trajectory[]>([]);
 
   const selectedRef = useRef<Country | null>(null);
-  const selectedUnitRef = useRef<Unit | null>(null);
 
   // player's intel level per foreign country (0-100)
   const intelRef = useRef<Map<string, IntelLevel>>(new Map());
+  // currently selected country's intel level, for conflict marker gating
+  const selectedIntelRef = useRef<IntelLevel>(0);
 
   // trajectory lines: dashed teal lines that fade after 8 seconds
   interface Trajectory {
@@ -68,7 +69,7 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   useEffect(() => {
     return selection.subscribe((sel) => {
       selectedRef.current = sel?.kind === "country" ? sel.country : null;
-      selectedUnitRef.current = sel?.kind === "unit" ? sel.unit : null;
+      selectedIntelRef.current = sel?.kind === "country" ? (intelRef.current.get(sel.country.id) ?? 0) : 0;
       requestAnimationFrame(draw);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,6 +93,7 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     return gameSocket.onEvent((evt) => {
       if (evt.type === "intel.gathered") {
         intelRef.current.set(evt.target, evt.intelLevel);
+        if (selectedRef.current?.id === evt.target) selectedIntelRef.current = evt.intelLevel;
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,27 +213,14 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
       }
     }
 
-    // military unit layer — conflict zone clustering + fog of war
-    const selCountry = selectedRef.current;
-    const selUnitId = selectedUnitRef.current?.id ?? null;
-    if (intelMode) {
-      // fog of war: cluster units into conflict zones and gate by intel
-      const zones = clusterConflictZones(units, CLUSTER_RADIUS_DEG);
-      for (const zone of zones) {
-        const xy = projection(zone.centroid);
-        if (!xy) continue;
-        const intel = selCountry ? (intelRef.current.get(selCountry.id) ?? 0) : 100;
-        drawConflictZoneMarker(ctx, xy[0], xy[1], zone, intel);
-      }
-    } else {
-      // normal mode: draw individual units
-      for (const u of units) {
-        const xy = projection(u.latlng);
-        if (!xy) continue;
-        const rel = selCountry ? relationshipOf(selCountry, u.ownerCode) : "neutral";
-        const color = unitColor(u, rel, selUnitId === u.id);
-        drawUnitMarker(ctx, xy[0], xy[1], u.type, color);
-      }
+    // military unit layer — ONLY active conflict zones are drawn.
+    // Peaceful/neutral units are never rendered on the map canvas.
+    const zones = clusterConflictZones(units, CLUSTER_RADIUS_DEG);
+    for (const zone of zones) {
+      if (zone.hostility < 70) continue; // only active combat
+      const xy = projection(zone.centroid);
+      if (!xy) continue;
+      drawConflictMarker(ctx, xy[0], xy[1], zone, intelMode, selectedIntelRef.current);
     }
 
     // trajectory lines (dashed teal, persist 8s)
@@ -352,51 +341,6 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
 
 // ---- helpers ---------------------------------------------------------------
 
-function relationshipOf(sel: Country, ownerCode: string): "ally" | "enemy" | "neutral" {
-  if (sel.id === ownerCode) return "ally";
-  const r = sel.relationships.find((x) => x.countryCode === ownerCode) as Relationship | undefined;
-  if (!r) return "neutral";
-  if (r.tension >= 60) return "enemy";
-  if (r.tension <= 25 && r.affinity >= 30) return "ally";
-  return "neutral";
-}
-
-function unitColor(_u: Unit, rel: "ally" | "enemy" | "neutral", selected: boolean): string {
-  if (selected) return "#ffffff";
-  if (rel === "ally") return "#4a9fe8"; // blue
-  if (rel === "enemy") return "#e8635a"; // red
-  return "#8ba3b5"; // gray
-}
-
-function drawUnitMarker(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  type: Unit["type"],
-  color: string
-) {
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.strokeStyle = "rgba(0,0,0,0.6)";
-  ctx.lineWidth = 1;
-  const r = 6;
-  ctx.beginPath();
-  if (type === "infantry") {
-    ctx.rect(x - r, y - r, r * 2, r * 2); // square
-  } else if (type === "armor") {
-    ctx.moveTo(x, y - r);
-    ctx.lineTo(x + r, y);
-    ctx.lineTo(x, y + r);
-    ctx.lineTo(x - r, y);
-    ctx.closePath(); // diamond
-  } else {
-    ctx.arc(x, y, r, 0, Math.PI * 2); // circle = navy
-  }
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
-}
-
 // ---- Conflict zone clustering + fog of war ----
 
 /** Group units within an 8° lat/lng radius into hexagonal conflict zones. */
@@ -441,44 +385,52 @@ function clusterConflictZones(units: Unit[], radiusDeg: number): ConflictZone[] 
   return zones;
 }
 
-/** Draw a hexagonal conflict zone blip, color-coded by hostility level.
- *  Red 70+, Amber 35+, Blue <35. Intel level controls detail shown. */
-function drawConflictZoneMarker(
+/** Draw a clean conflict marker (⚔️) for active war zones.
+ *  Only called when hostility >= 70 (active combat). */
+function drawConflictMarker(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   zone: ConflictZone,
+  fogMode: boolean,
   intel: IntelLevel
 ): void {
-  const r = 10 + Math.min(8, zone.unitCount);
-  const color = zone.hostility >= 70 ? "#c0392b" : zone.hostility >= 35 ? "#e67e22" : "#2980b9";
+  const r = 14;
   ctx.save();
-  ctx.fillStyle = color;
-  ctx.strokeStyle = "rgba(0,0,0,0.6)";
-  ctx.lineWidth = 1.5;
-  // hexagon
+  // pulsing red glow for active combat
+  ctx.fillStyle = "rgba(192, 57, 43, 0.25)";
   ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    const px = x + r * Math.cos(angle);
-    const py = y + r * Math.sin(angle);
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
+  ctx.arc(x, y, r + 6, 0, Math.PI * 2);
+  ctx.fill();
+  // solid red disc
+  ctx.fillStyle = "#c0392b";
+  ctx.strokeStyle = "rgba(0,0,0,0.7)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-  // unit count label
+  // crossed swords glyph
   ctx.fillStyle = "rgba(255,255,255,0.95)";
-  ctx.font = "bold 10px var(--mono)";
+  ctx.font = "16px var(--mono)";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(String(zone.unitCount), x, y);
-  // intel gating: show owner codes only if intel >= 31 (Medium+)
-  if (intel >= 31) {
+  ctx.fillText("\u2694", x, y + 1);
+  // unit count badge if multiple units
+  if (zone.unitCount > 1) {
+    ctx.fillStyle = "#c0392b";
+    ctx.beginPath();
+    ctx.arc(x + r - 2, y - r + 2, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 9px var(--mono)";
+    ctx.fillText(String(zone.unitCount), x + r - 2, y - r + 2);
+  }
+  // owner codes: show when fog off, or when intel >= 31 in fog mode
+  if (!fogMode || intel >= 31) {
     ctx.fillStyle = "rgba(255,255,255,0.7)";
     ctx.font = "9px var(--mono)";
-    ctx.fillText(zone.ownerCodes.join(","), x, y + r + 10);
+    ctx.fillText(zone.ownerCodes.join(" vs "), x, y + r + 12);
   }
   ctx.restore();
 }

@@ -8,12 +8,15 @@ import type { Country, GameEvent, IntentResponse, MarketPrice, PlayerPolicy, Str
 import { persistEvent, persistMarket, persistPlayerPolicy, persistTurnResults, persistUnitDisband, persistUnitMove, type PersistedWorld } from "./gameStore.js";
 import { processTurn } from "./turnEngine.js";
 
-const PLAYER_CODE = "USA";
-
 type EventListener = (evt: GameEvent) => void;
 type IntentListener = (res: IntentResponse) => void;
 type UnitsListener = (units: Unit[]) => void;
 type TickListener = (tick: number) => void;
+type PlayerListener = (code: string) => void;
+type SimStateListener = (state: SimState) => void;
+
+export type SimSpeed = 0 | 1 | 2 | 5;
+export interface SimState { paused: boolean; speed: SimSpeed; }
 
 const WS_URL = `ws://${location.host}/ws`;
 const BACKEND_PROBE = "/health";
@@ -29,12 +32,19 @@ class GameSocket {
   private gameId: string | null = null;
   private simTimer: ReturnType<typeof setInterval> | null = null;
   private marketTimer: ReturnType<typeof setInterval> | null = null;
+  private autoTickTimer: ReturnType<typeof setInterval> | null = null;
   private units: Unit[] = [];
   private market: MarketPrice[] = [];
   private countries: Country[] = [];
   private currentTick = 0;
   private turnInProgress = false;
   private tickListeners = new Set<TickListener>();
+  private playerCode = "USA";
+  private playerListeners = new Set<PlayerListener>();
+  private simState: SimState = { paused: true, speed: 0 };
+  private simStateListeners = new Set<SimStateListener>();
+  private intelMap = new Map<string, number>();
+  private intelListeners = new Set<(target: string, level: number) => void>();
 
   /** Hydrate from the persisted world (loaded/seeded via gameStore). */
   setPersistedWorld(world: PersistedWorld, seed: WorldSeed): void {
@@ -100,24 +110,108 @@ class GameSocket {
 
   /** Get the player's nation (USA) from the current countries array. */
   getPlayerCountry(): Country | undefined {
-    return this.countries.find((c) => c.id === PLAYER_CODE);
+    return this.countries.find((c) => c.id === this.playerCode);
+  }
+
+  getPlayerCode(): string {
+    return this.playerCode;
+  }
+
+  setPlayerCountry(code: string): void {
+    const c = this.countries.find((x) => x.id === code);
+    if (!c) return;
+    this.playerCode = code;
+    for (const l of this.playerListeners) l(code);
+  }
+
+  onPlayerChange(l: PlayerListener): () => void {
+    this.playerListeners.add(l);
+    l(this.playerCode);
+    return () => this.playerListeners.delete(l);
+  }
+
+  getSimState(): SimState { return this.simState; }
+
+  onSimStateChange(l: SimStateListener): () => void {
+    this.simStateListeners.add(l);
+    l(this.simState);
+    return () => this.simStateListeners.delete(l);
+  }
+
+  setPaused(paused: boolean): void {
+    if (this.simState.paused === paused) return;
+    this.simState = { ...this.simState, paused };
+    this.broadcastSimState();
+    this.sendSimControl();
+    if (paused) this.stopAutoTick(); else this.startAutoTick();
+  }
+
+  setSpeed(speed: SimSpeed): void {
+    if (speed === 0) { this.setPaused(true); return; }
+    this.simState = { paused: false, speed };
+    this.broadcastSimState();
+    this.sendSimControl();
+    this.startAutoTick();
+  }
+
+  private broadcastSimState(): void {
+    for (const l of this.simStateListeners) l(this.simState);
+  }
+
+  /** Notify the live server of pause/speed changes so its ambient event
+   *  generator freezes immediately when the player pauses. */
+  private sendSimControl(): void {
+    if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: "set_simulation_speed",
+        paused: this.simState.paused,
+        speed: this.simState.speed,
+      }));
+    }
+  }
+
+  private startAutoTick(): void {
+    this.stopAutoTick();
+    if (this.simState.paused || this.simState.speed === 0) return;
+    const interval = this.simState.speed === 1 ? 4000 : this.simState.speed === 2 ? 2000 : 800;
+    this.autoTickTimer = setInterval(() => { void this.advanceTurn(); }, interval);
+  }
+
+  private stopAutoTick(): void {
+    if (this.autoTickTimer) { clearInterval(this.autoTickTimer); this.autoTickTimer = null; }
+  }
+
+  getIntel(target: string): number {
+    return this.intelMap.get(target) ?? 0;
+  }
+
+  onIntelChange(l: (target: string, level: number) => void): () => void {
+    this.intelListeners.add(l);
+    return () => this.intelListeners.delete(l);
+  }
+
+  private setIntel(target: string, level: number): void {
+    const clamped = Math.max(0, Math.min(100, level));
+    this.intelMap.set(target, clamped);
+    for (const l of this.intelListeners) l(target, clamped);
   }
 
   /** Apply a player policy change (tax rate, military readiness, or posture).
    *  Updates the in-memory country state, emits an event, and persists. */
   applyPlayerPolicy(patch: Partial<PlayerPolicy>): void {
-    const idx = this.countries.findIndex((c) => c.id === PLAYER_CODE);
+    const idx = this.countries.findIndex((c) => c.id === this.playerCode);
     if (idx < 0) return;
     const c = this.countries[idx];
     const at = new Date().toISOString();
+    const pc = this.playerCode;
 
     if (patch.taxRate !== undefined) {
       const prev = c.economy.taxRate;
       this.countries[idx] = { ...c, economy: { ...c.economy, taxRate: patch.taxRate } };
       const treasuryImpact = Math.round(c.economy.gdp * (patch.taxRate - prev));
-      const evt: GameEvent = { type: "policy.tax-set", at, country: PLAYER_CODE, rate: patch.taxRate, treasuryImpact };
+      const evt: GameEvent = { type: "policy.tax-set", at, country: pc, rate: patch.taxRate, treasuryImpact };
       this.emit(evt);
-      if (this.gameId) { void persistPlayerPolicy(this.gameId, PLAYER_CODE, { taxRate: patch.taxRate }); void persistEvent(this.gameId, evt); }
+      if (this.gameId) { void persistPlayerPolicy(this.gameId, pc, { taxRate: patch.taxRate }); void persistEvent(this.gameId, evt); }
       return;
     }
 
@@ -126,17 +220,17 @@ class GameSocket {
       this.countries[idx] = { ...c, military: { ...c.military, readiness: patch.readiness } };
       const moraleImpact = Math.round((patch.readiness - prev) * -0.2);
       this.countries[idx] = { ...this.countries[idx], military: { ...this.countries[idx].military, morale: Math.max(10, Math.min(100, c.military.morale + moraleImpact)) } };
-      const evt: GameEvent = { type: "policy.readiness-set", at, country: PLAYER_CODE, level: patch.readiness, moraleImpact };
+      const evt: GameEvent = { type: "policy.readiness-set", at, country: pc, level: patch.readiness, moraleImpact };
       this.emit(evt);
-      if (this.gameId) { void persistPlayerPolicy(this.gameId, PLAYER_CODE, { readiness: patch.readiness }); void persistEvent(this.gameId, evt); }
+      if (this.gameId) { void persistPlayerPolicy(this.gameId, pc, { readiness: patch.readiness }); void persistEvent(this.gameId, evt); }
       return;
     }
 
     if (patch.posture !== undefined) {
       this.countries[idx] = { ...c, posture: patch.posture };
-      const evt: GameEvent = { type: "policy.posture-set", at, country: PLAYER_CODE, posture: patch.posture };
+      const evt: GameEvent = { type: "policy.posture-set", at, country: pc, posture: patch.posture };
       this.emit(evt);
-      if (this.gameId) { void persistPlayerPolicy(this.gameId, PLAYER_CODE, { posture: patch.posture }); void persistEvent(this.gameId, evt); }
+      if (this.gameId) { void persistPlayerPolicy(this.gameId, pc, { posture: patch.posture }); void persistEvent(this.gameId, evt); }
       return;
     }
   }
@@ -188,7 +282,12 @@ class GameSocket {
     // or { type: "tick_advanced", payload: { tick, summary } }. Legacy bare
     // IntentResponse objects (with an `ok` field) are still supported for
     // the direct WS send/reply path.
-    if (typeof m["ok"] === "boolean") {
+    if (typeof m["ok"] === "boolean" && m["type"] === "set_simulation_speed") {
+      return;
+    } else if (m["type"] === "hello" && typeof m["paused"] === "boolean") {
+      this.simState = { ...this.simState, paused: m["paused"] as boolean };
+      this.broadcastSimState();
+    } else if (typeof m["ok"] === "boolean") {
       for (const l of this.intentListeners) l(m as unknown as IntentResponse);
     } else if (m["type"] === "event_emitted" && m["payload"] && typeof m["payload"] === "object") {
       for (const l of this.eventListeners) l((m["payload"] as Record<string, unknown>) as unknown as GameEvent);
@@ -209,9 +308,13 @@ class GameSocket {
     if (intent.intent === "set-readiness") { this.applyPlayerPolicy({ readiness: intent.level }); return; }
     if (intent.intent === "set-posture") { this.applyPlayerPolicy({ posture: intent.posture }); return; }
 
-    // Recruitment creates a unit locally immediately — the server validates
-    // but the dashboard adds the marker so the player sees instant feedback.
+    // Recruitment creates a unit locally immediately
     if (intent.intent === "recruit-unit") { this.handleRecruitUnit(intent); return; }
+
+    // Covert ops in sim mode: generate events locally
+    if (intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage") {
+      if (this.mode === "sim") { this.handleCovertOpSim(intent); return; }
+    }
 
     if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(intent));
@@ -319,6 +422,39 @@ class GameSocket {
     }
   }
 
+  /** Handle covert ops (send-aid, gather-intel, fund-sabotage) in sim mode.
+   *  Generates the appropriate events locally and updates intel state. */
+  private handleCovertOpSim(intent: Extract<StrictIntent, { intent: "send-aid" | "gather-intel" | "fund-sabotage" }>): void {
+    const at = new Date().toISOString();
+    const pc = this.playerCode;
+    const res: IntentResponse = { ok: true, acknowledged: intent, events: [] };
+    for (const l of this.intentListeners) l(res);
+
+    if (intent.intent === "send-aid") {
+      const evt: GameEvent = { type: "aid.sent", at, from: pc, target: intent.target, amount: intent.amount, affinityGain: 15 };
+      this.emit(evt);
+      if (this.gameId) void persistEvent(this.gameId, evt);
+    } else if (intent.intent === "gather-intel") {
+      const current = this.intelMap.get(intent.target) ?? 0;
+      const newLevel = Math.min(100, current + 25);
+      const evt: GameEvent = { type: "intel.gathered", at, player: pc, target: intent.target, intelLevel: newLevel, cost: intent.cost };
+      this.emit(evt);
+      if (this.gameId) void persistEvent(this.gameId, evt);
+    } else if (intent.intent === "fund-sabotage") {
+      if (Math.random() < 0.3) {
+        const evt: GameEvent = { type: "sabotage.failed", at, from: pc, target: intent.target, cost: intent.cost, reason: "Operatives detected and neutralized" };
+        this.emit(evt);
+        if (this.gameId) void persistEvent(this.gameId, evt);
+      } else {
+        const stabilityHit = -(15 + Math.floor(Math.random() * 11));
+        const readinessHit = -(15 + Math.floor(Math.random() * 11));
+        const evt: GameEvent = { type: "sabotage.executed", at, from: pc, target: intent.target, stabilityHit, readinessHit, cost: intent.cost };
+        this.emit(evt);
+        if (this.gameId) void persistEvent(this.gameId, evt);
+      }
+    }
+  }
+
   // ---- simulator ----------------------------------------------------------
 
   private startSim(): void {
@@ -332,6 +468,7 @@ class GameSocket {
   private ensureSimRunning(): void {
     if (this.simTimer) return;
     this.simTimer = setInterval(() => {
+      if (this.simState.paused) return;
       if (!this.seed) return;
       const evt = simulateRandomEvent(this.seed, this.units);
       this.emit(evt);
@@ -358,6 +495,10 @@ class GameSocket {
   }
 
   private emit(evt: GameEvent): void {
+    // Track intel changes from gathered events
+    if (evt.type === "intel.gathered") {
+      this.setIntel(evt.target, evt.intelLevel);
+    }
     for (const l of this.eventListeners) l(evt);
   }
 

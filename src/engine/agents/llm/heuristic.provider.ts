@@ -38,6 +38,12 @@ export class HeuristicAgentProvider implements ILlmProvider {
     return JSON.stringify(action);
   }
 
+  /** Synchronous decision — used by AgentSystem for real-time providers. */
+  decideSync(prompt: string, _systemPrompt?: string): string {
+    const action = this.decide(prompt);
+    return JSON.stringify(action);
+  }
+
   private decide(prompt: string): {
     actionType: string;
     actorEntityId: string;

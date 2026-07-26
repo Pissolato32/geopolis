@@ -54,7 +54,8 @@ export class AgentController {
     if (!validation.isValid || !validation.validatedPayload) return false;
 
     // 6. Record decision in agent memory
-    this.memory.recordDecision(payload.narrativeSummary ?? payload.actionType);
+    const tick = worldState.getMetadata().currentTick;
+    this.memory.recordDecision(payload.narrativeSummary ?? payload.actionType, payload.actionType, tick as number);
 
     // 7. Emit validated action onto EventBus
     eventBus.publish(

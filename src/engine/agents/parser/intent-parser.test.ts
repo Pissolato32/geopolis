@@ -62,7 +62,7 @@ The regime decides to increase defense readiness following recent regional tensi
     expect(res.errors!.length).toBeGreaterThan(0);
   });
 
-  it('should reject invalid parameters for war.move-ordered and war.deploy-unit', () => {
+  it('should reject invalid parameters for war.move-ordered and military.deploy-unit', () => {
     const parser = new StrictIntentParser();
     const badMove = {
       actionType: 'war.move-ordered',
@@ -75,7 +75,7 @@ The regime decides to increase defense readiness following recent regional tensi
     expect(resMove.errors).toContain('move-ordered requires unitId parameter');
 
     const badDeploy = {
-      actionType: 'war.deploy-unit',
+      actionType: 'military.deploy-unit',
       actorEntityId: 'country-br' as EntityId,
       parameters: { countryId: 'country-br', provinceId: 'prov-1', unitName: '1st Division', personnel: -100 },
     };
