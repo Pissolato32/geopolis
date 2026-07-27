@@ -153,23 +153,40 @@ function main() {
 
   // POST /api/v1/action — accept a strict intent, validate + simulate it.
   app.post("/api/v1/action", (req, res) => {
-    const result = parser.parse(req.body);
-    if (result.ok) {
-      for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
+    try {
+      const result = parser.parse(req.body);
+      if (result.ok) {
+        for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
+      }
+      res.json(result);
+    } catch (err) {
+      console.error("[server] action error:", err);
+      res.status(400).json({
+        ok: false,
+        error: err instanceof Error ? err.message : "Invalid action payload structure",
+      });
     }
-    res.json(result);
   });
 
   // POST /api/v1/tick — advance the simulation by one turn and stream events.
   app.post("/api/v1/tick", (_req, res) => {
-    liveTick += 1;
-    const result = processTurn(liveCountries, liveUnits, liveTick);
-    liveCountries = result.countries;
-    liveUnits = result.units;
-    liveMarket = tickMarketPrices(liveMarket);
-    for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
-    broadcastEnvelope(clients, "tick_advanced", { tick: liveTick, summary: result.events[0] });
-    res.json({ ok: true, tick: liveTick, events: result.events });
+    try {
+      liveTick += 1;
+      const result = processTurn(liveCountries, liveUnits, liveTick);
+      liveCountries = result.countries;
+      liveUnits = result.units;
+      liveMarket = tickMarketPrices(liveMarket);
+      for (const evt of result.events) broadcastEnvelope(clients, "event_emitted", evt);
+      broadcastEnvelope(clients, "tick_advanced", { tick: liveTick, summary: result.events[0] });
+      res.json({ ok: true, tick: liveTick, events: result.events });
+    } catch (err) {
+      console.error("[server] tick error:", err);
+      liveTick = Math.max(0, liveTick - 1);
+      res.status(500).json({
+        ok: false,
+        error: err instanceof Error ? err.message : "Simulation turn failed",
+      });
+    }
   });
 
   // Serve the built dashboard so a single process powers the whole app on one port.

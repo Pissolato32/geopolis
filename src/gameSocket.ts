@@ -471,9 +471,21 @@ class GameSocket {
         body: JSON.stringify(intent),
       });
       if (!r.ok) {
+        console.warn("[gameSocket] Server action endpoint returned non-200, invoking local simulation fallback.");
         reportError(new ApiError(`Action rejected: ${r.status}`, r.status, "/api/v1/action"), {
           source: "gameSocket.postAction",
+          userMessage: "Server rejected the action. Processing locally instead.",
         });
+        const res = simulateIntent(intent, this.seed, this.units);
+        for (const l of this.intentListeners) l(res);
+        if (res.ok) {
+          for (const evt of res.events) { this.emit(evt); if (this.gameId) void persistEvent(this.gameId, evt); }
+          if (isUnitIntent(intent)) {
+            this.units = applyUnitIntent(this.units, intent);
+            this.broadcastUnits();
+            if (this.gameId) void persistUnitMutation(this.gameId, intent);
+          }
+        }
         return;
       }
       const res = (await r.json()) as IntentResponse;
@@ -492,6 +504,7 @@ class GameSocket {
         });
       }
     } catch (err) {
+      console.warn("[gameSocket] Network request failed, falling back to local simulation:", err);
       reportError(err, {
         category: "network",
         source: "gameSocket.postAction",
@@ -499,6 +512,14 @@ class GameSocket {
       });
       const res = simulateIntent(intent, this.seed, this.units);
       for (const l of this.intentListeners) l(res);
+      if (res.ok) {
+        for (const evt of res.events) { this.emit(evt); if (this.gameId) void persistEvent(this.gameId, evt); }
+        if (isUnitIntent(intent)) {
+          this.units = applyUnitIntent(this.units, intent);
+          this.broadcastUnits();
+          if (this.gameId) void persistUnitMutation(this.gameId, intent);
+        }
+      }
     }
   }
 

@@ -43,6 +43,8 @@ export class StrictIntentParser {
       case "set-posture":
       case "recruit-unit":
         return this.parsePlayerIntent(intent as Partial<StrictIntent>);
+      case "resolve-cabinet-card":
+        return this.parseCabinetIntent(intent as Partial<Extract<StrictIntent, { intent: "resolve-cabinet-card" }>>);
       default:
         return { ok: false, error: `unsupported intent "${intent.intent}"` };
     }
@@ -75,8 +77,9 @@ export class StrictIntentParser {
     }
     if (i === "set-posture") {
       const posture = (intent as Extract<StrictIntent, { intent: "set-posture" }>).posture;
-      if (!posture || typeof posture !== "string") {
-        return { ok: false, error: '"posture" must be a DiplomaticPosture string' };
+      const validPostures = ["isolationist", "diplomatic", "assertive", "expansionist"];
+      if (!posture || typeof posture !== "string" || !validPostures.includes(posture)) {
+        return { ok: false, error: '"posture" must be one of: isolationist, diplomatic, assertive, expansionist' };
       }
       return { ok: true, acknowledged: intent as Extract<StrictIntent, { intent: "set-posture" }>, events: [] };
     }
@@ -115,15 +118,44 @@ export class StrictIntentParser {
         return this.handleImproveRelations(
           intent as Extract<StrictIntent, { intent: "improve-relations" }>
         );
-      case "send-aid":
-        return this.handleSendAid(intent as Extract<StrictIntent, { intent: "send-aid" }>);
-      case "gather-intel":
-        return this.handleGatherIntel(intent as Extract<StrictIntent, { intent: "gather-intel" }>);
-      case "fund-sabotage":
-        return this.handleFundSabotage(intent as Extract<StrictIntent, { intent: "fund-sabotage" }>);
+      case "send-aid": {
+        const aid = intent as Extract<StrictIntent, { intent: "send-aid" }>;
+        if (typeof aid.amount !== "number" || aid.amount <= 0) {
+          return { ok: false, error: '"amount" must be a positive number' };
+        }
+        return this.handleSendAid(aid);
+      }
+      case "gather-intel": {
+        const intel = intent as Extract<StrictIntent, { intent: "gather-intel" }>;
+        if (typeof intel.cost !== "number" || intel.cost <= 0) {
+          return { ok: false, error: '"cost" must be a positive number' };
+        }
+        return this.handleGatherIntel(intel);
+      }
+      case "fund-sabotage": {
+        const sab = intent as Extract<StrictIntent, { intent: "fund-sabotage" }>;
+        if (typeof sab.cost !== "number" || sab.cost <= 0) {
+          return { ok: false, error: '"cost" must be a positive number' };
+        }
+        return this.handleFundSabotage(sab);
+      }
       default:
         return { ok: false, error: "unreachable" };
     }
+  }
+
+  private parseCabinetIntent(intent: Partial<Extract<StrictIntent, { intent: "resolve-cabinet-card" }>>): IntentResponse {
+    const from = (intent as Partial<{ from: string }>).from;
+    if (typeof from !== "string") {
+      return { ok: false, error: '"from" must be a string' };
+    }
+    if (!this.find(from)) {
+      return { ok: false, error: `unknown "from" country: ${from}` };
+    }
+    if (typeof intent.cardId !== "string" || !intent.cardId.trim()) {
+      return { ok: false, error: '"cardId" must be a non-empty string' };
+    }
+    return { ok: true, acknowledged: intent as Extract<StrictIntent, { intent: "resolve-cabinet-card" }>, events: [] };
   }
 
   private parseUnitIntent(
