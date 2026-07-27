@@ -70,14 +70,6 @@ export class StrictIntentParser implements IIntentParser {
           errors.push('adjust-tax requires newTaxRate number between 0.0 and 0.8');
         }
         break;
-      case 'diplomacy.propose-treaty':
-        if (!Array.isArray(params['signatories']) || params['signatories'].length < 2) {
-          errors.push('propose-treaty requires signatories array with at least 2 countries');
-        }
-        if (!params['treatyType']) {
-          errors.push('propose-treaty requires treatyType parameter');
-        }
-        break;
       case 'war.move-ordered':
         if (!params['unitId']) errors.push('move-ordered requires unitId parameter');
         if (!params['targetProvinceId']) errors.push('move-ordered requires targetProvinceId parameter');
@@ -92,6 +84,24 @@ export class StrictIntentParser implements IIntentParser {
       case 'war.request-peace':
         if (!params['initiator'] || !params['target']) {
           errors.push('request-peace requires initiator and target parameters');
+        }
+        break;
+      case 'diplomacy.improve-relations':
+        if (!params['targetCountryId']) {
+          errors.push('improve-relations requires targetCountryId parameter');
+        }
+        break;
+      case 'diplomacy.propose-treaty':
+        if (!Array.isArray(params['signatories']) || params['signatories'].length < 2) {
+          errors.push('propose-treaty requires signatories array with at least 2 countries');
+        }
+        if (!params['treatyType']) {
+          errors.push('propose-treaty requires treatyType parameter');
+        }
+        break;
+      case 'intel.gather-intel':
+        if (!params['targetCountryId']) {
+          errors.push('gather-intel requires targetCountryId parameter');
         }
         break;
     }

@@ -13,9 +13,18 @@ import { DIPLOMATIC_RELATION_TYPE } from '../../domain/diplomacy/components/rela
 
 export const AGENT_SYSTEM_ID = 'agent.evaluator';
 
+/** Priority tier for agent scheduling — major powers evaluate every tick,
+ *  minor powers every N ticks to prevent performance degradation. */
+export type AgentTier = 'major' | 'regional' | 'minor';
+
 interface IAgentRecord {
   countryId: EntityId;
   memory: AgentMemory;
+  tier: AgentTier;
+  /** Ticks between evaluations for this agent (1 = every tick). */
+  evaluationInterval: number;
+  /** Last tick this agent was evaluated. */
+  lastEvaluatedTick: number;
 }
 
 export interface IAgentSystemConfig {
@@ -23,6 +32,10 @@ export interface IAgentSystemConfig {
   readonly evaluator?: (prompt: string, systemPrompt?: string) => string;
   readonly controlledEntities?: ReadonlyArray<EntityId>;
   readonly personality?: Partial<IAgentPersonality>;
+  /** Map of country IDs to priority tiers. Countries not listed default to 'minor'. */
+  readonly tierAssignments?: Readonly<Record<string, AgentTier>>;
+  /** Maximum agents to evaluate per tick (round-robin cap). Default: 10. */
+  readonly maxAgentsPerTick?: number;
 }
 
 export class AgentSystem implements ISystem {
@@ -40,17 +53,23 @@ export class AgentSystem implements ISystem {
   private readonly provider: ILlmProvider | undefined;
   private readonly evaluator: ((prompt: string, systemPrompt?: string) => string) | undefined;
   private readonly personality: Partial<IAgentPersonality> | undefined;
+  private readonly config: IAgentSystemConfig;
 
   constructor(config: IAgentSystemConfig = {}) {
+    this.config = config;
     this.provider = config.provider;
     this.evaluator = config.evaluator;
     this.personality = config.personality;
 
     if (config.controlledEntities) {
       for (const id of config.controlledEntities) {
+        const tier = config.tierAssignments?.[id] ?? 'major';
         this.agents.push({
           countryId: id,
           memory: new AgentMemory(id, this.personality),
+          tier,
+          evaluationInterval: tier === 'major' ? 1 : tier === 'regional' ? 3 : 5,
+          lastEvaluatedTick: -1000,
         });
       }
     }
@@ -62,9 +81,13 @@ export class AgentSystem implements ISystem {
 
     for (const entity of countries) {
       if (!existing.has(entity.id)) {
+        const tier = this.config.tierAssignments?.[entity.id] ?? 'minor';
         this.agents.push({
           countryId: entity.id,
           memory: new AgentMemory(entity.id, this.personality),
+          tier,
+          evaluationInterval: tier === 'major' ? 1 : tier === 'regional' ? 3 : 5,
+          lastEvaluatedTick: -1000,
         });
         existing.add(entity.id);
       }
@@ -84,7 +107,22 @@ export class AgentSystem implements ISystem {
 
     if (!this.provider && !this.evaluator) return;
 
-    for (const agent of this.agents) {
+    const tick = state.getMetadata().currentTick;
+    const maxPerTick = this.config.maxAgentsPerTick ?? 10;
+
+    // Build eligible list: agents whose evaluation interval has elapsed
+    const eligible = this.agents.filter(
+      (a) => tick - a.lastEvaluatedTick >= a.evaluationInterval
+    );
+
+    // Sort by tier priority: major > regional > minor
+    const tierOrder: Record<AgentTier, number> = { major: 0, regional: 1, minor: 2 };
+    eligible.sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]);
+
+    // Round-robin cap
+    const toEvaluate = eligible.slice(0, maxPerTick);
+
+    for (const agent of toEvaluate) {
       if (this.provider instanceof HeuristicAgentProvider) {
         const ctx = this.collectHeuristicContext(state, agent.countryId);
         this.provider.setContext(ctx);
@@ -101,6 +139,8 @@ export class AgentSystem implements ISystem {
           this.processResponse(rawResponse, agent, state, eventBus);
         });
       }
+
+      agent.lastEvaluatedTick = tick;
     }
   }
 
