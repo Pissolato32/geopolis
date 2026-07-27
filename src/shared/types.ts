@@ -28,6 +28,114 @@ export interface Relationship {
 /** Government regime type — determines cabinet flavor text, not advisor availability. */
 export type RegimeType = "democracy" | "autocracy" | "dictatorship" | "monarchy" | "technocracy";
 
+/** Detailed regime classification for the intelligence panel (EIU/V-Dem aligned). */
+export type IntelligenceRegimeType =
+  | "full-democracy"
+  | "flawed-democracy"
+  | "hybrid-regime"
+  | "authoritarian"
+  | "absolute-monarchy"
+  | "one-party-state"
+  | "military-junta"
+  | "theocracy"
+  | "provisional"
+  | "transitional";
+
+/** Global intelligence metrics for a country — sourced from real-world indices. */
+export interface CountryIntelligence {
+  regimeType: IntelligenceRegimeType;
+  regimeLabel: string;           // e.g. "Full Democracy", "Authoritarian"
+  freedomStatus: string;         // e.g. "Free", "Partly Free", "Not Free"
+  hdiRank: number;               // 0-195 (lower = better)
+  hdiScore: number;              // 0-1
+  democracyIndex: number;        // 0-10
+  freedomScore: number;          // 0-100
+  corruptionIndex: number;       // 0-100 (CPI, 100 = cleanest)
+  crimeIndex: number;            // 0-10 (lower = safer)
+  terrorIndex: number;           // 0-10 (lower = safer)
+  fragilityIndex: number;        // 0-120 (lower = more stable)
+  fragilityLabel: string;        // "Sustainable", "Stable", "Warning", "Alert"
+  stabilityLabel: string;        // "Very Stable", "Stable", "Unstable", "Critical"
+  passportRank: number;          // 0-199 (Henley, lower = better)
+  passportScore: number;         // number of visa-free destinations
+  keyRisks: string[];            // e.g. ["Banking reputation", "EU relations"]
+  gdpGrowth: number;             // GDP growth rate as decimal (e.g. 0.013 = +1.3%)
+  militaryPowerScore: number;    // 0-100 composite score
+  gfpRank: number;               // 1-145 (Global Firepower)
+  gfpScore: number;              // PwrIndx value (0.0000 = perfect)
+  gfpTotalScore: number;         // GFP monetary value (GFP$)
+  dataYear: number;              // Reference year for the data
+  isEstimated: boolean;          // true if data was estimated/fallback
+}
+
+/** Detailed military equipment and statistics (mirroring GFP categories). */
+export interface CountryMilitaryDetail {
+  // Manpower
+  availableManpower: number;
+  fitForService: number;
+  reachingMilAgeAnnual: number;
+  activePersonnel: number;
+  reservePersonnel: number;
+  paramilitaryPersonnel: number;
+  airForcePersonnel: number;
+  armyPersonnel: number;
+  navyPersonnel: number;
+  // Airpower
+  totalAircraft: number;
+  fighterAircraft: number;
+  attackAircraft: number;
+  transportAircraft: number;
+  trainerAircraft: number;
+  specialMissionAircraft: number;
+  tankerAircraft: number;
+  helicopters: number;
+  attackHelicopters: number;
+  // Land Forces
+  tanks: number;
+  armoredVehicles: number;
+  selfPropelledArtillery: number;
+  towedArtillery: number;
+  mlrs: number;
+  // Naval Forces
+  totalNaval: number;
+  aircraftCarriers: number;
+  helicopterCarriers: number;
+  submarines: number;
+  destroyers: number;
+  frigates: number;
+  corvettes: number;
+  patrolCraft: number;
+  mineWarfare: number;
+  // Financials
+  defenseBudget: number;
+  externalDebt: number;
+  purchasingPowerParity: number;
+  foreignReserves: number;
+  // Geography
+  squareLandArea: number;
+  coastlineKm: number;
+  sharedBordersKm: number;
+  waterwaysKm: number;
+  // Logistics
+  internetCoverage: number;
+  laborForce: number;
+  merchantMarineFleet: number;
+  ports: number;
+  airports: number;
+  roadwayKm: number;
+  railwayKm: number;
+  // Natural Resources
+  oilProduction: number;
+  oilConsumption: number;
+  oilProvenReserves: number;
+  naturalGasProduction: number;
+  naturalGasConsumption: number;
+  naturalGasReserves: number;
+  coalProduction: number;
+  coalConsumption: number;
+  coalReserves: number;
+}
+
 /** The 5 universal advisor slots present in every regime type. */
 export type AdvisorSlotId =
   | "finance"      // Financial & Economic Advisor
@@ -245,6 +353,8 @@ export interface Country {
   cooldowns?: PolicyCooldown[];
   research?: ResearchState;
   covertOps?: CovertOpsState;
+  intelligence?: CountryIntelligence;
+  militaryDetail?: CountryMilitaryDetail;
 }
 
 /** Player's espionage knowledge about a foreign nation (0 = blind, 100 = full). */

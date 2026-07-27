@@ -1,16 +1,17 @@
-// CountryProfile — right panel. Renders either a Country profile (Economy,
-// Military, Diplomacy tabs) or a Unit profile (Unit Mode) depending on what
-// the SelectionManager currently holds. Country names in the Diplomacy tab
-// are clickable links (cross-navigation). Action buttons dispatch strict
-// intent JSON via the WebSocket. Foreign country metrics are masked by
-// fog-of-war based on the player's intel level (ADR-001).
+// CountryProfile — right panel. Renders either a Country profile (Overview,
+// Economy, Military, Politics, Diplomacy, Intelligence tabs) or a Unit profile
+// (Unit Mode) depending on what the SelectionManager currently holds.
+// Country names in the Diplomacy tab are clickable links (cross-navigation).
+// Action buttons dispatch strict intent JSON via the WebSocket. Foreign
+// country metrics are masked by fog-of-war based on the player's intel
+// level (ADR-001).
 
 import { useEffect, useState } from "react";
 import { selection } from "./selectionManager.js";
 import { gameSocket } from "./gameSocket.js";
-import type { Country, DiplomaticPosture, Relationship, StrictIntent, Unit, UnitType } from "./shared/types.js";
+import type { Country, CountryIntelligence, CountryMilitaryDetail, DiplomaticPosture, IntelLevel, Relationship, StrictIntent, Unit, UnitType } from "./shared/types.js";
 
-type Tab = "economy" | "military" | "diplomacy";
+type Tab = "overview" | "economy" | "military" | "politics" | "diplomacy" | "intelligence";
 
 const UNIT_COSTS: Record<UnitType, number> = {
   infantry: 50,
@@ -26,9 +27,11 @@ function intelTier(level: number): IntelTier {
   return "low";
 }
 
+const ALL_TABS: Tab[] = ["overview", "economy", "military", "politics", "diplomacy", "intelligence"];
+
 export function CountryProfile() {
   const [sel, setSel] = useState<ReturnType<typeof selection.getSelected>>(null);
-  const [tab, setTab] = useState<Tab>("economy");
+  const [tab, setTab] = useState<Tab>("overview");
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => selection.subscribe(setSel), []);
@@ -96,6 +99,7 @@ function CountryProfileBody({
 
   const isSelf = country.id === playerCode;
   const tier = intelTier(intelLevel);
+  const intel = country.intelligence;
 
   const sendIntent = (intent: StrictIntent["intent"], extra?: { terms?: string }) => {
     const payload = { intent, from: playerCode, target: country.id, ...(extra ?? {}) } as StrictIntent;
@@ -118,6 +122,28 @@ function CountryProfileBody({
         <button className="chip close" onClick={() => selection.selectCountry(null)} title="Close">✕</button>
       </header>
 
+      {intel && (isSelf || tier !== "low") && (
+        <div className="quick-stats">
+          <QuickStat label="Population" value={country.population.toLocaleString()} />
+          <QuickStat label="GDP" value={fmtMoney(country.economy.gdp)} />
+          {intel.gdpGrowth !== undefined && (
+            <QuickStat
+              label="Growth"
+              value={`${intel.gdpGrowth >= 0 ? "↑ +" : "↓ "}${(intel.gdpGrowth * 100).toFixed(1)}%`}
+              className={intel.gdpGrowth >= 0 ? "positive" : "negative"}
+            />
+          )}
+          <QuickStat label="Regime" value={intel.regimeLabel} />
+          {intel.hdiRank > 0 && <QuickStat label="HDI Rank" value={`#${intel.hdiRank}`} />}
+          {intel.militaryPowerScore > 0 && (
+            <QuickStat label="Military Power" value={`${intel.militaryPowerScore}/100`} />
+          )}
+          {intel.passportRank > 0 && (
+            <QuickStat label="Passport Rank" value={`#${intel.passportRank}`} />
+          )}
+        </div>
+      )}
+
       {!isSelf && (
         <button className="btn btn-take-command" onClick={takeCommand} title={`Take control of ${country.name}`}>
           🎮 Assumir Nação (Take Command)
@@ -135,21 +161,24 @@ function CountryProfileBody({
       )}
 
       <nav className="tabs">
-        {(["economy", "military", "diplomacy"] as Tab[]).map((t) => (
+        {ALL_TABS.map((t) => (
           <button
             key={t}
             className={tab === t ? "tab tab-active" : "tab"}
             onClick={() => setTab(t)}
           >
-            {t[0].toUpperCase() + t.slice(1)}
+            {t[0]!.toUpperCase() + t.slice(1)}
           </button>
         ))}
       </nav>
 
       <div className="tab-body">
+        {tab === "overview" && <OverviewTab c={country} isSelf={isSelf} tier={tier} />}
         {tab === "economy" && <EconomyTab c={country} isSelf={isSelf} tier={tier} />}
         {tab === "military" && <MilitaryTab c={country} isSelf={isSelf} tier={tier} />}
+        {tab === "politics" && <PoliticsTab c={country} isSelf={isSelf} tier={tier} />}
         {tab === "diplomacy" && <DiplomacyTab c={country} />}
+        {tab === "intelligence" && <IntelligenceTab c={country} isSelf={isSelf} tier={tier} />}
       </div>
 
       {!isSelf && (
@@ -161,6 +190,335 @@ function CountryProfileBody({
     </aside>
   );
 }
+
+// ---- QuickStat component ---------------------------------------------------
+
+function QuickStat({ label, value, className }: { label: string; value: string; className?: string }) {
+  return (
+    <div className={`quick-stat${className ? " " + className : ""}`}>
+      <div className="quick-stat-label">{label}</div>
+      <div className="quick-stat-value">{value}</div>
+    </div>
+  );
+}
+
+// ---- IntelligenceGauge component -------------------------------------------
+
+function IntelligenceGauge({
+  label,
+  value,
+  min,
+  max,
+  unit,
+  invertColor,
+  source,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  unit?: string;
+  invertColor?: boolean;
+  source?: string;
+}) {
+  const pct = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
+  const normalized = invertColor ? 100 - pct : pct;
+  const colorClass = normalized >= 66 ? "gauge-fill-green" : normalized >= 33 ? "gauge-fill-yellow" : "gauge-fill-red";
+
+  return (
+    <div className="gauge">
+      <div className="gauge-label">{label}</div>
+      <div className="gauge-value">{value}{unit ?? ""}</div>
+      <div className="gauge-bar">
+        <div className={`gauge-fill ${colorClass}`} style={{ width: `${pct}%` }} />
+      </div>
+      {source && <div className="gauge-source">{source}</div>}
+    </div>
+  );
+}
+
+// ---- Overview Tab ----------------------------------------------------------
+
+function OverviewTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
+  const intel = c.intelligence;
+  const showFull = isSelf || tier === "high";
+  const showPartial = showFull || tier === "medium";
+
+  return (
+    <div className="stats-grid">
+      <Stat label="Population" value={c.population.toLocaleString()} />
+      <Stat label="GDP" value={fmtMoney(c.economy.gdp)} />
+      {intel && (showFull || showPartial) && (
+        <>
+          <Stat label="GDP Growth" value={`${intel.gdpGrowth >= 0 ? "+" : ""}${(intel.gdpGrowth * 100).toFixed(1)}%`} />
+          <Stat label="Regime" value={intel.regimeLabel} />
+          <Stat label="HDI Rank" value={intel.hdiRank > 0 ? `#${intel.hdiRank}` : "—"} />
+          <Stat label="Military Power" value={`${intel.militaryPowerScore}/100`} />
+          <Stat label="Passport Rank" value={intel.passportRank > 0 ? `#${intel.passportRank}` : "—"} />
+        </>
+      )}
+      <div className="bar">
+        <span className="bar-label">Stability</span>
+        <div className="bar-track">
+          <div className="bar-fill bar-fill-stab" style={{ width: `${c.economy.stability}%` }} />
+        </div>
+      </div>
+
+      {intel && showFull && intel.keyRisks.length > 0 && (
+        <div className="risk-tags-section">
+          <span className="risk-tags-label">Key Risks</span>
+          <div className="risk-tags">
+            {intel.keyRisks.map((risk, i) => (
+              <span key={i} className="risk-tag">{risk}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {intel && showFull && (
+        <div className="intel-grid">
+          <IntelligenceGauge label="Democracy Index" value={intel.democracyIndex} min={0} max={10} />
+          <IntelligenceGauge label="Freedom Score" value={intel.freedomScore} min={0} max={100} />
+          <IntelligenceGauge label="Corruption (CPI)" value={intel.corruptionIndex} min={0} max={100} />
+          <IntelligenceGauge label="Stability" value={c.economy.stability} min={0} max={100} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---- Intelligence Tab ------------------------------------------------------
+
+function IntelligenceTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
+  const intel = c.intelligence;
+  const milDetail = c.militaryDetail;
+
+  if (!intel) {
+    return <div className="feed-empty">No intelligence data available.</div>;
+  }
+
+  // Fog-of-war: low intel shows only regime type (public info)
+  if (!isSelf && tier === "low") {
+    return (
+      <div className="stats-grid fog-masked">
+        <Stat label="Regime Type" value={intel.regimeLabel} />
+        <Stat label="Population" value={c.population.toLocaleString()} />
+        <div className="feed-empty">Insufficient intel for detailed metrics.</div>
+      </div>
+    );
+  }
+
+  const showFull = isSelf || tier === "high";
+
+  return (
+    <div className="intel-scroll">
+      {/* Section 1: Regime Classification */}
+      <div className="intel-section">
+        <div className="intel-regime-row">
+          <span className={`regime-badge ${intel.regimeType.includes("democracy") ? "regime-democracy" : intel.regimeType.includes("authoritarian") || intel.regimeType.includes("one-party") || intel.regimeType.includes("junta") ? "regime-authoritarian" : "regime-hybrid"}`}>
+            {intel.regimeLabel}
+          </span>
+          <span className="freedom-status">{intel.freedomStatus}</span>
+          {intel.isEstimated && <span className="estimated-badge">Estimated</span>}
+        </div>
+      </div>
+
+      {/* Section 2: Key Metrics Grid */}
+      {(showFull || tier === "medium") && (
+        <div className="intel-grid">
+          <IntelligenceGauge label="Democracy Index" value={intel.democracyIndex} min={0} max={10} source="EIU" />
+          <IntelligenceGauge label="Freedom Score" value={intel.freedomScore} min={0} max={100} source="Freedom House" />
+          <IntelligenceGauge label="Corruption (CPI)" value={intel.corruptionIndex} min={0} max={100} source="Transparency Intl" />
+          <IntelligenceGauge label="Crime Index" value={intel.crimeIndex} min={0} max={10} invertColor source="Numbeo" />
+          <IntelligenceGauge label="Terror Index" value={intel.terrorIndex} min={0} max={10} invertColor source="IEP" />
+          <IntelligenceGauge label="Stability Score" value={c.economy.stability} min={0} max={100} />
+          <IntelligenceGauge label="Fragility Index" value={intel.fragilityIndex} min={0} max={120} invertColor source="Fund for Peace" />
+          <IntelligenceGauge label="HDI Score" value={intel.hdiScore} min={0} max={1} unit="" source="UNDP" />
+        </div>
+      )}
+
+      {/* Section 3: GFP Details */}
+      {showFull && (
+        <div className="intel-section">
+          <h4 className="intel-section-title">Global Firepower</h4>
+          <div className="stats-grid">
+            <Stat label="GFP Rank" value={intel.gfpRank > 0 ? `#${intel.gfpRank} of 145` : "—"} />
+            <Stat label="PwrIndx Score" value={intel.gfpScore > 0 ? intel.gfpScore.toFixed(4) : "—"} />
+            <Stat label="Military Power" value={`${intel.militaryPowerScore}/100`} />
+            <Stat label="GFP Total" value={intel.gfpTotalScore > 0 ? fmtMoney(intel.gfpTotalScore) : "—"} />
+          </div>
+        </div>
+      )}
+
+      {/* Section 4: Military Detail (if available) */}
+      {showFull && milDetail && (
+        <MilitaryDetailSection detail={milDetail} />
+      )}
+
+      {/* Section 5: Key Risks */}
+      {showFull && intel.keyRisks.length > 0 && (
+        <div className="intel-section">
+          <h4 className="intel-section-title">Key Risks</h4>
+          <div className="risk-tags">
+            {intel.keyRisks.map((risk, i) => (
+              <span key={i} className="risk-tag">{risk}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Section 6: Source Attribution */}
+      <div className="source-footer">
+        Data sourced from: Global Firepower, Freedom House, Transparency International, UNDP, EIU, IEP
+        {intel.isEstimated && " · Values estimated from economic/military indicators"}
+      </div>
+    </div>
+  );
+}
+
+// ---- Military Detail Section ----------------------------------------------
+
+function MilitaryDetailSection({ detail }: { detail: CountryMilitaryDetail }) {
+  const [section, setSection] = useState<string>("manpower");
+  const sections = ["manpower", "airpower", "land", "naval", "financials", "geography", "logistics", "resources"];
+
+  const sectionData: Record<string, { label: string; value: number }[]> = {
+    manpower: [
+      { label: "Available Manpower", value: detail.availableManpower },
+      { label: "Fit for Service", value: detail.fitForService },
+      { label: "Reaching Mil Age/Year", value: detail.reachingMilAgeAnnual },
+      { label: "Active Personnel", value: detail.activePersonnel },
+      { label: "Reserve Personnel", value: detail.reservePersonnel },
+      { label: "Paramilitary", value: detail.paramilitaryPersonnel },
+    ],
+    airpower: [
+      { label: "Total Aircraft", value: detail.totalAircraft },
+      { label: "Fighters", value: detail.fighterAircraft },
+      { label: "Attack", value: detail.attackAircraft },
+      { label: "Transport", value: detail.transportAircraft },
+      { label: "Trainer", value: detail.trainerAircraft },
+      { label: "Helicopters", value: detail.helicopters },
+      { label: "Attack Helicopters", value: detail.attackHelicopters },
+    ],
+    land: [
+      { label: "Tanks", value: detail.tanks },
+      { label: "Armored Vehicles", value: detail.armoredVehicles },
+      { label: "Self-Propelled Artillery", value: detail.selfPropelledArtillery },
+      { label: "Towed Artillery", value: detail.towedArtillery },
+      { label: "MLRS", value: detail.mlrs },
+    ],
+    naval: [
+      { label: "Total Naval", value: detail.totalNaval },
+      { label: "Aircraft Carriers", value: detail.aircraftCarriers },
+      { label: "Submarines", value: detail.submarines },
+      { label: "Destroyers", value: detail.destroyers },
+      { label: "Frigates", value: detail.frigates },
+      { label: "Corvettes", value: detail.corvettes },
+      { label: "Patrol Craft", value: detail.patrolCraft },
+    ],
+    financials: [
+      { label: "Defense Budget", value: detail.defenseBudget },
+      { label: "External Debt", value: detail.externalDebt },
+      { label: "PPP", value: detail.purchasingPowerParity },
+      { label: "Foreign Reserves", value: detail.foreignReserves },
+    ],
+    geography: [
+      { label: "Land Area (km²)", value: detail.squareLandArea },
+      { label: "Coastline (km)", value: detail.coastlineKm },
+      { label: "Shared Borders (km)", value: detail.sharedBordersKm },
+      { label: "Waterways (km)", value: detail.waterwaysKm },
+    ],
+    logistics: [
+      { label: "Internet Coverage (%)", value: detail.internetCoverage },
+      { label: "Labor Force", value: detail.laborForce },
+      { label: "Merchant Marine", value: detail.merchantMarineFleet },
+      { label: "Ports", value: detail.ports },
+      { label: "Airports", value: detail.airports },
+      { label: "Roadways (km)", value: detail.roadwayKm },
+      { label: "Railways (km)", value: detail.railwayKm },
+    ],
+    resources: [
+      { label: "Oil Production (bbl/day)", value: detail.oilProduction },
+      { label: "Oil Consumption (bbl/day)", value: detail.oilConsumption },
+      { label: "Oil Reserves (bbl)", value: detail.oilProvenReserves },
+      { label: "Gas Production (m³)", value: detail.naturalGasProduction },
+      { label: "Gas Consumption (m³)", value: detail.naturalGasConsumption },
+    ],
+  };
+
+  const formatValue = (label: string, value: number): string => {
+    if (label.includes("km") || label.includes("bbl") || label.includes("m³")) return value.toLocaleString();
+    if (label.includes("Budget") || label.includes("Debt") || label.includes("PPP") || label.includes("Reserves")) return fmtMoney(value);
+    if (label.includes("(%)" )) return `${value}%`;
+    return value.toLocaleString();
+  };
+
+  return (
+    <div className="intel-section">
+      <h4 className="intel-section-title">Military Equipment</h4>
+      <div className="mil-detail-tabs">
+        {sections.map((s) => (
+          <button
+            key={s}
+            className={section === s ? "mil-detail-tab tab-active" : "mil-detail-tab"}
+            onClick={() => setSection(s)}
+          >
+            {s[0]!.toUpperCase() + s.slice(1)}
+          </button>
+        ))}
+      </div>
+      <div className="stats-grid">
+        {sectionData[section]?.map((item) => (
+          <Stat key={item.label} label={item.label} value={formatValue(item.label, item.value)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---- Politics Tab ----------------------------------------------------------
+
+function PoliticsTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
+  const intel = c.intelligence;
+  const showFull = isSelf || tier === "high";
+  const showPartial = showFull || tier === "medium";
+
+  return (
+    <div className="stats-grid">
+      {intel && (showFull || showPartial) && (
+        <>
+          <Stat label="Regime Type" value={intel.regimeLabel} />
+          <Stat label="Freedom Status" value={intel.freedomStatus} />
+          <Stat label="Democracy Index" value={`${intel.democracyIndex}/10`} />
+          <Stat label="Freedom Score" value={`${intel.freedomScore}/100`} />
+          <Stat label="Corruption (CPI)" value={`${intel.corruptionIndex}/100`} />
+          <Stat label="Fragility Index" value={`${intel.fragilityIndex}/120`} />
+          <Stat label="Stability" value={intel.stabilityLabel} />
+        </>
+      )}
+      <Stat label="Diplomatic Posture" value={c.posture[0]!.toUpperCase() + c.posture.slice(1)} />
+      <Stat label="Legislative Support" value={`${(c.economy.legislativeSupport * 100).toFixed(0)}%`} />
+      <div className="bar">
+        <span className="bar-label">Stability</span>
+        <div className="bar-track">
+          <div className="bar-fill bar-fill-stab" style={{ width: `${c.economy.stability}%` }} />
+        </div>
+      </div>
+      {intel && showFull && intel.keyRisks.length > 0 && (
+        <div className="risk-tags-section">
+          <span className="risk-tags-label">Key Risks</span>
+          <div className="risk-tags">
+            {intel.keyRisks.map((risk, i) => (
+              <span key={i} className="risk-tag">{risk}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---- Existing tabs (Economy, Military, Diplomacy) -------------------------
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -214,6 +572,7 @@ function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: In
         <Stat label="Tax Rate" value={`${(e.taxRate * 100).toFixed(1)}%`} />
         <Stat label="Stability" value={`${e.stability}/100`} />
         <Stat label="Population" value={c.population.toLocaleString()} />
+        {c.intelligence && <Stat label="GDP Growth" value={`${c.intelligence.gdpGrowth >= 0 ? "+" : ""}${(c.intelligence.gdpGrowth * 100).toFixed(1)}%`} />}
         <div className="bar">
           <span className="bar-label">Stability</span>
           <div className="bar-track">
@@ -260,6 +619,8 @@ function MilitaryTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
         <Stat label="Force Limit" value={m.forceLimit.toLocaleString()} />
         <Stat label="Readiness" value={`${m.readiness}/100`} />
         <Stat label="Morale" value={`${m.morale}/100`} />
+        {c.intelligence && <Stat label="Military Power" value={`${c.intelligence.militaryPowerScore}/100`} />}
+        {c.intelligence && <Stat label="GFP Rank" value={c.intelligence.gfpRank > 0 ? `#${c.intelligence.gfpRank}` : "—"} />}
         <Bar label="Readiness" value={m.readiness} cls="bar-fill-ready" />
         <Bar label="Morale" value={m.morale} cls="bar-fill-morale" />
       </div>
@@ -607,4 +968,4 @@ function GovernancePanel({ country }: { country: Country }) {
 }
 
 // referenced to keep the type import used in this module's surface
-export type { Relationship };
+export type { Relationship, CountryIntelligence, IntelLevel };
