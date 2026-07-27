@@ -131,6 +131,44 @@ describe("processTurn", () => {
     expect(countries[0]!.economy.treasury).toBeGreaterThan(originalTreasury);
   });
 
+  it("applies weekly (not annual) GDP growth — 52 ticks ≈ 1 year of growth", () => {
+    // Stability 60 → annualGrowthRate = 0.6*0.02 - 0.01 = +0.002 (0.2%/yr)
+    // diplomatic posture → 0 modifier. Over 52 weekly ticks at 0.2%/52 per tick,
+    // GDP should grow ~0.2%, NOT ~20% (the old annual-per-tick bug).
+    const c = makeCountry("USA", { posture: "diplomatic" });
+    const startGdp = c.economy.gdp;
+    let current = c;
+    for (let i = 0; i < 52; i++) {
+      const res = processTurn([current], [], i + 1);
+      current = res.countries[0]!;
+    }
+    const growthRatio = current.economy.gdp / startGdp;
+    // Should stay well under 5% for one year (allows for noise).
+    // The old bug would produce ~1.002^52 ≈ 1.11 (11%) or worse with noise.
+    expect(growthRatio).toBeLessThan(1.05);
+    expect(growthRatio).toBeGreaterThan(0.95);
+  });
+
+  it("treasury grows by weekly tax revenue, not annual", () => {
+    // GDP=1B, taxRate=0.25, stability=60 → annual tax = 1B*0.25*0.6 = 150M
+    // Weekly tax = 150M/52 ≈ 2.88M per tick. Over 52 ticks ≈ 150M.
+    // The old bug (0.005 factor) would add 1B*0.25*0.005*0.6 = 750K per tick
+    // → 39M/year, which is too low, but the key check is it's not the
+    // annual amount applied per tick (150M/tick → 7.8B/year, absurd).
+    const c = makeCountry("USA", { posture: "diplomatic" });
+    const startTreasury = c.economy.treasury;
+    let current = c;
+    for (let i = 0; i < 52; i++) {
+      const res = processTurn([current], [], i + 1);
+      current = res.countries[0]!;
+    }
+    const treasuryGain = current.economy.treasury - startTreasury;
+    // Annual tax yield ≈ 150M. Weekly compounding should produce ~150M.
+    // The old annual-per-tick bug would produce 150M*52 ≈ 7.8B.
+    expect(treasuryGain).toBeLessThan(200_000_000);
+    expect(treasuryGain).toBeGreaterThan(100_000_000);
+  });
+
   it("returns surviving units", () => {
     const units = [makeUnit("USA-1", "USA")];
     const { units: result } = processTurn([makeCountry("USA")], units, 1);

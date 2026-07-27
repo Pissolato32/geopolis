@@ -249,13 +249,14 @@ export class SeedValidationSuite {
 
       for (let tick = 1; tick <= 10; tick++) {
         for (const country of workingCountries) {
-          // Simulate economic tick: GDP growth
-          const growthRate = 1 + (country.economy.stability / 1000);
-          country.economy.gdp = Math.round(country.economy.gdp * growthRate);
+          // Simulate economic tick: GDP growth (annual rate divided by 52 for weekly ticks)
+          const annualGrowthRate = 1 + (country.economy.stability / 1000);
+          const weeklyGrowthRate = 1 + (annualGrowthRate - 1) / 52;
+          country.economy.gdp = Math.round(country.economy.gdp * weeklyGrowthRate);
 
-          // Simulate treasury tax collection
-          const taxRevenue = country.economy.gdp * country.economy.taxRate * 0.01;
-          country.economy.treasury += Math.round(taxRevenue);
+          // Simulate treasury tax collection (annual tax yield divided by 52)
+          const weeklyTaxRevenue = country.economy.gdp * country.economy.taxRate / 52;
+          country.economy.treasury += Math.round(weeklyTaxRevenue);
 
           // Simulate military readiness drift
           const drift = (Math.random() - 0.5) * 2;

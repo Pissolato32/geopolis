@@ -108,6 +108,10 @@ export function processTurn(
   // ---- 1. Economy: every nation grows or shrinks based on stability --------
   // Posture modifiers: the player's diplomatic posture shapes their economy
   // and domestic stability. AI nations use 'diplomatic' by default.
+  // Ticks represent weeks. All rates below are ANNUAL and must be divided
+  // by 52 before being applied per-tick, otherwise compounding over many
+  // weeks produces unrealistic hyper-growth (e.g. GDP doubling every year).
+  const TICKS_PER_YEAR = 52;
   const POSTURE_GROWTH: Record<string, number> = {
     isolationist: -0.003,  // less trade → slower growth
     diplomatic: 0,
@@ -127,12 +131,16 @@ export function processTurn(
   const updated = countries.map((c) => {
     const postureGrowthMod = POSTURE_GROWTH[c.posture] ?? 0;
     const postureStabMod = POSTURE_STABILITY[c.posture] ?? 0;
-    const growthRate = (c.economy.stability / 100) * 0.02 - 0.01 + postureGrowthMod; // -1%..+1%
-    const noise = (Math.random() - 0.5) * 0.008;
-    const gdpDelta = Math.round(c.economy.gdp * (growthRate + noise));
+    const annualGrowthRate = (c.economy.stability / 100) * 0.02 - 0.01 + postureGrowthMod; // -1%..+1%
+    const weeklyGrowthRate = annualGrowthRate / TICKS_PER_YEAR;
+    const noise = (Math.random() - 0.5) * 0.008 / TICKS_PER_YEAR;
+    const gdpDelta = Math.round(c.economy.gdp * (weeklyGrowthRate + noise));
     const newGdp = Math.max(0, c.economy.gdp + gdpDelta);
-    // treasury collects tax revenue proportional to GDP, stability, and tax rate
-    const treasuryDelta = Math.round(c.economy.gdp * c.economy.taxRate * 0.005 * (c.economy.stability / 100));
+    // Treasury collects annual tax revenue (GDP × taxRate), divided into weekly
+    // installments and weighted by stability (0..1). The 1/TICKS_PER_YEAR factor
+    // converts the annual tax yield to a per-tick (weekly) collection.
+    const weeklyTaxRevenue = (c.economy.gdp * c.economy.taxRate * (c.economy.stability / 100)) / TICKS_PER_YEAR;
+    const treasuryDelta = Math.round(weeklyTaxRevenue);
     const newTreasury = c.economy.treasury + treasuryDelta;
     globalGdpDelta += gdpDelta;
     if (gdpDelta > 0) economiesGrown++;
