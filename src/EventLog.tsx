@@ -31,6 +31,7 @@ const MAJOR_TYPES = new Set<string>([
   "sabotage.executed",
   "sabotage.failed",
   "ai.decision",
+  "narrative.beat",
   "turn.advanced",
   "policy.tax-set",
   "policy.readiness-set",
@@ -88,6 +89,7 @@ function eventCountries(evt: GameEvent): string[] {
     case "sabotage.executed":
     case "sabotage.failed": push(evt.from); push(evt.target); break;
     case "economy.indicator": push(evt.country); break;
+    case "narrative.beat": break;
   }
   return codes;
 }
@@ -385,6 +387,23 @@ function EventRow({ evt }: { evt: GameEvent }) {
         <span className="feed-tag tag-intel">INTEL</span>
         <span className="feed-text">
           <CountryLink code={evt.player} /> gathered intelligence on <CountryLink code={evt.target} /> — intel level {evt.intelLevel}/100 (${fmtMoney(evt.cost)}).
+        </span>
+      </article>
+    );
+  }
+  if (evt.type === "narrative.beat") {
+    const ministerLabel = evt.minister
+      ? { defense: "Defesa", foreign: "R.E.", economy: "Economia", intelligence: "Intelig." }[evt.minister]
+      : null;
+    const sevClass = `feed-narrative feed-narrative-${evt.severity}`;
+    const sevLabel = { routine: "BRIEFING", notable: "ALERTA", dramatic: "CRISE", critical: "CRÍTICO" }[evt.severity];
+    return (
+      <article className={sevClass}>
+        <span className="feed-time">{time}</span>
+        <span className={`feed-tag tag-narrative tag-narrative-${evt.severity}`}>{sevLabel}</span>
+        <span className="feed-text feed-narrative-prose">
+          {ministerLabel && <span className="feed-narrative-minister">{ministerLabel}</span>}
+          {evt.prose}
         </span>
       </article>
     );

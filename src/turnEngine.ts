@@ -8,6 +8,7 @@
 
 import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard } from "./shared/types.js";
 import { runAIDirector } from "./aiDirector.js";
+import { generateNarrativeBeats, buildProfiles } from "./narrativeDirector.js";
 
 /** Evaluate the player country state and generate 0–3 dynamic cabinet cards. */
 function generateCabinetCards(player: Country): CabinetCard[] {
@@ -348,6 +349,11 @@ export function processTurn(
   // ---- 5. Cabinet cards: evaluate player country state -------------------
   const playerCountry = playerCode ? updated.find((c) => c.id === playerCode) : undefined;
   const cabinetCards = playerCountry ? generateCabinetCards(playerCountry) : [];
+
+  // ---- 5b. Narrative beats: transform significant events into prose --------
+  const profiles = buildProfiles(updated);
+  const narrativeBeats = generateNarrativeBeats(events, updated, tick, profiles);
+  events.push(...narrativeBeats);
 
   // ---- 6. Summary event ---------------------------------------------------
   const summary: TurnSummary = {

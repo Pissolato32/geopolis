@@ -93,7 +93,8 @@ export type GameEvent =
   | { type: "intel.gathered"; at: string; player: string; target: string; intelLevel: number; cost: number }
   | { type: "aid.sent"; at: string; from: string; target: string; amount: number; affinityGain: number }
   | { type: "sabotage.executed"; at: string; from: string; target: string; stabilityHit: number; readinessHit: number; cost: number }
-  | { type: "sabotage.failed"; at: string; from: string; target: string; cost: number; reason: string };
+  | { type: "sabotage.failed"; at: string; from: string; target: string; cost: number; reason: string }
+  | { type: "narrative.beat"; at: string; tick: number; severity: "routine" | "notable" | "dramatic" | "critical"; minister?: "defense" | "foreign" | "economy" | "intelligence"; prose: string };
 
 // Aggregate result of one simulation turn, emitted with turn.advanced.
 export interface TurnSummary {
