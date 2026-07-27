@@ -9,6 +9,8 @@ import {
 import {
   WAR_COMBAT_RESOLVED_EVENT,
   IWarCombatResolvedPayload,
+  WAR_ADVANTAGE_SHIFTED_EVENT,
+  IWarAdvantageShiftedPayload,
 } from '../events/war.events.js';
 import {
   RelationComponent,
@@ -29,7 +31,7 @@ export class CombatSystem implements ISystem {
     priority: 450 as SystemPriority,
     requiredComponents: [MILITARY_UNIT_TYPE],
     subscribedEvents: [],
-    emittedEvents: [WAR_COMBAT_RESOLVED_EVENT],
+    emittedEvents: [WAR_COMBAT_RESOLVED_EVENT, WAR_ADVANTAGE_SHIFTED_EVENT],
   };
 
   execute(state: Readonly<IWorldState>, eventBus: IEventBus): void {
@@ -80,6 +82,25 @@ export class CombatSystem implements ISystem {
 
         const attackerGroup = victorId === aId ? groupA : groupB;
         const defenderGroup = victorId === aId ? groupB : groupA;
+
+        // Emit advantage-shifted BEFORE casualties are applied, so the UI can
+        // visualize the pre-casualty balance of power.
+        const attackerAdvantagePct = Math.round((attackerGroup.totalPower / totalPower) * 1000) / 10;
+        const defenderAdvantagePct = Math.round((defenderGroup.totalPower / totalPower) * 1000) / 10;
+        const momentum = Math.max(-1, Math.min(1, (attackerGroup.totalPower - defenderGroup.totalPower) / totalPower));
+
+        eventBus.publish<IWarAdvantageShiftedPayload>(
+          WAR_ADVANTAGE_SHIFTED_EVENT,
+          {
+            attackerId: attackerGroup.countryId,
+            defenderId: defenderGroup.countryId,
+            momentum,
+            attackerAdvantagePct,
+            defenderAdvantagePct,
+          },
+          COMBAT_SYSTEM_ID,
+          attackerGroup.countryId as EntityId,
+        );
 
         const attackerCasualties = Math.round(defenderGroup.totalPower / totalPower * 1000);
         const defenderCasualties = Math.round(attackerGroup.totalPower / totalPower * 1000);

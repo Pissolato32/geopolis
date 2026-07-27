@@ -8,7 +8,7 @@ import {
 } from '../interfaces/event-bus.interface.js';
 import { EntityId } from '../interfaces/entity.interface.js';
 import { ITimeline } from '../interfaces/timeline.interface.js';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-polyfill.js';
 
 interface Subscription<TPayload = unknown> {
   readonly token: SubscriptionToken;

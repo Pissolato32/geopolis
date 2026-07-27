@@ -11,7 +11,7 @@ import { DenseFormatter } from '../utils/dense-formatter.js';
 import { bigintJsonReplacer, bigintJsonReviver } from '../utils/bigint-json.js';
 import { IDemographicComponent, IEconomicComponent, IMilitaryComponent } from '../components/index.js';
 import { Entity } from '../ecs/entity.js';
-import { createHash } from 'node:crypto';
+import { createHash } from '../utils/crypto-polyfill.js';
 
 /**
  * Concrete World State implementation — entity registry with component indices.

@@ -24,6 +24,9 @@ interface ConflictData {
   totalEngagements: number;
   attackerCasualties: number;
   defenderCasualties: number;
+  momentum: number;
+  attackerAdvantagePct: number;
+  defenderAdvantagePct: number;
 }
 
 function getCountryName(seed: WorldSeed, code: string): string {
@@ -60,6 +63,9 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
           totalEngagements: 0,
           attackerCasualties: 0,
           defenderCasualties: 0,
+          momentum: 0,
+          attackerAdvantagePct: 50,
+          defenderAdvantagePct: 50,
         });
       }
 
@@ -71,6 +77,18 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
         conflict.attackerWins++;
       } else {
         conflict.defenderWins++;
+      }
+    }
+
+    // Overlay the latest advantage-shifted data (pre-casualty balance of power)
+    const advantageEvents = events.filter((e) => e.type === "war.advantage-shifted");
+    for (const evt of advantageEvents) {
+      const pairId = [evt.attacker, evt.defender].sort().join(":");
+      const conflict = conflictMap.get(pairId);
+      if (conflict) {
+        conflict.momentum = evt.momentum;
+        conflict.attackerAdvantagePct = evt.attackerAdvantagePct;
+        conflict.defenderAdvantagePct = evt.defenderAdvantagePct;
       }
     }
 
@@ -117,7 +135,7 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
                 const totalWins = conflict.attackerWins + conflict.defenderWins;
                 const attackerAdvantage = totalWins > 0
                   ? (conflict.attackerWins / totalWins) * 100
-                  : 50;
+                  : conflict.attackerAdvantagePct;
                 const defenderAdvantage = 100 - attackerAdvantage;
                 const attackerFlag = getCountryFlag(seed, conflict.attackerId);
                 const defenderFlag = getCountryFlag(seed, conflict.defenderId);
@@ -127,6 +145,11 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
                 const defenderName = conflict.defenderId === playerCode
                   ? "You"
                   : getCountryName(seed, conflict.defenderId);
+                const momentumLabel = conflict.momentum > 0.2
+                  ? `${attackerName} advancing`
+                  : conflict.momentum < -0.2
+                  ? `${defenderName} advancing`
+                  : "Stalemate";
 
                 return (
                   <div key={conflict.id} className="war-room-conflict-card">
@@ -148,6 +171,18 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
                       <span className="war-room-engagements">
                         {conflict.totalEngagements} engagement{conflict.totalEngagements !== 1 ? "s" : ""}
                       </span>
+                    </div>
+
+                    {/* Momentum indicator */}
+                    <div className="war-room-momentum">
+                      <span className="war-room-momentum-label">Momentum</span>
+                      <div className="war-room-momentum-bar">
+                        <div
+                          className={conflict.momentum >= 0 ? "war-room-momentum-fill war-room-momentum-attacker" : "war-room-momentum-fill war-room-momentum-defender"}
+                          style={{ width: `${Math.abs(conflict.momentum) * 100}%` }}
+                        />
+                      </div>
+                      <span className="war-room-momentum-value">{momentumLabel}</span>
                     </div>
 
                     {/* Advantage bar */}

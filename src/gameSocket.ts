@@ -6,7 +6,7 @@
 
 import type { Country, GameEvent, IntentResponse, MarketPrice, PlayerPolicy, StrictIntent, Unit, WorldSeed, CabinetCard } from "./shared/types.js";
 import { persistEvent, persistMarket, persistPlayerPolicy, persistTurnResults, persistUnitDisband, persistUnitMove, type PersistedWorld } from "./gameStore.js";
-import { processTurn } from "./turnEngine.js";
+import { EngineAdapter } from "./engineAdapter.js";
 import { selectOptionForPosture } from "./ministerAI.js";
 import { reportError, ApiError, WebSocketError } from "./errors.js";
 
@@ -41,6 +41,7 @@ class GameSocket {
   private offlineActionQueue: StrictIntent[] = [];
   private seed: WorldSeed | null = null;
   private gameId: string | null = null;
+  private engineAdapter: EngineAdapter | null = null;
   private simTimer: ReturnType<typeof setInterval> | null = null;
   private marketTimer: ReturnType<typeof setInterval> | null = null;
   private autoTickTimer: ReturnType<typeof setInterval> | null = null;
@@ -67,6 +68,8 @@ class GameSocket {
     this.market = world.market;
     this.countries = world.countries;
     this.currentTick = 0;
+    // Build the Clean Architecture engine adapter — replaces processTurn
+    this.engineAdapter = new EngineAdapter(seed);
     this.broadcastUnits();
     this.broadcastTick();
     // replay persisted events into the log so a reload shows history
@@ -816,24 +819,27 @@ class GameSocket {
         const ok = await this.postServerTick();
         if (ok) return;
       }
-      const nextTick = this.currentTick + 1;
-      const result = processTurn(this.countries, this.units, nextTick, this.playerCode);
+      // Use the Clean Architecture TickEngine adapter instead of legacy processTurn
+      if (!this.engineAdapter) {
+        throw new Error("Engine adapter not initialized — call setPersistedWorld first");
+      }
+      const result = this.engineAdapter.tick();
       this.countries = result.countries;
       this.units = result.units;
-      this.currentTick = nextTick;
+      this.currentTick = this.engineAdapter.getCurrentTick();
       this.broadcastUnits();
       this.broadcastTick();
-      this.pendingCabinetCards = result.cabinetCards;
+      this.pendingCabinetCards = [];
       this.broadcastCabinetCards();
       for (let i = 0; i < result.events.length; i++) {
-        const evt = result.events[i];
+        const evt = result.events[i]!;
         setTimeout(() => {
           this.emit(evt);
           if (this.gameId) void persistEvent(this.gameId, evt);
         }, i * 60);
       }
       if (this.gameId) {
-        void persistTurnResults(this.gameId, nextTick, result.countries, result.units);
+        void persistTurnResults(this.gameId, this.currentTick, result.countries, result.units);
       }
     } catch (err) {
       reportError(err, {

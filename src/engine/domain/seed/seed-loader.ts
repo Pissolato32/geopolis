@@ -5,7 +5,7 @@ import { IComponent } from '../../core/interfaces/component.interface.js';
 import { DIPLOMATIC_RELATION_TYPE, RelationComponent } from '../diplomacy/components/relation.component.js';
 import { SeedSanitizer } from '../../core/utils/seed-sanitizer.js';
 import { EntityId } from '../../core/interfaces/entity.interface.js';
-import { GEO_POSITION_TYPE } from '../../scenarios/scenario.loader.js';
+import { GEO_POSITION_TYPE } from './geo-position.component.js';
 
 /**
  * Utility to populate a WorldState instance from an IWorldSeed configuration (Base Seed)

@@ -1,6 +1,6 @@
 import { ITimeline, ITimelineEntry, ITimelineQuery } from '../interfaces/timeline.interface.js';
 import { ISimulationEvent, TickNumber, EventId } from '../interfaces/event-bus.interface.js';
-import { createHash } from 'node:crypto';
+import { createHash } from '../utils/crypto-polyfill.js';
 import { bigintJsonReplacer } from '../utils/bigint-json.js';
 
 /**

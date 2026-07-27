@@ -401,6 +401,7 @@ export type GameEvent =
   | { type: "turn.economy-growth"; at: string; tick: number; country: string; gdpGrowth: number; treasuryChange: number }
   | { type: "turn.stability-shift"; at: string; tick: number; country: string; stability: number; delta: number }
   | { type: "war.declared"; at: string; tick: number; aggressor: string; target: string; reason: string }
+  | { type: "war.advantage-shifted"; at: string; tick: number; attacker: string; defender: string; momentum: number; attackerAdvantagePct: number; defenderAdvantagePct: number }
   | { type: "peace.declared"; at: string; tick: number; initiator: string; target: string; terms: string }
   | { type: "ai.decision"; at: string; tick: number; country: string; action: string; rationale: string }
   | { type: "policy.tax-set"; at: string; country: string; rate: number; treasuryImpact: number }

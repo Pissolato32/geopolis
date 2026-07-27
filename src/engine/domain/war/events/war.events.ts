@@ -5,6 +5,7 @@ export const WAR_UNIT_MOVED_EVENT = 'war.unit-moved';
 export const WAR_MOVE_ORDERED_EVENT = 'war.move-ordered';
 export const WAR_PROVINCE_CAPTURED_EVENT = 'war.province-captured';
 export const WAR_PEACE_REQUESTED_EVENT = 'war.peace-requested';
+export const WAR_ADVANTAGE_SHIFTED_EVENT = 'war.advantage-shifted';
 
 export interface IWarFuelConsumedPayload {
   readonly unitId: string;
@@ -61,4 +62,15 @@ export interface IWarPeaceSignedPayload {
   readonly returnedProvinces: ReadonlyArray<string>;
   readonly newAffinity: number;
   readonly newTension: number;
+}
+
+export interface IWarAdvantageShiftedPayload {
+  readonly attackerId: string;
+  readonly defenderId: string;
+  /** Momentum from -1.0 (defender dominant) to +1.0 (attacker dominant). */
+  readonly momentum: number;
+  /** Attacker's share of combat power, 0..100. */
+  readonly attackerAdvantagePct: number;
+  /** Defender's share of combat power, 0..100. */
+  readonly defenderAdvantagePct: number;
 }
