@@ -10,7 +10,7 @@ import { GlobalSearch } from "./GlobalSearch.js";
 import { MarketTicker } from "./MarketTicker.js";
 import { CabinetModal } from "./CabinetModal.js";
 import { BriefingDashboard } from "./briefing/BriefingDashboard.js";
-import { mockBriefing } from "./briefing/mockBriefing.js";
+import { generateBriefing } from "./briefing/briefingGenerator.js";
 import { gameSocket } from "./gameSocket.js";
 import type { ConnectionStatus, SimSpeed } from "./gameSocket.js";
 import { loadOrSeedWorld } from "./gameStore.js";
@@ -18,7 +18,7 @@ import { ToastContainer, pushToast } from "./Toast.js";
 import { ErrorBoundary } from "./ErrorBoundary.js";
 import { useOnlineStatus } from "./useOnlineStatus.js";
 import { reportError } from "./errors.js";
-import type { CabinetCard, WorldSeed } from "./shared/types.js";
+import type { CabinetCard, GameEvent, WorldSeed } from "./shared/types.js";
 import seedData from "../data/world-seed-2026.json";
 
 const SEED = seedData as WorldSeed;
@@ -47,6 +47,7 @@ export default function App() {
   const [cabinetCards, setCabinetCards] = useState<CabinetCard[]>([]);
   const [connStatus, setConnStatus] = useState<ConnectionStatus>("offline");
   const [view, setView] = useState<ViewMode>("map");
+  const [events, setEvents] = useState<GameEvent[]>([]);
   const { online, wasOffline } = useOnlineStatus();
 
   useEffect(() => {
@@ -87,6 +88,12 @@ export default function App() {
   }, [seed]);
 
   useEffect(() => gameSocket.onTick(setTick), []);
+  useEffect(() => gameSocket.onEvent((evt) => {
+    setEvents((prev) => {
+      const next = [...prev, evt];
+      return next.length > 500 ? next.slice(-500) : next;
+    });
+  }), []);
   useEffect(() => gameSocket.onPlayerChange(setPlayerCode), []);
   useEffect(() => gameSocket.onSimStateChange((s) => {
     setSimPaused(s.paused);
@@ -321,7 +328,14 @@ export default function App() {
       {view === "map" && <MarketTicker />}
 
       {view === "briefing" ? (
-        <BriefingDashboard briefing={mockBriefing} />
+        <BriefingDashboard briefing={generateBriefing({
+          tick,
+          playerCode,
+          countries: gameSocket.getCountries(),
+          units: gameSocket.getUnits(),
+          market: gameSocket.getMarket(),
+          events,
+        })} />
       ) : (
         <main className="layout">
           <EventLog />
