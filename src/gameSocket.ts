@@ -104,9 +104,16 @@ class GameSocket {
   connect(): void {
     this.setConnectionStatus("connecting");
     fetch(BACKEND_PROBE)
-      .then((r) => {
-        if (r.ok) this.openWebSocket();
-        else this.startSim();
+      .then(async (r) => {
+        // Vite's SPA fallback returns 200 + text/html for any GET, including
+        // /health. A real backend health endpoint returns JSON. Check the
+        // content-type to distinguish a genuine backend from SPA fallback.
+        const ct = r.headers.get("content-type") ?? "";
+        if (r.ok && ct.includes("application/json")) {
+          this.openWebSocket();
+        } else {
+          this.startSim();
+        }
       })
       .catch(() => {
         reportError(new Error("Backend unreachable"), {
@@ -534,6 +541,12 @@ class GameSocket {
         reportError(new ApiError(`Tick failed: ${r.status}`, r.status, "/api/v1/tick"), {
           source: "gameSocket.postServerTick",
         });
+        // Backend gone or misconfigured — fall back to in-browser sim so the
+        // game keeps running instead of repeatedly hitting a dead endpoint.
+        if (r.status === 404 || r.status >= 500) {
+          console.warn("[ws] backend tick endpoint unavailable — falling back to simulator");
+          this.startSim();
+        }
       }
       return r.ok;
     } catch (err) {
