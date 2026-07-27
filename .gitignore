@@ -4,4 +4,6 @@ data/savegames/
 dashboard/
 *.log
 .env
-    
+.env.*
+.env.local
+.agents/

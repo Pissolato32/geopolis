@@ -264,18 +264,23 @@ src/
 │       ├── systems/
 │       └── events/
 │
-├── agents/                        # Agent Layer (Phase 3)
-│   ├── controller/
-│   ├── memory/
-│   ├── perception/
-│   └── decision/
+├── agents/                        # Agent Layer (Phase 3 & ADR-005)
+│   ├── controller/                # Agent System Controller
+│   ├── memory/                    # Memory Stores (Supabase & InMemory)
+│   ├── perception/                # Perception Filter & Fog of War
+│   ├── llm/                       # Provider Chain (OpenAI, Anthropic, FallbackChain)
+│   └── parser/                    # Intent Parser & Schema Validator
 │
-├── application/                   # Application Layer
-│   ├── tick-runner/
-│   ├── scenario-loader/
-│   └── perception-layer/
+├── gateway/                       # Gateway Layer (Phase 4 & ADR-005)
+│   ├── gateway-router.ts          # REST API Gateway Router
+│   ├── http-server.ts             # Express Server with Security Headers
+│   └── ws-broadcaster.ts          # Real-time WebSocket Broadcaster
 │
-└── interface/                     # Interface Layer (Phase 4)
-    ├── api/
-    └── reports/
+├── persistence/                   # Persistence Layer
+│   ├── state-serializer.ts        # Dense YAML State Serializer
+│   └── snapshot-store.ts          # Save/Load Game State Manager
+│
+└── scenarios/                     # Scenario Layer (ADR-003)
+    ├── scenario-loader.ts         # Declarative Preset Loader
+    └── scenario-validator.ts      # Fail-Fast Schema Validator
 ```

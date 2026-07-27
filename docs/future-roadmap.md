@@ -19,36 +19,23 @@ com LLM real e coordenação multi-agente.
 
 #### 1. Integração HTTP/LLM
 
-- [ ] Adicionar dependência de HTTP client (`openai`, `anthropic`, ou `fetch` nativo)
-- [ ] Criar `ILlmProvider` interface no `src/agents/llm/`:
+- [x] Adicionar dependência de HTTP client (`openai`, `anthropic`, ou `fetch` nativo)
+- [x] Criar `ILlmProvider` interface no `src/agents/llm/`:
   ```typescript
   interface ILlmProvider {
     evaluate(prompt: string, systemPrompt?: string): Promise<string>;
   }
   ```
-- [ ] Implementar provedores concretos: `OpenAiProvider`, `AnthropicProvider`,
-      `MockProvider` (para testes)
-- [ ] Adicionar rate limiting, retry com backoff, cost tracking e fallback
-      entre provedores
-- [ ] Remover o `llmEvaluator` callback injetado do `AgentController` em favor
-      do `LlmProvider` resolvido por DI
+- [x] Implementar provedores concretos: `OpenAiProvider`, `AnthropicProvider`, `MockProvider` (para testes)
+- [x] Adicionar rate limiting, retry com backoff, cost tracking e fallback entre provedores (`ProviderFallbackChain`)
+- [x] Resolver `LlmProvider` por injeção de dependência e fábrica de provedores
 
 #### 2. Memória Persistente
 
-- [ ] Atual `AgentMemory` é runtime-only (array em memória, perdido ao reiniciar)
-- [ ] Criar `IAgentMemoryStore` interface com operações CRUD:
-  ```typescript
-  interface IAgentMemoryStore {
-    saveDecision(countryId: EntityId, decision: string): Promise<void>;
-    getRecentDecisions(countryId: EntityId, limit: number): Promise<string[]>;
-    saveEpisode(countryId: EntityId, summary: string): Promise<void>;
-    queryEpisodes(filter: EpisodicFilter): Promise<Episode[]>;
-  }
-  ```
-- [ ] Implementar `InMemoryAgentMemoryStore` (atual, como fallback) e
-      `SqliteAgentMemoryStore` (persistente)
-- [ ] Adicionar summarization de memória longa (comprimir decisões antigas em
-      episódios narrativos via LLM)
+- [x] Atual `AgentMemory` possui abstração flexível de armazenamento `IAgentMemoryStore`
+- [x] Criar `IAgentMemoryStore` interface com operações CRUD
+- [x] Implementar `InMemoryAgentMemoryStore` (fallback) e `SupabaseAgentMemoryStore` (persistência em nuvem)
+- [ ] Adicionar summarization de memória longa (comprimir decisões antigas em episódios narrativos via LLM)
 
 #### 3. Sistema de Objetivos Multi-Turno
 
