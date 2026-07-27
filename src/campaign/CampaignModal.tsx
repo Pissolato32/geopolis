@@ -42,7 +42,7 @@ export function CampaignModal({ seed, onConfirm }: Props) {
   const sovereignList = useMemo(() => {
     return seed.countries
       .filter((c) => SOVEREIGN_POWERS.includes(c.id))
-      .sort((a, b) => b.economy.gdp - a.economy.gdp);
+      .sort((a, b) => (b.economy?.gdp ?? 0) - (a.economy?.gdp ?? 0));
   }, [seed]);
 
   const searchResults = useMemo(() => {
@@ -107,7 +107,7 @@ export function CampaignModal({ seed, onConfirm }: Props) {
                       <img className="campaign-flag" src={c.flag} alt="" />
                       <div className="campaign-card-info">
                         <span className="campaign-card-name">{c.name}</span>
-                        <span className="campaign-card-code">{c.id} · {fmtMoney(c.economy.gdp)}</span>
+                        <span className="campaign-card-code">{c.id} · {fmtMoney(c.economy?.gdp ?? 0)}</span>
                       </div>
                     </button>
                   ))}
@@ -126,7 +126,7 @@ export function CampaignModal({ seed, onConfirm }: Props) {
                       <img className="campaign-flag" src={c.flag} alt="" />
                       <div className="campaign-card-info">
                         <span className="campaign-card-name">{c.name}</span>
-                        <span className="campaign-card-code">{c.id} · {fmtMoney(c.economy.gdp)}</span>
+                        <span className="campaign-card-code">{c.id} · {fmtMoney(c.economy?.gdp ?? 0)}</span>
                       </div>
                     </button>
                   ))}
@@ -169,15 +169,15 @@ export function CampaignModal({ seed, onConfirm }: Props) {
             <div className="campaign-confirm-grid">
               <div className="campaign-confirm-card">
                 <span className="campaign-confirm-label">GDP</span>
-                <span className="campaign-confirm-value">{fmtMoney(selected.economy.gdp)}</span>
+                <span className="campaign-confirm-value">{fmtMoney(selected.economy?.gdp ?? 0)}</span>
               </div>
               <div className="campaign-confirm-card">
                 <span className="campaign-confirm-label">Economic Stability</span>
-                <span className="campaign-confirm-value">{round2(selected.economy.stability)}%</span>
+                <span className="campaign-confirm-value">{round2(selected.economy?.stability ?? 0)}%</span>
               </div>
               <div className="campaign-confirm-card">
                 <span className="campaign-confirm-label">Military Readiness</span>
-                <span className="campaign-confirm-value">{round2(selected.military.readiness)}%</span>
+                <span className="campaign-confirm-value">{round2(selected.military?.readiness ?? 0)}%</span>
               </div>
               <div className="campaign-confirm-card">
                 <span className="campaign-confirm-label">Max Tension</span>
@@ -185,11 +185,11 @@ export function CampaignModal({ seed, onConfirm }: Props) {
               </div>
               <div className="campaign-confirm-card">
                 <span className="campaign-confirm-label">Treasury</span>
-                <span className="campaign-confirm-value">{fmtMoney(selected.economy.treasury)}</span>
+                <span className="campaign-confirm-value">{fmtMoney(selected.economy?.treasury ?? 0)}</span>
               </div>
               <div className="campaign-confirm-card">
                 <span className="campaign-confirm-label">Diplomatic Posture</span>
-                <span className="campaign-confirm-value">{selected.posture}</span>
+                <span className="campaign-confirm-value">{selected.posture ?? "—"}</span>
               </div>
             </div>
 

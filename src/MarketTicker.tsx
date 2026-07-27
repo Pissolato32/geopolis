@@ -22,7 +22,8 @@ export function MarketTicker() {
     return gameSocket.onEvent((evt) => {
       if (evt.type !== "economy.market-update") return;
       setRows((prev) => {
-        const byRes = new Map(evt.prices.map((p) => [p.resource, p]));
+        const prices = evt.prices ?? [];
+        const byRes = new Map(prices.map((p) => [p.resource, p]));
         return prev.map((r) => {
           const next = byRes.get(r.resource);
           if (!next) return r;

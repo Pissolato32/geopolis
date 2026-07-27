@@ -243,11 +243,12 @@ function OverviewTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
   const intel = c.intelligence;
   const showFull = isSelf || tier === "high";
   const showPartial = showFull || tier === "medium";
+  const stability = c.economy?.stability ?? 0;
 
   return (
     <div className="stats-grid">
-      <Stat label="Population" value={c.population.toLocaleString()} />
-      <Stat label="GDP" value={fmtMoney(c.economy.gdp)} />
+      <Stat label="Population" value={(c.population ?? 0).toLocaleString()} />
+      <Stat label="GDP" value={fmtMoney(c.economy?.gdp ?? 0)} />
       {intel && (showFull || showPartial) && (
         <>
           <Stat label="GDP Growth" value={`${intel.gdpGrowth >= 0 ? "+" : ""}${(intel.gdpGrowth * 100).toFixed(1)}%`} />
@@ -260,11 +261,11 @@ function OverviewTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
       <div className="bar">
         <span className="bar-label">Stability</span>
         <div className="bar-track">
-          <div className="bar-fill bar-fill-stab" style={{ width: `${c.economy.stability}%` }} />
+          <div className="bar-fill bar-fill-stab" style={{ width: `${stability}%` }} />
         </div>
       </div>
 
-      {intel && showFull && intel.keyRisks.length > 0 && (
+      {intel && showFull && intel.keyRisks?.length > 0 && (
         <div className="risk-tags-section">
           <span className="risk-tags-label">Key Risks</span>
           <div className="risk-tags">
@@ -280,7 +281,7 @@ function OverviewTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
           <IntelligenceGauge label="Democracy Index" value={intel.democracyIndex} min={0} max={10} />
           <IntelligenceGauge label="Freedom Score" value={intel.freedomScore} min={0} max={100} />
           <IntelligenceGauge label="Corruption (CPI)" value={intel.corruptionIndex} min={0} max={100} />
-          <IntelligenceGauge label="Stability" value={c.economy.stability} min={0} max={100} />
+          <IntelligenceGauge label="Stability" value={stability} min={0} max={100} />
         </div>
       )}
     </div>
@@ -296,13 +297,14 @@ function IntelligenceTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tie
   if (!intel) {
     return <div className="feed-empty">No intelligence data available.</div>;
   }
+  const stability = c.economy?.stability ?? 0;
 
   // Fog-of-war: low intel shows only regime type (public info)
   if (!isSelf && tier === "low") {
     return (
       <div className="stats-grid fog-masked">
         <Stat label="Regime Type" value={intel.regimeLabel} />
-        <Stat label="Population" value={c.population.toLocaleString()} />
+        <Stat label="Population" value={(c.population ?? 0).toLocaleString()} />
         <div className="feed-empty">Insufficient intel for detailed metrics.</div>
       </div>
     );
@@ -331,7 +333,7 @@ function IntelligenceTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tie
           <IntelligenceGauge label="Corruption (CPI)" value={intel.corruptionIndex} min={0} max={100} source="Transparency Intl" />
           <IntelligenceGauge label="Crime Index" value={intel.crimeIndex} min={0} max={10} invertColor source="Numbeo" />
           <IntelligenceGauge label="Terror Index" value={intel.terrorIndex} min={0} max={10} invertColor source="IEP" />
-          <IntelligenceGauge label="Stability Score" value={c.economy.stability} min={0} max={100} />
+          <IntelligenceGauge label="Stability Score" value={stability} min={0} max={100} />
           <IntelligenceGauge label="Fragility Index" value={intel.fragilityIndex} min={0} max={120} invertColor source="Fund for Peace" />
           <IntelligenceGauge label="HDI Score" value={intel.hdiScore} min={0} max={1} unit="" source="UNDP" />
         </div>
@@ -356,7 +358,7 @@ function IntelligenceTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tie
       )}
 
       {/* Section 5: Key Risks */}
-      {showFull && intel.keyRisks.length > 0 && (
+      {showFull && intel.keyRisks?.length > 0 && (
         <div className="intel-section">
           <h4 className="intel-section-title">Key Risks</h4>
           <div className="risk-tags">
@@ -478,10 +480,17 @@ function MilitaryDetailSection({ detail }: { detail: CountryMilitaryDetail }) {
 
 // ---- Politics Tab ----------------------------------------------------------
 
+function formatPosture(posture: DiplomaticPosture | undefined): string {
+  if (!posture) return "—";
+  return posture[0]!.toUpperCase() + posture.slice(1);
+}
+
 function PoliticsTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
   const intel = c.intelligence;
   const showFull = isSelf || tier === "high";
   const showPartial = showFull || tier === "medium";
+  const legSupport = c.economy?.legislativeSupport ?? 0;
+  const stability = c.economy?.stability ?? 0;
 
   return (
     <div className="stats-grid">
@@ -496,15 +505,15 @@ function PoliticsTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
           <Stat label="Stability" value={intel.stabilityLabel} />
         </>
       )}
-      <Stat label="Diplomatic Posture" value={c.posture[0]!.toUpperCase() + c.posture.slice(1)} />
-      <Stat label="Legislative Support" value={`${(c.economy.legislativeSupport * 100).toFixed(0)}%`} />
+      <Stat label="Diplomatic Posture" value={formatPosture(c.posture)} />
+      <Stat label="Legislative Support" value={`${(legSupport * 100).toFixed(0)}%`} />
       <div className="bar">
         <span className="bar-label">Stability</span>
         <div className="bar-track">
-          <div className="bar-fill bar-fill-stab" style={{ width: `${c.economy.stability}%` }} />
+          <div className="bar-fill bar-fill-stab" style={{ width: `${stability}%` }} />
         </div>
       </div>
-      {intel && showFull && intel.keyRisks.length > 0 && (
+      {intel && showFull && intel.keyRisks?.length > 0 && (
         <div className="risk-tags-section">
           <span className="risk-tags-label">Key Risks</span>
           <div className="risk-tags">
@@ -563,20 +572,22 @@ function stabilityLabel(s: number): string {
 
 function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
   const e = c.economy;
+  const gdp = e?.gdp ?? 0;
+  const stability = e?.stability ?? 0;
   if (isSelf || tier === "high") {
     return (
       <div className="stats-grid">
-        <Stat label="GDP" value={fmtMoney(e.gdp)} />
-        <Stat label="GDP / capita" value={`$${fmtMoney(e.gdpPerCapita)}`} />
-        <Stat label="Treasury" value={`$${fmtMoney(e.treasury)}`} />
-        <Stat label="Tax Rate" value={`${(e.taxRate * 100).toFixed(1)}%`} />
-        <Stat label="Stability" value={`${e.stability}/100`} />
-        <Stat label="Population" value={c.population.toLocaleString()} />
+        <Stat label="GDP" value={fmtMoney(gdp)} />
+        <Stat label="GDP / capita" value={`${fmtMoney(e?.gdpPerCapita ?? 0)}`} />
+        <Stat label="Treasury" value={`${fmtMoney(e?.treasury ?? 0)}`} />
+        <Stat label="Tax Rate" value={`${((e?.taxRate ?? 0) * 100).toFixed(1)}%`} />
+        <Stat label="Stability" value={`${stability}/100`} />
+        <Stat label="Population" value={(c.population ?? 0).toLocaleString()} />
         {c.intelligence && <Stat label="GDP Growth" value={`${c.intelligence.gdpGrowth >= 0 ? "+" : ""}${(c.intelligence.gdpGrowth * 100).toFixed(1)}%`} />}
         <div className="bar">
           <span className="bar-label">Stability</span>
           <div className="bar-track">
-            <div className="bar-fill bar-fill-stab" style={{ width: `${e.stability}%` }} />
+            <div className="bar-fill bar-fill-stab" style={{ width: `${stability}%` }} />
           </div>
         </div>
       </div>
@@ -585,14 +596,14 @@ function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: In
   if (tier === "medium") {
     return (
       <div className="stats-grid">
-        <Stat label="GDP" value={estimateGdp(e.gdp)} />
-        <Stat label="Treasury" value={estimateRange(e.treasury, 0.2)} />
-        <Stat label="Stability" value={`${stabilityLabel(e.stability)} (${e.stability}±15)`} />
-        <Stat label="Population" value={c.population.toLocaleString()} />
+        <Stat label="GDP" value={estimateGdp(gdp)} />
+        <Stat label="Treasury" value={estimateRange(e?.treasury ?? 0, 0.2)} />
+        <Stat label="Stability" value={`${stabilityLabel(stability)} (${stability}±15)`} />
+        <Stat label="Population" value={(c.population ?? 0).toLocaleString()} />
         <div className="bar">
           <span className="bar-label">Stability (est.)</span>
           <div className="bar-track">
-            <div className="bar-fill bar-fill-stab" style={{ width: `${Math.max(0, Math.min(100, e.stability))}%`, opacity: 0.6 }} />
+            <div className="bar-fill bar-fill-stab" style={{ width: `${Math.max(0, Math.min(100, stability))}%`, opacity: 0.6 }} />
           </div>
         </div>
       </div>
@@ -601,37 +612,40 @@ function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: In
   // low intel
   return (
     <div className="stats-grid fog-masked">
-      <Stat label="GDP" value={estimateGdp(e.gdp)} />
+      <Stat label="GDP" value={estimateGdp(gdp)} />
       <Stat label="Treasury" value="Classified" />
       <Stat label="Tax Rate" value="Unknown" />
-      <Stat label="Stability" value={stabilityLabel(e.stability)} />
-      <Stat label="Population" value={c.population.toLocaleString()} />
+      <Stat label="Stability" value={stabilityLabel(stability)} />
+      <Stat label="Population" value={(c.population ?? 0).toLocaleString()} />
     </div>
   );
 }
 
 function MilitaryTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: IntelTier }) {
   const m = c.military;
+  const personnel = m?.totalPersonnel ?? 0;
+  const readiness = m?.readiness ?? 0;
+  const morale = m?.morale ?? 0;
   if (isSelf || tier === "high") {
     return (
       <div className="stats-grid">
-        <Stat label="Total Personnel" value={m.totalPersonnel.toLocaleString()} />
-        <Stat label="Force Limit" value={m.forceLimit.toLocaleString()} />
-        <Stat label="Readiness" value={`${m.readiness}/100`} />
-        <Stat label="Morale" value={`${m.morale}/100`} />
+        <Stat label="Total Personnel" value={personnel.toLocaleString()} />
+        <Stat label="Force Limit" value={(m?.forceLimit ?? 0).toLocaleString()} />
+        <Stat label="Readiness" value={`${readiness}/100`} />
+        <Stat label="Morale" value={`${morale}/100`} />
         {c.intelligence && <Stat label="Military Power" value={`${c.intelligence.militaryPowerScore}/100`} />}
         {c.intelligence && <Stat label="GFP Rank" value={c.intelligence.gfpRank > 0 ? `#${c.intelligence.gfpRank}` : "—"} />}
-        <Bar label="Readiness" value={m.readiness} cls="bar-fill-ready" />
-        <Bar label="Morale" value={m.morale} cls="bar-fill-morale" />
+        <Bar label="Readiness" value={readiness} cls="bar-fill-ready" />
+        <Bar label="Morale" value={morale} cls="bar-fill-morale" />
       </div>
     );
   }
   if (tier === "medium") {
     return (
       <div className="stats-grid">
-        <Stat label="Total Personnel" value={`~${(m.totalPersonnel * 0.9).toLocaleString(undefined, { maximumFractionDigits: 0 })} – ${(m.totalPersonnel * 1.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
-        <Stat label="Readiness" value={m.readiness >= 70 ? "High" : m.readiness >= 40 ? "Medium" : "Low"} />
-        <Stat label="Morale" value={m.morale >= 70 ? "High" : m.morale >= 40 ? "Medium" : "Low"} />
+        <Stat label="Total Personnel" value={`~${(personnel * 0.9).toLocaleString(undefined, { maximumFractionDigits: 0 })} – ${(personnel * 1.1).toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
+        <Stat label="Readiness" value={readiness >= 70 ? "High" : readiness >= 40 ? "Medium" : "Low"} />
+        <Stat label="Morale" value={morale >= 70 ? "High" : morale >= 40 ? "Medium" : "Low"} />
       </div>
     );
   }
@@ -646,7 +660,7 @@ function MilitaryTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
 }
 
 function DiplomacyTab({ c }: { c: Country }) {
-  if (c.relationships.length === 0) {
+  if (!c.relationships || c.relationships.length === 0) {
     return <div className="feed-empty">No active relationships modeled.</div>;
   }
   return (
@@ -870,14 +884,14 @@ const POSTURES: { value: DiplomaticPosture; label: string; desc: string }[] = [
 function GovernancePanel({ country }: { country: Country }) {
   const [taxRate, setTaxRate] = useState(country.economy.taxRate);
   const [readiness, setReadiness] = useState(country.military.readiness);
-  const [posture, setPosture] = useState<DiplomaticPosture>(country.posture);
+  const [posture, setPosture] = useState<DiplomaticPosture>(country.posture ?? "diplomatic");
   const [taxFeedback, setTaxFeedback] = useState<string | null>(null);
 
   useEffect(() => {
-    setTaxRate(country.economy.taxRate);
-    setReadiness(country.military.readiness);
-    setPosture(country.posture);
-  }, [country.economy.taxRate, country.military.readiness, country.posture]);
+    setTaxRate(country.economy?.taxRate ?? 0);
+    setReadiness(country.military?.readiness ?? 50);
+    setPosture(country.posture ?? "diplomatic");
+  }, [country.economy?.taxRate, country.military?.readiness, country.posture]);
 
   const commitTax = (val: number) => {
     setTaxRate(val);

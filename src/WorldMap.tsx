@@ -394,9 +394,9 @@ export function WorldMap({ seed, onCountryPicked }: { seed: WorldSeed; onCountry
           style={{ left: tooltip.x + 16, top: tooltip.y + 16 }}
         >
           <div className="map-tooltip-name">{tooltip.country.name}</div>
-          <div className="map-tooltip-row"><span>GDP Growth</span><span>{round2(tooltip.country.economy.stability)}%</span></div>
-          <div className="map-tooltip-row"><span>Tension</span><span>{round2(tooltip.country.relationships.length > 0 ? Math.max(...tooltip.country.relationships.map((r) => r.tension)) : 0)}</span></div>
-          <div className="map-tooltip-row"><span>Readiness</span><span>{round2(tooltip.country.military.readiness)}%</span></div>
+          <div className="map-tooltip-row"><span>GDP Growth</span><span>{round2(tooltip.country.economy?.stability ?? 0)}%</span></div>
+          <div className="map-tooltip-row"><span>Tension</span><span>{round2(tooltip.country.relationships?.length > 0 ? Math.max(...tooltip.country.relationships.map((r) => r.tension)) : 0)}</span></div>
+          <div className="map-tooltip-row"><span>Readiness</span><span>{round2(tooltip.country.military?.readiness ?? 0)}%</span></div>
         </div>
       )}
     </div>

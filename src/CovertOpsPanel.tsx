@@ -27,7 +27,7 @@ export function CovertOpsPanel({ playerCountry, onLaunch, onAbort }: Props) {
       <div className="covert-header">
         <h3 className="section-heading">Covert Operations</h3>
         <span className="covert-treasury">
-          Treasury: ${(playerCountry.economy.treasury / 1e9).toFixed(2)}B
+          Treasury: ${((playerCountry.economy?.treasury ?? 0) / 1e9).toFixed(2)}B
         </span>
       </div>
 
@@ -56,7 +56,7 @@ export function CovertOpsPanel({ playerCountry, onLaunch, onAbort }: Props) {
       <div className="covert-ops-grid">
         {OP_ORDER.map((opType) => {
           const template = OP_TEMPLATES[opType];
-          const canAfford = playerCountry.economy.treasury >= template.baseCost;
+          const canAfford = (playerCountry.economy?.treasury ?? 0) >= template.baseCost;
           const canLaunch = canAfford && selectedTarget !== "";
           return (
             <div key={opType} className="covert-op-card">
