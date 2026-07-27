@@ -160,7 +160,7 @@ function evaluate(c: Country, all: Country[], tick: number): AIDecision | null {
   const atStr = at();
 
   if (!enemy) {
-    return evaluateDiplomacy(c, friend, atStr, tick);
+    return evaluateDiplomacy(c, all, friend, atStr, tick);
   }
 
   const target = all.find((x) => x.id === enemy.countryCode);
@@ -180,7 +180,7 @@ function evaluate(c: Country, all: Country[], tick: number): AIDecision | null {
       return evaluateDiplomaticFriction(c, enemy, tick, atStr);
 
     default:
-      return evaluateDiplomacy(c, friend, atStr, tick);
+      return evaluateDiplomacy(c, all, friend, atStr, tick);
   }
 }
 
@@ -349,6 +349,7 @@ function evaluateDiplomaticFriction(
 /** Level 0 — Normal Relations: improve relations, mobilize if unstable, seek trade. */
 function evaluateDiplomacy(
   c: Country,
+  all: Country[],
   friend: Relationship | null,
   atStr: string,
   tick: number,
@@ -419,6 +420,42 @@ function evaluateDiplomacy(
           [friend.countryCode, { affinity: clamp(friend.affinity + 8, -100, 100) }],
         ]),
       };
+    }
+  }
+
+  // ---- Scenario E2: Deep affinity + common threat → formalize military alliance --
+  if (friend && friend.affinity >= 65 && c.military.readiness >= 50) {
+    const ally = all.find((x) => x.id === friend.countryCode);
+    if (ally) {
+      const myEnemy = worstEnemy(c);
+      const allyEnemy = worstEnemy(ally);
+      const sharedThreat =
+        myEnemy && allyEnemy && myEnemy.countryCode === allyEnemy.countryCode && myEnemy.tension >= 60;
+      if (sharedThreat && Math.random() < 0.25) {
+        return {
+          events: [
+            {
+              type: "diplomacy.treaty-signed",
+              at: atStr,
+              parties: [c.id, friend.countryCode],
+              kind: "alliance",
+              durationYears: Math.round(5 + Math.random() * 10),
+            },
+            {
+              type: "ai.decision",
+              at: atStr,
+              tick,
+              country: c.id,
+              action: `formalize military alliance with ${friend.countryCode}`,
+              rationale: `common threat from ${myEnemy!.countryCode} demands unified defense`,
+            },
+          ],
+          relPatches: new Map([
+            [friend.countryCode, { affinity: clamp(friend.affinity + 15, -100, 100), tension: 0 }],
+          ]),
+          milPatch: { morale: clamp(c.military.morale + 5, 10, 100) },
+        };
+      }
     }
   }
 
