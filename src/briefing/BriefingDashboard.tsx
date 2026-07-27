@@ -7,8 +7,7 @@ import type { StrictIntent } from "../shared/types.js";
 import type { AnalysisSnapshot } from "./byodTypes.js";
 import type { AdvisorAgenda, AdvisorCard, ByodAdvisorResponse } from "../campaign/advisorTypes.js";
 import type { CompetingOption } from "../shared/types.js";
-import { ResearchPanel } from "../research/ResearchPanel.js";
-import { calculateResearchOutput, calculateAdvisorResearchBonus, createInitialResearchState } from "../research/researchEngine.js";
+
 import { KPIHeaderBar } from "./KPIHeaderBar.js";
 import { Tab1Briefing } from "./Tab1Briefing.js";
 import { Tab2Domains } from "./Tab2Domains.js";
@@ -125,23 +124,6 @@ export function BriefingDashboard({
                 dispatched={false}
               />
             )}
-            {(() => {
-              const player = gameSocket.getCountries().find((c) => c.id === gameSocket.getPlayerCode());
-              if (!player) return null;
-              const playerWithResearch = {
-                ...player,
-                research: player.research ?? createInitialResearchState(player.id),
-              };
-              const output = calculateResearchOutput(playerWithResearch);
-              const bonus = calculateAdvisorResearchBonus(playerWithResearch.cabinet);
-              return (
-                <ResearchPanel
-                  playerCountry={playerWithResearch}
-                  researchOutput={output}
-                  advisorBonus={bonus}
-                />
-              );
-            })()}
           </>
         )}
         {tab === "archive" && <Tab5Archive briefing={briefing} />}

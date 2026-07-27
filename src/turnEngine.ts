@@ -6,11 +6,14 @@
 // responsible for persisting the mutated countries/relationships/units back
 // to Supabase.
 
-import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard, ActiveTreaty } from "./shared/types.js";
+import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard, ActiveTreaty, InternationalBloc } from "./shared/types.js";
 import { runAIDirector } from "./aiDirector.js";
 import { generateNarrativeBeats, buildProfiles } from "./narrativeDirector.js";
 import { createDefaultCabinet } from "./campaign/advisorTypes.js";
 import { createInitialResearchState, advanceResearch } from "./research/researchEngine.js";
+import { advanceCovertOps, createInitialCovertOpsState } from "./domain/intelligence/covertOps.js";
+import { initializeBlocs, applyBlocEconomicBonuses, triggerCollectiveDefense } from "./domain/diplomacy/multilateralBlocs.js";
+import { calculateVictoryProgress } from "./victory/victoryManager.js";
 
 /** Evaluate the player country state and generate 0–3 dynamic cabinet cards. */
 function generateCabinetCards(player: Country): CabinetCard[] {
@@ -98,7 +101,7 @@ export function processTurn(
   units: Unit[],
   tick: number,
   playerCode?: string,
-): { countries: Country[]; units: Unit[]; events: GameEvent[]; cabinetCards: CabinetCard[] } {
+): { countries: Country[]; units: Unit[]; events: GameEvent[]; cabinetCards: CabinetCard[]; blocs: InternationalBloc[] } {
   const events: GameEvent[] = [];
   const byCode = new Map(countries.map((c) => [c.id, c]));
 
@@ -391,6 +394,10 @@ export function processTurn(
     if (!updated[i]!.research) {
       updated[i] = { ...updated[i]!, research: createInitialResearchState(updated[i]!.id) };
     }
+    // Initialize covert ops state for any country that doesn't have one yet
+    if (!updated[i]!.covertOps) {
+      updated[i] = { ...updated[i]!, covertOps: createInitialCovertOpsState(updated[i]!.id) };
+    }
   }
 
   // Advance research for all countries
@@ -410,6 +417,49 @@ export function processTurn(
       }
     } else if (result.research !== updated[i]!.research) {
       updated[i] = { ...updated[i]!, research: result.research };
+    }
+  }
+
+  // Advance covert operations for all countries
+  const covertResult = advanceCovertOps(updated, tick);
+  for (let i = 0; i < covertResult.countries.length; i++) {
+    updated[i] = covertResult.countries[i]!;
+  }
+  events.push(...covertResult.events);
+
+  // Initialize and apply multilateral blocs
+  const blocs = initializeBlocs(updated, tick);
+  const blocUpdated = applyBlocEconomicBonuses(updated, blocs);
+  for (let i = 0; i < blocUpdated.length; i++) {
+    updated[i] = blocUpdated[i]!;
+  }
+
+  // Check for collective defense triggers from war declarations this tick
+  const warDeclarations = events.filter((e) => e.type === "war.declared");
+  for (const warEvent of warDeclarations) {
+    const aggressor = (warEvent as { aggressor?: string; country?: string }).aggressor ?? (warEvent as { country?: string }).country;
+    const target = (warEvent as { target?: string; defender?: string }).target ?? (warEvent as { defender?: string }).defender;
+    if (aggressor && target) {
+      const defense = triggerCollectiveDefense(target, aggressor, blocs, tick);
+      events.push(...defense.events);
+    }
+  }
+
+  // Check victory conditions for the player
+  if (playerCode) {
+    const player = updated.find((c) => c.id === playerCode);
+    if (player) {
+      const victory = calculateVictoryProgress(player, updated, blocs, tick);
+      if (victory.achieved) {
+        events.push({
+          type: "narrative.beat",
+          at: at(),
+          tick,
+          severity: "critical",
+          minister: "intelligence",
+          prose: `VICTORY ACHIEVED: ${victory.achieved}`,
+        });
+      }
     }
   }
 
@@ -440,5 +490,5 @@ export function processTurn(
     summary,
   });
 
-  return { countries: updated, units: survivingUnits, events, cabinetCards };
+  return { countries: updated, units: survivingUnits, events, cabinetCards, blocs };
 }

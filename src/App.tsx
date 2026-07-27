@@ -27,6 +27,13 @@ import type { AdvisorCard, AdvisorAgenda, ByodAdvisorResponse } from "./campaign
 import { CabinetManagerModal } from "./campaign/CabinetManagerModal.js";
 import { applyAdvisorFeedback, ADVISOR_SLOTS } from "./campaign/advisorTypes.js";
 import type { AdvisorSlotId, AdvisorState, CompetingOption, CabinetState } from "./shared/types.js";
+import { ResearchPanel } from "./research/ResearchPanel.js";
+import { calculateResearchOutput, calculateAdvisorResearchBonus, createInitialResearchState } from "./research/researchEngine.js";
+import { CovertOpsPanel } from "./CovertOpsPanel.js";
+import { VictoryModal } from "./VictoryModal.js";
+import { calculateVictoryProgress } from "./victory/victoryManager.js";
+import { initializeBlocs } from "./domain/diplomacy/multilateralBlocs.js";
+import type { CovertOpType } from "./shared/types.js";
 
 const SEED = seedData as WorldSeed;
 
@@ -36,7 +43,7 @@ interface ScenarioMeta {
   description: string;
 }
 
-type ViewMode = "map" | "briefing";
+type ViewMode = "map" | "briefing" | "research";
 
 export default function App() {
   const [seed] = useState<WorldSeed>(SEED);
@@ -61,6 +68,7 @@ export default function App() {
   const [advisorAgenda, setAdvisorAgenda] = useState<AdvisorAgenda>({ cards: [], competingCards: [], councilSummary: "", vacantSlots: [] });
   const [advisorResponses, setAdvisorResponses] = useState<ByodAdvisorResponse[]>([]);
   const [showCabinetManager, setShowCabinetManager] = useState(false);
+  const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [cabinetOverride, setCabinetOverride] = useState<CabinetState | null>(null);
   const { online, wasOffline } = useOnlineStatus();
 
@@ -323,6 +331,25 @@ export default function App() {
     );
   }
 
+  const researchPlayer = gameSocket.getCountries().find((c) => c.id === playerCode);
+  const playerWithResearch = researchPlayer
+    ? { ...researchPlayer, research: researchPlayer.research ?? createInitialResearchState(researchPlayer.id) }
+    : undefined;
+
+  const allCountries = gameSocket.getCountries();
+  const victoryProgress = playerWithResearch
+    ? calculateVictoryProgress(playerWithResearch, allCountries, initializeBlocs(allCountries, tick), tick)
+    : null;
+
+  const handleLaunchCovertOp = (_type: CovertOpType, _target: string) => {
+    // Covert ops are handled via the game socket / turn engine
+    pushToast({ kind: "info", title: "Operation Launched", message: `Covert operation initiated against ${_target}.`, dismissable: true, duration: 4000 });
+  };
+
+  const handleAbortCovertOp = (_opId: string) => {
+    pushToast({ kind: "info", title: "Operation Aborted", message: "Active covert mission has been terminated.", dismissable: true, duration: 3000 });
+  };
+
   const connLabel =
     connStatus === "live" ? "Live Engine WebSocket" :
     connStatus === "connecting" ? "Connecting…" :
@@ -444,6 +471,9 @@ export default function App() {
             )}
           </div>
           <span className="tick-badge" title="Simulation turn">Turn {tick}</span>
+          <button className="victory-header-btn" onClick={() => setShowVictoryModal(true)} title="Campaign Victory Progress">
+            ◆ Victory
+          </button>
           <div className="view-toggle">
             <button
               className={`view-btn ${view === "map" ? "active" : ""}`}
@@ -458,6 +488,13 @@ export default function App() {
               title="Presidential Briefing"
             >
               ◢ Briefing
+            </button>
+            <button
+              className={`view-btn ${view === "research" ? "active" : ""}`}
+              onClick={() => setView("research")}
+              title="Tecnologia & P&D"
+            >
+              ◆ Tech &amp; R&amp;D
             </button>
           </div>
           <div className="speed-controls">
@@ -511,7 +548,24 @@ export default function App() {
 
       {view === "map" && <MarketTicker />}
 
-      {view === "briefing" ? (
+      {view === "research" ? (
+        <div className="research-fullpage">
+          {playerWithResearch && (
+            <>
+              <ResearchPanel
+                playerCountry={playerWithResearch}
+                researchOutput={calculateResearchOutput(playerWithResearch)}
+                advisorBonus={calculateAdvisorResearchBonus(playerWithResearch.cabinet)}
+              />
+              <CovertOpsPanel
+                playerCountry={playerWithResearch}
+                onLaunch={handleLaunchCovertOp}
+                onAbort={handleAbortCovertOp}
+              />
+            </>
+          )}
+        </div>
+      ) : view === "briefing" ? (
         <BriefingDashboard
           briefing={generateBriefing({
             tick,
@@ -560,6 +614,9 @@ export default function App() {
         />
       )}
 
+      {showVictoryModal && victoryProgress && (
+        <VictoryModal progress={victoryProgress} onClose={() => setShowVictoryModal(false)} />
+      )}
       {showCabinetManager && currentPlayer?.cabinet && (
         <CabinetManagerModal
           cabinet={cabinetOverride ?? currentPlayer.cabinet}

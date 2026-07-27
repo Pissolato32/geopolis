@@ -147,6 +147,85 @@ export interface ResearchState {
   researchPerTick: number;     // base research output per tick
 }
 
+// ===== Covert Operations Types =====
+
+export type CovertOpType = "cyber_sabotage" | "political_subversion" | "economic_sabotage" | "troop_recon";
+
+export type CovertOpStatus = "planning" | "active" | "succeeded" | "failed" | "exposed" | "aborted";
+
+export interface CovertOperation {
+  id: string;
+  type: CovertOpType;
+  sourceCountry: string;
+  targetCountry: string;
+  successChance: number;     // 0.30 - 0.85
+  exposureRisk: number;      // 0.15 - 0.60
+  costTreasury: number;
+  durationTicks: number;
+  startTick: number;
+  endTick: number;
+  status: CovertOpStatus;
+  researchDelayTicks?: number;  // for cyber_sabotage
+}
+
+export interface CovertOpsState {
+  countryId: string;
+  activeOps: CovertOperation[];
+  completedOps: CovertOperation[];
+  exposedIncidents: CovertOperation[];
+}
+
+// ===== Multilateral Blocs Types =====
+
+export type BlocType = "economic" | "military";
+
+export interface InternationalBloc {
+  id: string;
+  name: string;
+  type: BlocType;
+  members: string[];         // country alpha-3 codes
+  foundedTick: number;
+  collectiveDefense: boolean; // true for military blocs with Article 5
+  tariffReductionPct: number; // for economic blocs
+  tradeBonusPct: number;      // bilateral trade bonus for members
+}
+
+export interface BlocMembership {
+  blocId: string;
+  countryId: string;
+  joinedTick: number;
+}
+
+// ===== Victory Conditions Types =====
+
+export type VictoryType = "hegemonic" | "tech_supremacy" | "pax" | "survival";
+
+export interface VictoryProgress {
+  hegemonic: {
+    gdpControlPct: number;       // % of global GDP controlled
+    militaryControlPct: number;  // % of global military power
+    overallPct: number;          // max of the two
+  };
+  techSupremacy: {
+    tier3Unlocked: number;       // count of T3 techs unlocked (max 3)
+    overallPct: number;
+  };
+  pax: {
+    consecutiveLowTensionTicks: number;  // ticks with tension < 15%
+    requiredTicks: number;                // 100
+    hasActiveAlliances: boolean;
+    overallPct: number;
+  };
+  survival: {
+    scenarioTicksElapsed: number;
+    scenarioTicksRequired: number;
+    governmentIntact: boolean;
+    capitalHeld: boolean;
+    overallPct: number;
+  };
+  achieved: VictoryType | null;
+}
+
 export interface Country {
   id: string; // alpha-3 code
   numericCode: string; // ISO 3166-1 numeric (joins to world-atlas geometry id)
@@ -165,6 +244,7 @@ export interface Country {
   activeTreaties?: ActiveTreaty[];
   cooldowns?: PolicyCooldown[];
   research?: ResearchState;
+  covertOps?: CovertOpsState;
 }
 
 /** Player's espionage knowledge about a foreign nation (0 = blind, 100 = full). */
