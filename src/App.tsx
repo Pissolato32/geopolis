@@ -9,6 +9,8 @@ import { CountryProfile } from "./CountryProfile.js";
 import { GlobalSearch } from "./GlobalSearch.js";
 import { MarketTicker } from "./MarketTicker.js";
 import { CabinetModal } from "./CabinetModal.js";
+import { BriefingDashboard } from "./briefing/BriefingDashboard.js";
+import { mockBriefing } from "./briefing/mockBriefing.js";
 import { gameSocket } from "./gameSocket.js";
 import type { ConnectionStatus, SimSpeed } from "./gameSocket.js";
 import { loadOrSeedWorld } from "./gameStore.js";
@@ -27,6 +29,8 @@ interface ScenarioMeta {
   description: string;
 }
 
+type ViewMode = "map" | "briefing";
+
 export default function App() {
   const [seed] = useState<WorldSeed>(SEED);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -42,6 +46,7 @@ export default function App() {
   const [simSpeed, setSimSpeed] = useState<SimSpeed>(0);
   const [cabinetCards, setCabinetCards] = useState<CabinetCard[]>([]);
   const [connStatus, setConnStatus] = useState<ConnectionStatus>("offline");
+  const [view, setView] = useState<ViewMode>("map");
   const { online, wasOffline } = useOnlineStatus();
 
   useEffect(() => {
@@ -248,6 +253,22 @@ export default function App() {
             )}
           </div>
           <span className="tick-badge" title="Simulation turn">Turn {tick}</span>
+          <div className="view-toggle">
+            <button
+              className={`view-btn ${view === "map" ? "active" : ""}`}
+              onClick={() => setView("map")}
+              title="Map Command View"
+            >
+              ◈ Map
+            </button>
+            <button
+              className={`view-btn ${view === "briefing" ? "active" : ""}`}
+              onClick={() => setView("briefing")}
+              title="Presidential Briefing"
+            >
+              ◢ Briefing
+            </button>
+          </div>
           <div className="speed-controls">
             <button
               className={simPaused ? "speed-btn active" : "speed-btn"}
@@ -297,15 +318,19 @@ export default function App() {
         </div>
       </header>
 
-      <MarketTicker />
+      {view === "map" && <MarketTicker />}
 
-      <main className="layout">
-        <EventLog />
-        <section className="map-pane">
-          <WorldMap seed={seed} />
-        </section>
-        <CountryProfile />
-      </main>
+      {view === "briefing" ? (
+        <BriefingDashboard briefing={mockBriefing} />
+      ) : (
+        <main className="layout">
+          <EventLog />
+          <section className="map-pane">
+            <WorldMap seed={seed} />
+          </section>
+          <CountryProfile />
+        </main>
+      )}
 
       {cabinetCards.length > 0 && (
         <CabinetModal
