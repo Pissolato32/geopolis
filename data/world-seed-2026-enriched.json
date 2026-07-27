@@ -16,9 +16,9 @@
       "subregion": "Southern Asia",
       "population": 38928341,
       "economy": {
-        "gdp": 1352214852976,
-        "gdpPerCapita": 34736,
-        "treasury": 78841253257,
+        "gdp": 97320852500,
+        "gdpPerCapita": 2500,
+        "treasury": 5674318665,
         "taxRate": 0.219,
         "stability": 92,
         "legislativeSupport": 0.55
@@ -161,9 +161,9 @@
       "subregion": "Northern Europe",
       "population": 28875,
       "economy": {
-        "gdp": 517699875,
-        "gdpPerCapita": 17929,
-        "treasury": 11221456,
+        "gdp": 2364862500,
+        "gdpPerCapita": 81900,
+        "treasury": 51259816,
         "taxRate": 0.261,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -306,9 +306,9 @@
       "subregion": "Southern Europe",
       "population": 2837743,
       "economy": {
-        "gdp": 47654218199,
-        "gdpPerCapita": 16793,
-        "treasury": 663151174,
+        "gdp": 70943575000,
+        "gdpPerCapita": 25000,
+        "treasury": 987243456,
         "taxRate": 0.183,
         "stability": 92,
         "legislativeSupport": 0.55
@@ -451,9 +451,9 @@
       "subregion": "Northern Africa",
       "population": 43851043,
       "economy": {
-        "gdp": 796378791923,
-        "gdpPerCapita": 18161,
-        "treasury": 46643208145,
+        "gdp": 153478650500,
+        "gdpPerCapita": 3500,
+        "treasury": 8989110099,
         "taxRate": 0.189,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -596,9 +596,9 @@
       "subregion": "Polynesia",
       "population": 55197,
       "economy": {
-        "gdp": 1104878349,
-        "gdpPerCapita": 20017,
-        "treasury": 51375988,
+        "gdp": 645804900,
+        "gdpPerCapita": 11700,
+        "treasury": 30029428,
         "taxRate": 0.335,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -741,9 +741,9 @@
       "subregion": "Southern Europe",
       "population": 77265,
       "economy": {
-        "gdp": 2370490200,
-        "gdpPerCapita": 30680,
-        "treasury": 105078657,
+        "gdp": 3766668750,
+        "gdpPerCapita": 48750,
+        "treasury": 166968205,
         "taxRate": 0.225,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -886,9 +886,9 @@
       "subregion": "Middle Africa",
       "population": 32866268,
       "economy": {
-        "gdp": 766375637224,
-        "gdpPerCapita": 23318,
-        "treasury": 16019904699,
+        "gdp": 72305789600,
+        "gdpPerCapita": 2200,
+        "treasury": 1511441390,
         "taxRate": 0.378,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -1031,9 +1031,9 @@
       "subregion": "Caribbean",
       "population": 13452,
       "economy": {
-        "gdp": 397721832,
-        "gdpPerCapita": 29566,
-        "treasury": 10398679,
+        "gdp": 209851200,
+        "gdpPerCapita": 15600,
+        "treasury": 5486687,
         "taxRate": 0.367,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -1176,9 +1176,9 @@
       "subregion": "",
       "population": 1000,
       "economy": {
-        "gdp": 22134000,
-        "gdpPerCapita": 22134,
-        "treasury": 620819,
+        "gdp": 9750000,
+        "gdpPerCapita": 9750,
+        "treasury": 273470,
         "taxRate": 0.315,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -1290,9 +1290,9 @@
       "subregion": "Caribbean",
       "population": 97928,
       "economy": {
-        "gdp": 2119161920,
-        "gdpPerCapita": 21640,
-        "treasury": 36105285,
+        "gdp": 1527676800,
+        "gdpPerCapita": 15600,
+        "treasury": 26027839,
         "taxRate": 0.199,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -1435,9 +1435,9 @@
       "subregion": "South America",
       "population": 45376763,
       "economy": {
-        "gdp": 1572486345002,
-        "gdpPerCapita": 34654,
-        "treasury": 20187248984,
+        "gdp": 640000000000,
+        "gdpPerCapita": 14104,
+        "treasury": 8216185400,
         "taxRate": 0.241,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -1580,9 +1580,9 @@
       "subregion": "Western Asia",
       "population": 2963234,
       "economy": {
-        "gdp": 105633365632,
-        "gdpPerCapita": 35648,
-        "treasury": 5708804901,
+        "gdp": 29632340000,
+        "gdpPerCapita": 10000,
+        "treasury": 1601437641,
         "taxRate": 0.26,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -1725,9 +1725,9 @@
       "subregion": "Caribbean",
       "population": 106766,
       "economy": {
-        "gdp": 2616514362,
-        "gdpPerCapita": 24507,
-        "treasury": 57955546,
+        "gdp": 1281192000,
+        "gdpPerCapita": 12000,
+        "treasury": 28378282,
         "taxRate": 0.274,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -1870,9 +1870,9 @@
       "subregion": "Australia and New Zealand",
       "population": 25687041,
       "economy": {
-        "gdp": 552733748238,
-        "gdpPerCapita": 21518,
-        "treasury": 6352318027,
+        "gdp": 1690000000000,
+        "gdpPerCapita": 65792,
+        "treasury": 19422402739,
         "taxRate": 0.381,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -2015,9 +2015,9 @@
       "subregion": "Western Europe",
       "population": 8917205,
       "economy": {
-        "gdp": 206121193575,
-        "gdpPerCapita": 23115,
-        "treasury": 2228794724,
+        "gdp": 520000000000,
+        "gdpPerCapita": 58314,
+        "treasury": 5622775787,
         "taxRate": 0.29,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -2160,9 +2160,9 @@
       "subregion": "Western Asia",
       "population": 10110116,
       "economy": {
-        "gdp": 284751417140,
-        "gdpPerCapita": 28165,
-        "treasury": 5788930956,
+        "gdp": 101101160000,
+        "gdpPerCapita": 10000,
+        "treasury": 2055363379,
         "taxRate": 0.125,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -2305,9 +2305,9 @@
       "subregion": "Caribbean",
       "population": 393248,
       "economy": {
-        "gdp": 18060700896,
-        "gdpPerCapita": 45927,
-        "treasury": 860849028,
+        "gdp": 4718976000,
+        "gdpPerCapita": 12000,
+        "treasury": 224926260,
         "taxRate": 0.264,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -2450,9 +2450,9 @@
       "subregion": "Western Asia",
       "population": 1701583,
       "economy": {
-        "gdp": 76184975659,
-        "gdpPerCapita": 44773,
-        "treasury": 1099037155,
+        "gdp": 17015830000,
+        "gdpPerCapita": 10000,
+        "treasury": 245468732,
         "taxRate": 0.289,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -2595,9 +2595,9 @@
       "subregion": "Southern Asia",
       "population": 164689383,
       "economy": {
-        "gdp": 6178651582011,
-        "gdpPerCapita": 37517,
-        "treasury": 87693245829,
+        "gdp": 446000000000,
+        "gdpPerCapita": 2708,
+        "treasury": 6330052297,
         "taxRate": 0.246,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -2740,9 +2740,9 @@
       "subregion": "Caribbean",
       "population": 287371,
       "economy": {
-        "gdp": 14156470202,
-        "gdpPerCapita": 49262,
-        "treasury": 660009943,
+        "gdp": 3448452000,
+        "gdpPerCapita": 12000,
+        "treasury": 160775432,
         "taxRate": 0.182,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -2885,9 +2885,9 @@
       "subregion": "Eastern Europe",
       "population": 9398861,
       "economy": {
-        "gdp": 418568875774,
-        "gdpPerCapita": 44534,
-        "treasury": 4337889873,
+        "gdp": 84589749000,
+        "gdpPerCapita": 9000,
+        "treasury": 876656237,
         "taxRate": 0.149,
         "stability": 87,
         "legislativeSupport": 0.55
@@ -3030,9 +3030,9 @@
       "subregion": "Western Europe",
       "population": 11555997,
       "economy": {
-        "gdp": 345108294408,
-        "gdpPerCapita": 29864,
-        "treasury": 13009192804,
+        "gdp": 640000000000,
+        "gdpPerCapita": 55382,
+        "treasury": 24125422453,
         "taxRate": 0.152,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -3175,9 +3175,9 @@
       "subregion": "Central America",
       "population": 397621,
       "economy": {
-        "gdp": 18325159027,
-        "gdpPerCapita": 46087,
-        "treasury": 1033944699,
+        "gdp": 3578589000,
+        "gdpPerCapita": 9000,
+        "treasury": 201911652,
         "taxRate": 0.37,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -3320,9 +3320,9 @@
       "subregion": "Western Africa",
       "population": 12123198,
       "economy": {
-        "gdp": 365684144472,
-        "gdpPerCapita": 30164,
-        "treasury": 13941669709,
+        "gdp": 26671035600,
+        "gdpPerCapita": 2200,
+        "treasury": 1016830439,
         "taxRate": 0.296,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -3465,9 +3465,9 @@
       "subregion": "Northern America",
       "population": 63903,
       "economy": {
-        "gdp": 2403647442,
-        "gdpPerCapita": 37614,
-        "treasury": 58665974,
+        "gdp": 1121497650,
+        "gdpPerCapita": 17550,
+        "treasury": 27372464,
         "taxRate": 0.371,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -3610,9 +3610,9 @@
       "subregion": "Southern Asia",
       "population": 771612,
       "economy": {
-        "gdp": 24862881864,
-        "gdpPerCapita": 32222,
-        "treasury": 1285383892,
+        "gdp": 1929030000,
+        "gdpPerCapita": 2500,
+        "treasury": 99728748,
         "taxRate": 0.397,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -3755,9 +3755,9 @@
       "subregion": "South America",
       "population": 11673029,
       "economy": {
-        "gdp": 49540335076,
-        "gdpPerCapita": 4244,
-        "treasury": 2043614996,
+        "gdp": 81711203000,
+        "gdpPerCapita": 7000,
+        "treasury": 3370712764,
         "taxRate": 0.383,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -3900,9 +3900,9 @@
       "subregion": "Caribbean",
       "population": 17408,
       "economy": {
-        "gdp": 611055616,
-        "gdpPerCapita": 35102,
-        "treasury": 18991914,
+        "gdp": 271564800,
+        "gdpPerCapita": 15600,
+        "treasury": 8440370,
         "taxRate": 0.288,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -4045,9 +4045,9 @@
       "subregion": "Southern Europe",
       "population": 3280815,
       "economy": {
-        "gdp": 138269948175,
-        "gdpPerCapita": 42145,
-        "treasury": 7226576535,
+        "gdp": 82020375000,
+        "gdpPerCapita": 25000,
+        "treasury": 4286734212,
         "taxRate": 0.311,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -4190,9 +4190,9 @@
       "subregion": "Southern Africa",
       "population": 2351625,
       "economy": {
-        "gdp": 85780225125,
-        "gdpPerCapita": 36477,
-        "treasury": 2046494873,
+        "gdp": 5173575000,
+        "gdpPerCapita": 2200,
+        "treasury": 123428153,
         "taxRate": 0.173,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -4335,9 +4335,9 @@
       "subregion": "South America",
       "population": 212559409,
       "economy": {
-        "gdp": 9010605906919,
-        "gdpPerCapita": 42391,
-        "treasury": 174661451793,
+        "gdp": 2331000000000,
+        "gdpPerCapita": 10966,
+        "treasury": 45184069566,
         "taxRate": 0.277,
         "stability": 67,
         "legislativeSupport": 0.55
@@ -4480,9 +4480,9 @@
       "subregion": "Eastern Africa",
       "population": 3000,
       "economy": {
-        "gdp": 15981000,
-        "gdpPerCapita": 5327,
-        "treasury": 769770,
+        "gdp": 12870000,
+        "gdpPerCapita": 4290,
+        "treasury": 619920,
         "taxRate": 0.347,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -4625,9 +4625,9 @@
       "subregion": "South-Eastern Asia",
       "population": 437483,
       "economy": {
-        "gdp": 1874614655,
-        "gdpPerCapita": 4285,
-        "treasury": 38153893,
+        "gdp": 3609234750,
+        "gdpPerCapita": 8250,
+        "treasury": 73458487,
         "taxRate": 0.243,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -4770,9 +4770,9 @@
       "subregion": "Eastern Europe",
       "population": 6927288,
       "economy": {
-        "gdp": 298884768048,
-        "gdpPerCapita": 43146,
-        "treasury": 16075192923,
+        "gdp": 62345592000,
+        "gdpPerCapita": 9000,
+        "treasury": 3353190013,
         "taxRate": 0.249,
         "stability": 86,
         "legislativeSupport": 0.55
@@ -4915,9 +4915,9 @@
       "subregion": "Western Africa",
       "population": 20903278,
       "economy": {
-        "gdp": 91807196976,
-        "gdpPerCapita": 4392,
-        "treasury": 1292675244,
+        "gdp": 45987211600,
+        "gdpPerCapita": 2200,
+        "treasury": 647514922,
         "taxRate": 0.392,
         "stability": 86,
         "legislativeSupport": 0.55
@@ -5060,9 +5060,9 @@
       "subregion": "Eastern Africa",
       "population": 11890781,
       "economy": {
-        "gdp": 419364064308,
-        "gdpPerCapita": 35268,
-        "treasury": 6029681422,
+        "gdp": 26159718200,
+        "gdpPerCapita": 2200,
+        "treasury": 376128477,
         "taxRate": 0.297,
         "stability": 92,
         "legislativeSupport": 0.55
@@ -5205,9 +5205,9 @@
       "subregion": "Western Africa",
       "population": 555988,
       "economy": {
-        "gdp": 7813855352,
-        "gdpPerCapita": 14054,
-        "treasury": 452653127,
+        "gdp": 1223173600,
+        "gdpPerCapita": 2200,
+        "treasury": 70857897,
         "taxRate": 0.176,
         "stability": 86,
         "legislativeSupport": 0.55
@@ -5350,9 +5350,9 @@
       "subregion": "South-Eastern Asia",
       "population": 16718971,
       "economy": {
-        "gdp": 667939610421,
-        "gdpPerCapita": 39951,
-        "treasury": 14613393968,
+        "gdp": 91954340500,
+        "gdpPerCapita": 5500,
+        "treasury": 2011806133,
         "taxRate": 0.138,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -5495,9 +5495,9 @@
       "subregion": "Middle Africa",
       "population": 26545864,
       "economy": {
-        "gdp": 719738010632,
-        "gdpPerCapita": 27113,
-        "treasury": 9266720969,
+        "gdp": 58400900800,
+        "gdpPerCapita": 2200,
+        "treasury": 751919232,
         "taxRate": 0.224,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -5640,9 +5640,9 @@
       "subregion": "Northern America",
       "population": 38005238,
       "economy": {
-        "gdp": 463587893124,
-        "gdpPerCapita": 12198,
-        "treasury": 20810615076,
+        "gdp": 2242000000000,
+        "gdpPerCapita": 58992,
+        "treasury": 100644127451,
         "taxRate": 0.315,
         "stability": 90,
         "legislativeSupport": 0.55
@@ -5785,9 +5785,9 @@
       "subregion": "Caribbean",
       "population": 65720,
       "economy": {
-        "gdp": 2008074600,
-        "gdpPerCapita": 30555,
-        "treasury": 21075962,
+        "gdp": 1025232000,
+        "gdpPerCapita": 15600,
+        "treasury": 10760432,
         "taxRate": 0.185,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -5930,9 +5930,9 @@
       "subregion": "Middle Africa",
       "population": 4829764,
       "economy": {
-        "gdp": 67346229216,
-        "gdpPerCapita": 13944,
-        "treasury": 703683552,
+        "gdp": 10625480800,
+        "gdpPerCapita": 2200,
+        "treasury": 111022936,
         "taxRate": 0.373,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -6075,9 +6075,9 @@
       "subregion": "Middle Africa",
       "population": 16425859,
       "economy": {
-        "gdp": 636436332814,
-        "gdpPerCapita": 38746,
-        "treasury": 23624540711,
+        "gdp": 36136889800,
+        "gdpPerCapita": 2200,
+        "treasury": 1341402714,
         "taxRate": 0.298,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -6220,9 +6220,9 @@
       "subregion": "South America",
       "population": 19116209,
       "economy": {
-        "gdp": 235951367687,
-        "gdpPerCapita": 12343,
-        "treasury": 6114147568,
+        "gdp": 335000000000,
+        "gdpPerCapita": 17524,
+        "treasury": 8680769497,
         "taxRate": 0.176,
         "stability": 66,
         "legislativeSupport": 0.55
@@ -6365,9 +6365,9 @@
       "subregion": "Eastern Asia",
       "population": 1402112000,
       "economy": {
-        "gdp": 15803204352000,
-        "gdpPerCapita": 11271,
-        "treasury": 630712847454,
+        "gdp": 17790000000000,
+        "gdpPerCapita": 12688,
+        "treasury": 710006737006,
         "taxRate": 0.229,
         "stability": 71,
         "legislativeSupport": 0.55
@@ -6510,9 +6510,9 @@
       "subregion": "Australia and New Zealand",
       "population": 2072,
       "economy": {
-        "gdp": 39863208,
-        "gdpPerCapita": 19239,
-        "treasury": 1225010,
+        "gdp": 181818000,
+        "gdpPerCapita": 87750,
+        "treasury": 5587329,
         "taxRate": 0.291,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -6655,9 +6655,9 @@
       "subregion": "Australia and New Zealand",
       "population": 550,
       "economy": {
-        "gdp": 14478750,
-        "gdpPerCapita": 26325,
-        "treasury": 658684,
+        "gdp": 48262500,
+        "gdpPerCapita": 87750,
+        "treasury": 2195613,
         "taxRate": 0.166,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -6800,9 +6800,9 @@
       "subregion": "South America",
       "population": 50882884,
       "economy": {
-        "gdp": 634662212132,
-        "gdpPerCapita": 12473,
-        "treasury": 34063321383,
+        "gdp": 360000000000,
+        "gdpPerCapita": 7075,
+        "treasury": 19321767491,
         "taxRate": 0.214,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -6945,9 +6945,9 @@
       "subregion": "Eastern Africa",
       "population": 869595,
       "economy": {
-        "gdp": 11418651945,
-        "gdpPerCapita": 13131,
-        "treasury": 658108470,
+        "gdp": 1913109000,
+        "gdpPerCapita": 2200,
+        "treasury": 110261110,
         "taxRate": 0.276,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -7090,9 +7090,9 @@
       "subregion": "Middle Africa",
       "population": 5518092,
       "economy": {
-        "gdp": 61190122188,
-        "gdpPerCapita": 11089,
-        "treasury": 2540774754,
+        "gdp": 12139802400,
+        "gdpPerCapita": 2200,
+        "treasury": 504076514,
         "taxRate": 0.271,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -7235,9 +7235,9 @@
       "subregion": "Middle Africa",
       "population": 89561404,
       "economy": {
-        "gdp": 994668952824,
-        "gdpPerCapita": 11106,
-        "treasury": 55834342970,
+        "gdp": 197035088800,
+        "gdpPerCapita": 2200,
+        "treasury": 11060287640,
         "taxRate": 0.356,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -7380,9 +7380,9 @@
       "subregion": "Polynesia",
       "population": 18100,
       "economy": {
-        "gdp": 258558500,
-        "gdpPerCapita": 14285,
-        "treasury": 15197915,
+        "gdp": 211770000,
+        "gdpPerCapita": 11700,
+        "treasury": 12447715,
         "taxRate": 0.136,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -7525,9 +7525,9 @@
       "subregion": "Central America",
       "population": 5094114,
       "economy": {
-        "gdp": 112615578198,
-        "gdpPerCapita": 22107,
-        "treasury": 4660499327,
+        "gdp": 30564684000,
+        "gdpPerCapita": 6000,
+        "treasury": 1264893290,
         "taxRate": 0.222,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -7670,9 +7670,9 @@
       "subregion": "Western Africa",
       "population": 26378275,
       "economy": {
-        "gdp": 630071476650,
-        "gdpPerCapita": 23886,
-        "treasury": 8005779855,
+        "gdp": 58032205000,
+        "gdpPerCapita": 2200,
+        "treasury": 737365640,
         "taxRate": 0.312,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -7815,9 +7815,9 @@
       "subregion": "Southern Europe",
       "population": 4047200,
       "economy": {
-        "gdp": 107101053600,
-        "gdpPerCapita": 26463,
-        "treasury": 4071257578,
+        "gdp": 101180000000,
+        "gdpPerCapita": 25000,
+        "treasury": 3846179173,
         "taxRate": 0.314,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -7960,9 +7960,9 @@
       "subregion": "Caribbean",
       "population": 11326616,
       "economy": {
-        "gdp": 252368331096,
-        "gdpPerCapita": 22281,
-        "treasury": 7373609767,
+        "gdp": 107000000000,
+        "gdpPerCapita": 9447,
+        "treasury": 3126288634,
         "taxRate": 0.18,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -8105,9 +8105,9 @@
       "subregion": "Caribbean",
       "population": 155014,
       "economy": {
-        "gdp": 4045245344,
-        "gdpPerCapita": 26096,
-        "treasury": 76058026,
+        "gdp": 1860168000,
+        "gdpPerCapita": 12000,
+        "treasury": 34974567,
         "taxRate": 0.131,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -8250,9 +8250,9 @@
       "subregion": "Southern Europe",
       "population": 1207361,
       "economy": {
-        "gdp": 29312310358,
-        "gdpPerCapita": 24278,
-        "treasury": 806287432,
+        "gdp": 30184025000,
+        "gdpPerCapita": 25000,
+        "treasury": 830265500,
         "taxRate": 0.122,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -8395,9 +8395,9 @@
       "subregion": "Eastern Europe",
       "population": 10698896,
       "economy": {
-        "gdp": 310867122176,
-        "gdpPerCapita": 29056,
-        "treasury": 7406483986,
+        "gdp": 330000000000,
+        "gdpPerCapita": 30844,
+        "treasury": 7862329404,
         "taxRate": 0.168,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -8540,9 +8540,9 @@
       "subregion": "Northern Europe",
       "population": 5831404,
       "economy": {
-        "gdp": 108149218584,
-        "gdpPerCapita": 18546,
-        "treasury": 6208610209,
+        "gdp": 244918968000,
+        "gdpPerCapita": 42000,
+        "treasury": 14060262524,
         "taxRate": 0.295,
         "stability": 87,
         "legislativeSupport": 0.55
@@ -8685,9 +8685,9 @@
       "subregion": "Eastern Africa",
       "population": 988002,
       "economy": {
-        "gdp": 12378677058,
-        "gdpPerCapita": 12529,
-        "treasury": 366219704,
+        "gdp": 2173604400,
+        "gdpPerCapita": 2200,
+        "treasury": 64305479,
         "taxRate": 0.345,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -8830,9 +8830,9 @@
       "subregion": "Caribbean",
       "population": 71991,
       "economy": {
-        "gdp": 1890555651,
-        "gdpPerCapita": 26261,
-        "treasury": 87854389,
+        "gdp": 1123059600,
+        "gdpPerCapita": 15600,
+        "treasury": 52188739,
         "taxRate": 0.128,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -8975,9 +8975,9 @@
       "subregion": "Caribbean",
       "population": 10847904,
       "economy": {
-        "gdp": 131075224032,
-        "gdpPerCapita": 12083,
-        "treasury": 5896425047,
+        "gdp": 86783232000,
+        "gdpPerCapita": 8000,
+        "treasury": 3903947726,
         "taxRate": 0.196,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -9120,9 +9120,9 @@
       "subregion": "South America",
       "population": 17643060,
       "economy": {
-        "gdp": 794466991800,
-        "gdpPerCapita": 45030,
-        "treasury": 19304549645,
+        "gdp": 120000000000,
+        "gdpPerCapita": 6802,
+        "treasury": 2915849219,
         "taxRate": 0.139,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -9265,9 +9265,9 @@
       "subregion": "Northern Africa",
       "population": 102334403,
       "economy": {
-        "gdp": 3349609678996,
-        "gdpPerCapita": 32732,
-        "treasury": 86223039791,
+        "gdp": 398000000000,
+        "gdpPerCapita": 3889,
+        "treasury": 10245005575,
         "taxRate": 0.304,
         "stability": 87,
         "legislativeSupport": 0.55
@@ -9410,9 +9410,9 @@
       "subregion": "Central America",
       "population": 6486201,
       "economy": {
-        "gdp": 122167595835,
-        "gdpPerCapita": 18835,
-        "treasury": 2284266261,
+        "gdp": 38917206000,
+        "gdpPerCapita": 6000,
+        "treasury": 727666449,
         "taxRate": 0.334,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -9555,9 +9555,9 @@
       "subregion": "Middle Africa",
       "population": 1402985,
       "economy": {
-        "gdp": 56394385060,
-        "gdpPerCapita": 40196,
-        "treasury": 2648897386,
+        "gdp": 3086567000,
+        "gdpPerCapita": 2200,
+        "treasury": 144978959,
         "taxRate": 0.369,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -9700,9 +9700,9 @@
       "subregion": "Eastern Africa",
       "population": 5352000,
       "economy": {
-        "gdp": 204317952000,
-        "gdpPerCapita": 38176,
-        "treasury": 3661890036,
+        "gdp": 11774400000,
+        "gdpPerCapita": 2200,
+        "treasury": 211026773,
         "taxRate": 0.335,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -9845,9 +9845,9 @@
       "subregion": "Northern Europe",
       "population": 1331057,
       "economy": {
-        "gdp": 63522033211,
-        "gdpPerCapita": 47723,
-        "treasury": 1503666076,
+        "gdp": 55904394000,
+        "gdpPerCapita": 42000,
+        "treasury": 1323344618,
         "taxRate": 0.237,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -9990,9 +9990,9 @@
       "subregion": "Southern Africa",
       "population": 1160164,
       "economy": {
-        "gdp": 22144050268,
-        "gdpPerCapita": 19087,
-        "treasury": 569305791,
+        "gdp": 2552360800,
+        "gdpPerCapita": 2200,
+        "treasury": 65619151,
         "taxRate": 0.296,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -10135,9 +10135,9 @@
       "subregion": "Eastern Africa",
       "population": 114963583,
       "economy": {
-        "gdp": 590797853037,
-        "gdpPerCapita": 5139,
-        "treasury": 16282726770,
+        "gdp": 252919882600,
+        "gdpPerCapita": 2200,
+        "treasury": 6970616636,
         "taxRate": 0.137,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -10280,9 +10280,9 @@
       "subregion": "South America",
       "population": 2563,
       "economy": {
-        "gdp": 34831170,
-        "gdpPerCapita": 13590,
-        "treasury": 416250,
+        "gdp": 34984950,
+        "gdpPerCapita": 13650,
+        "treasury": 418088,
         "taxRate": 0.334,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -10425,9 +10425,9 @@
       "subregion": "Northern Europe",
       "population": 48865,
       "economy": {
-        "gdp": 889733920,
-        "gdpPerCapita": 18208,
-        "treasury": 43303098,
+        "gdp": 4002043500,
+        "gdpPerCapita": 81900,
+        "treasury": 194778324,
         "taxRate": 0.163,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -10570,9 +10570,9 @@
       "subregion": "Melanesia",
       "population": 896444,
       "economy": {
-        "gdp": 39606688808,
-        "gdpPerCapita": 44182,
-        "treasury": 501363289,
+        "gdp": 2689332000,
+        "gdpPerCapita": 3000,
+        "treasury": 34043046,
         "taxRate": 0.286,
         "stability": 81,
         "legislativeSupport": 0.55
@@ -10715,9 +10715,9 @@
       "subregion": "Northern Europe",
       "population": 5530719,
       "economy": {
-        "gdp": 32979677397,
-        "gdpPerCapita": 5963,
-        "treasury": 1888916607,
+        "gdp": 300000000000,
+        "gdpPerCapita": 54242,
+        "treasury": 17182550796,
         "taxRate": 0.223,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -10860,9 +10860,9 @@
       "subregion": "Western Europe",
       "population": 67391582,
       "economy": {
-        "gdp": 935395158160,
-        "gdpPerCapita": 13880,
-        "treasury": 39736016954,
+        "gdp": 3032000000000,
+        "gdpPerCapita": 44991,
+        "treasury": 128800755866,
         "taxRate": 0.124,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -11005,9 +11005,9 @@
       "subregion": "South America",
       "population": 254541,
       "economy": {
-        "gdp": 7260782025,
-        "gdpPerCapita": 28525,
-        "treasury": 419737468,
+        "gdp": 2672680500,
+        "gdpPerCapita": 10500,
+        "treasury": 154504589,
         "taxRate": 0.327,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -11150,9 +11150,9 @@
       "subregion": "Polynesia",
       "population": 280904,
       "economy": {
-        "gdp": 11361724088,
-        "gdpPerCapita": 40447,
-        "treasury": 648033022,
+        "gdp": 2528136000,
+        "gdpPerCapita": 9000,
+        "treasury": 144196039,
         "taxRate": 0.255,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -11295,9 +11295,9 @@
       "subregion": "Southern Africa",
       "population": 140,
       "economy": {
-        "gdp": 3339560,
-        "gdpPerCapita": 23854,
-        "treasury": 105662,
+        "gdp": 600600,
+        "gdpPerCapita": 4290,
+        "treasury": 19003,
         "taxRate": 0.269,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -11440,9 +11440,9 @@
       "subregion": "Middle Africa",
       "population": 2225728,
       "economy": {
-        "gdp": 80662608448,
-        "gdpPerCapita": 36241,
-        "treasury": 1480180078,
+        "gdp": 4896601600,
+        "gdpPerCapita": 2200,
+        "treasury": 89853927,
         "taxRate": 0.386,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -11585,9 +11585,9 @@
       "subregion": "Western Africa",
       "population": 2416664,
       "economy": {
-        "gdp": 97331142600,
-        "gdpPerCapita": 40275,
-        "treasury": 1981236392,
+        "gdp": 5316660800,
+        "gdpPerCapita": 2200,
+        "treasury": 108223962,
         "taxRate": 0.283,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -11730,9 +11730,9 @@
       "subregion": "Western Asia",
       "population": 3714000,
       "economy": {
-        "gdp": 115030008000,
-        "gdpPerCapita": 30972,
-        "treasury": 4183827170,
+        "gdp": 37140000000,
+        "gdpPerCapita": 10000,
+        "treasury": 1350841783,
         "taxRate": 0.123,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -11875,9 +11875,9 @@
       "subregion": "Western Europe",
       "population": 83240525,
       "economy": {
-        "gdp": 1547441359750,
-        "gdpPerCapita": 18590,
-        "treasury": 62564373568,
+        "gdp": 4456000000000,
+        "gdpPerCapita": 53532,
+        "treasury": 180159879315,
         "taxRate": 0.153,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -12020,9 +12020,9 @@
       "subregion": "Western Africa",
       "population": 31072945,
       "economy": {
-        "gdp": 1112100701550,
-        "gdpPerCapita": 35790,
-        "treasury": 30517152971,
+        "gdp": 68360479000,
+        "gdpPerCapita": 2200,
+        "treasury": 1875879758,
         "taxRate": 0.268,
         "stability": 86,
         "legislativeSupport": 0.55
@@ -12165,9 +12165,9 @@
       "subregion": "Southern Europe",
       "population": 33691,
       "economy": {
-        "gdp": 1625422295,
-        "gdpPerCapita": 48245,
-        "treasury": 36940245,
+        "gdp": 1642436250,
+        "gdpPerCapita": 48750,
+        "treasury": 37326914,
         "taxRate": 0.299,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -12310,9 +12310,9 @@
       "subregion": "Southern Europe",
       "population": 10715549,
       "economy": {
-        "gdp": 346401552523,
-        "gdpPerCapita": 32327,
-        "treasury": 17274033581,
+        "gdp": 240000000000,
+        "gdpPerCapita": 22397,
+        "treasury": 11968098957,
         "taxRate": 0.332,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -12455,9 +12455,9 @@
       "subregion": "Northern America",
       "population": 56367,
       "economy": {
-        "gdp": 1860731037,
-        "gdpPerCapita": 33011,
-        "treasury": 31022583,
+        "gdp": 989240850,
+        "gdpPerCapita": 17550,
+        "treasury": 16492876,
         "taxRate": 0.393,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -12600,9 +12600,9 @@
       "subregion": "Caribbean",
       "population": 112519,
       "economy": {
-        "gdp": 3831496988,
-        "gdpPerCapita": 34052,
-        "treasury": 82664919,
+        "gdp": 1350228000,
+        "gdpPerCapita": 12000,
+        "treasury": 29131300,
         "taxRate": 0.143,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -12745,9 +12745,9 @@
       "subregion": "Caribbean",
       "population": 400132,
       "economy": {
-        "gdp": 12730199580,
-        "gdpPerCapita": 31815,
-        "treasury": 298339091,
+        "gdp": 4801584000,
+        "gdpPerCapita": 12000,
+        "treasury": 112527710,
         "taxRate": 0.341,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -12890,9 +12890,9 @@
       "subregion": "Micronesia",
       "population": 168783,
       "economy": {
-        "gdp": 4515620382,
-        "gdpPerCapita": 26754,
-        "treasury": 192694565,
+        "gdp": 1012698000,
+        "gdpPerCapita": 6000,
+        "treasury": 43214749,
         "taxRate": 0.336,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -13035,9 +13035,9 @@
       "subregion": "Central America",
       "population": 16858333,
       "economy": {
-        "gdp": 688174011393,
-        "gdpPerCapita": 40821,
-        "treasury": 23963152106,
+        "gdp": 101149998000,
+        "gdpPerCapita": 6000,
+        "treasury": 3522180070,
         "taxRate": 0.272,
         "stability": 69,
         "legislativeSupport": 0.55
@@ -13180,9 +13180,9 @@
       "subregion": "Northern Europe",
       "population": 62999,
       "economy": {
-        "gdp": 2642178060,
-        "gdpPerCapita": 41940,
-        "treasury": 68095480,
+        "gdp": 5159618100,
+        "gdpPerCapita": 81900,
+        "treasury": 132976152,
         "taxRate": 0.189,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -13325,9 +13325,9 @@
       "subregion": "Western Africa",
       "population": 13132792,
       "economy": {
-        "gdp": 536710943456,
-        "gdpPerCapita": 40868,
-        "treasury": 18397587134,
+        "gdp": 28892142400,
+        "gdpPerCapita": 2200,
+        "treasury": 990376130,
         "taxRate": 0.389,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -13470,9 +13470,9 @@
       "subregion": "Western Africa",
       "population": 1967998,
       "economy": {
-        "gdp": 84295258334,
-        "gdpPerCapita": 42833,
-        "treasury": 2189127711,
+        "gdp": 4329595600,
+        "gdpPerCapita": 2200,
+        "treasury": 112438563,
         "taxRate": 0.207,
         "stability": 81,
         "legislativeSupport": 0.55
@@ -13615,9 +13615,9 @@
       "subregion": "South America",
       "population": 786559,
       "economy": {
-        "gdp": 22108600372,
-        "gdpPerCapita": 28108,
-        "treasury": 506215205,
+        "gdp": 5505913000,
+        "gdpPerCapita": 7000,
+        "treasury": 126067541,
         "taxRate": 0.301,
         "stability": 70,
         "legislativeSupport": 0.55
@@ -13760,9 +13760,9 @@
       "subregion": "Caribbean",
       "population": 11402533,
       "economy": {
-        "gdp": 177594451475,
-        "gdpPerCapita": 15575,
-        "treasury": 5442885504,
+        "gdp": 91220264000,
+        "gdpPerCapita": 8000,
+        "treasury": 2795703630,
         "taxRate": 0.133,
         "stability": 67,
         "legislativeSupport": 0.55
@@ -13905,9 +13905,9 @@
       "subregion": "Central America",
       "population": 9904608,
       "economy": {
-        "gdp": 287302964256,
-        "gdpPerCapita": 29007,
-        "treasury": 13520494438,
+        "gdp": 59427648000,
+        "gdpPerCapita": 6000,
+        "treasury": 2796668619,
         "taxRate": 0.358,
         "stability": 67,
         "legislativeSupport": 0.55
@@ -14050,9 +14050,9 @@
       "subregion": "Eastern Asia",
       "population": 7481800,
       "economy": {
-        "gdp": 194676436000,
-        "gdpPerCapita": 26020,
-        "treasury": 6467635982,
+        "gdp": 382000000000,
+        "gdpPerCapita": 51057,
+        "treasury": 12690991246,
         "taxRate": 0.165,
         "stability": 68,
         "legislativeSupport": 0.55
@@ -14195,9 +14195,9 @@
       "subregion": "Eastern Europe",
       "population": 9749763,
       "economy": {
-        "gdp": 108817104843,
-        "gdpPerCapita": 11161,
-        "treasury": 3935413875,
+        "gdp": 210000000000,
+        "gdpPerCapita": 21539,
+        "treasury": 7594733520,
         "taxRate": 0.156,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -14340,9 +14340,9 @@
       "subregion": "Northern Europe",
       "population": 366425,
       "economy": {
-        "gdp": 15965870100,
-        "gdpPerCapita": 43572,
-        "treasury": 399900051,
+        "gdp": 23084775000,
+        "gdpPerCapita": 63000,
+        "treasury": 578208556,
         "taxRate": 0.197,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -14485,9 +14485,9 @@
       "subregion": "Southern Asia",
       "population": 1380004385,
       "economy": {
-        "gdp": 52823807849030,
-        "gdpPerCapita": 38278,
-        "treasury": 2860384241283,
+        "gdp": 3550000000000,
+        "gdpPerCapita": 2572,
+        "treasury": 192230822995,
         "taxRate": 0.285,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -14630,9 +14630,9 @@
       "subregion": "South-Eastern Asia",
       "population": 273523621,
       "economy": {
-        "gdp": 11697784699307,
-        "gdpPerCapita": 42767,
-        "treasury": 389078406420,
+        "gdp": 1371000000000,
+        "gdpPerCapita": 5012,
+        "treasury": 45600642251,
         "taxRate": 0.143,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -14775,9 +14775,9 @@
       "subregion": "Southern Asia",
       "population": 83992953,
       "economy": {
-        "gdp": 2848956972807,
-        "gdpPerCapita": 33919,
-        "treasury": 93053173130,
+        "gdp": 770000000000,
+        "gdpPerCapita": 9167,
+        "treasury": 25149886079,
         "taxRate": 0.251,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -14920,9 +14920,9 @@
       "subregion": "Western Asia",
       "population": 40222503,
       "economy": {
-        "gdp": 1430875321722,
-        "gdpPerCapita": 35574,
-        "treasury": 50327603632,
+        "gdp": 402225030000,
+        "gdpPerCapita": 10000,
+        "treasury": 14147299610,
         "taxRate": 0.387,
         "stability": 86,
         "legislativeSupport": 0.55
@@ -15065,9 +15065,9 @@
       "subregion": "Northern Europe",
       "population": 4994724,
       "economy": {
-        "gdp": 181388396784,
-        "gdpPerCapita": 36316,
-        "treasury": 4768411544,
+        "gdp": 545000000000,
+        "gdpPerCapita": 109115,
+        "treasury": 14327180446,
         "taxRate": 0.146,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -15210,9 +15210,9 @@
       "subregion": "Northern Europe",
       "population": 85032,
       "economy": {
-        "gdp": 3341672568,
-        "gdpPerCapita": 39299,
-        "treasury": 106373705,
+        "gdp": 6964120800,
+        "gdpPerCapita": 81900,
+        "treasury": 221685194,
         "taxRate": 0.277,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -15355,9 +15355,9 @@
       "subregion": "Western Asia",
       "population": 9216900,
       "economy": {
-        "gdp": 348841231200,
-        "gdpPerCapita": 37848,
-        "treasury": 10889874545,
+        "gdp": 530000000000,
+        "gdpPerCapita": 57503,
+        "treasury": 16545158636,
         "taxRate": 0.389,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -15500,9 +15500,9 @@
       "subregion": "Southern Europe",
       "population": 59554023,
       "economy": {
-        "gdp": 2213265710772,
-        "gdpPerCapita": 37164,
-        "treasury": 52984345392,
+        "gdp": 2170000000000,
+        "gdpPerCapita": 36438,
+        "treasury": 51948588432,
         "taxRate": 0.317,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -15645,9 +15645,9 @@
       "subregion": "Caribbean",
       "population": 2961161,
       "economy": {
-        "gdp": 30739812341,
-        "gdpPerCapita": 10381,
-        "treasury": 1625232809,
+        "gdp": 23689288000,
+        "gdpPerCapita": 8000,
+        "treasury": 1252467245,
         "taxRate": 0.207,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -15790,9 +15790,9 @@
       "subregion": "Eastern Asia",
       "population": 125836021,
       "economy": {
-        "gdp": 2544026836557,
-        "gdpPerCapita": 20217,
-        "treasury": 52452682151,
+        "gdp": 4213000000000,
+        "gdpPerCapita": 33480,
+        "treasury": 86863529396,
         "taxRate": 0.358,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -15935,9 +15935,9 @@
       "subregion": "Northern Europe",
       "population": 100800,
       "economy": {
-        "gdp": 726969600,
-        "gdpPerCapita": 7212,
-        "treasury": 22117898,
+        "gdp": 6350400000,
+        "gdpPerCapita": 63000,
+        "treasury": 193209592,
         "taxRate": 0.344,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -16080,9 +16080,9 @@
       "subregion": "Western Asia",
       "population": 10203140,
       "economy": {
-        "gdp": 71993355840,
-        "gdpPerCapita": 7056,
-        "treasury": 2081762082,
+        "gdp": 102031400000,
+        "gdpPerCapita": 10000,
+        "treasury": 2950343087,
         "taxRate": 0.37,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -16225,9 +16225,9 @@
       "subregion": "Central Asia",
       "population": 18754440,
       "economy": {
-        "gdp": 586207531080,
-        "gdpPerCapita": 31257,
-        "treasury": 23134091471,
+        "gdp": 260000000000,
+        "gdpPerCapita": 13863,
+        "treasury": 10260638875,
         "taxRate": 0.304,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -16370,9 +16370,9 @@
       "subregion": "Eastern Africa",
       "population": 53771300,
       "economy": {
-        "gdp": 1815104002800,
-        "gdpPerCapita": 33756,
-        "treasury": 56024088755,
+        "gdp": 118296860000,
+        "gdpPerCapita": 2200,
+        "treasury": 3651291482,
         "taxRate": 0.169,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -16515,9 +16515,9 @@
       "subregion": "Micronesia",
       "population": 119446,
       "economy": {
-        "gdp": 5683240680,
-        "gdpPerCapita": 47580,
-        "treasury": 88964407,
+        "gdp": 716676000,
+        "gdpPerCapita": 6000,
+        "treasury": 11218715,
         "taxRate": 0.229,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -16660,9 +16660,9 @@
       "subregion": "Eastern Asia",
       "population": 25778815,
       "economy": {
-        "gdp": 1006018255375,
-        "gdpPerCapita": 39025,
-        "treasury": 27876286912,
+        "gdp": 309345780000,
+        "gdpPerCapita": 12000,
+        "treasury": 8571824291,
         "taxRate": 0.244,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -16805,9 +16805,9 @@
       "subregion": "Eastern Asia",
       "population": 51780579,
       "economy": {
-        "gdp": 1715697704586,
-        "gdpPerCapita": 33134,
-        "treasury": 70559752591,
+        "gdp": 1760000000000,
+        "gdpPerCapita": 33990,
+        "treasury": 72381727986,
         "taxRate": 0.24,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -16950,9 +16950,9 @@
       "subregion": "Western Asia",
       "population": 4270563,
       "economy": {
-        "gdp": 182186488143,
-        "gdpPerCapita": 42661,
-        "treasury": 3301436780,
+        "gdp": 160000000000,
+        "gdpPerCapita": 37466,
+        "treasury": 2899391114,
         "taxRate": 0.234,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -17095,9 +17095,9 @@
       "subregion": "Central Asia",
       "population": 6591600,
       "economy": {
-        "gdp": 289489888800,
-        "gdpPerCapita": 43918,
-        "treasury": 3646191377,
+        "gdp": 26366400000,
+        "gdpPerCapita": 4000,
+        "treasury": 332090840,
         "taxRate": 0.293,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -17240,9 +17240,9 @@
       "subregion": "South-Eastern Asia",
       "population": 7275556,
       "economy": {
-        "gdp": 215487417608,
-        "gdpPerCapita": 29618,
-        "treasury": 2900774601,
+        "gdp": 40015558000,
+        "gdpPerCapita": 5500,
+        "treasury": 538667712,
         "taxRate": 0.139,
         "stability": 73,
         "legislativeSupport": 0.55
@@ -17385,9 +17385,9 @@
       "subregion": "Northern Europe",
       "population": 1901548,
       "economy": {
-        "gdp": 46814210212,
-        "gdpPerCapita": 24619,
-        "treasury": 947187300,
+        "gdp": 45000000000,
+        "gdpPerCapita": 23665,
+        "treasury": 910480564,
         "taxRate": 0.301,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -17530,9 +17530,9 @@
       "subregion": "Western Asia",
       "population": 6825442,
       "economy": {
-        "gdp": 167202852674,
-        "gdpPerCapita": 24497,
-        "treasury": 7539831737,
+        "gdp": 68254420000,
+        "gdpPerCapita": 10000,
+        "treasury": 3077859222,
         "taxRate": 0.39,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -17675,9 +17675,9 @@
       "subregion": "Southern Africa",
       "population": 2142252,
       "economy": {
-        "gdp": 76752604656,
-        "gdpPerCapita": 35828,
-        "treasury": 1775106616,
+        "gdp": 4712954400,
+        "gdpPerCapita": 2200,
+        "treasury": 108999513,
         "taxRate": 0.171,
         "stability": 66,
         "legislativeSupport": 0.55
@@ -17820,9 +17820,9 @@
       "subregion": "Western Africa",
       "population": 5057677,
       "economy": {
-        "gdp": 141559321553,
-        "gdpPerCapita": 27989,
-        "treasury": 3361423526,
+        "gdp": 11126889400,
+        "gdpPerCapita": 2200,
+        "treasury": 264215647,
         "taxRate": 0.383,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -17965,9 +17965,9 @@
       "subregion": "Northern Africa",
       "population": 6871287,
       "economy": {
-        "gdp": 183161026272,
-        "gdpPerCapita": 26656,
-        "treasury": 6036246676,
+        "gdp": 24049504500,
+        "gdpPerCapita": 3500,
+        "treasury": 792574406,
         "taxRate": 0.249,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -18110,9 +18110,9 @@
       "subregion": "Western Europe",
       "population": 38137,
       "economy": {
-        "gdp": 977336899,
-        "gdpPerCapita": 25627,
-        "treasury": 56437208,
+        "gdp": 2974686000,
+        "gdpPerCapita": 78000,
+        "treasury": 171775948,
         "taxRate": 0.341,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -18255,9 +18255,9 @@
       "subregion": "Northern Europe",
       "population": 2794700,
       "economy": {
-        "gdp": 110069259500,
-        "gdpPerCapita": 39385,
-        "treasury": 1387678780,
+        "gdp": 80000000000,
+        "gdpPerCapita": 28626,
+        "treasury": 1008585893,
         "taxRate": 0.336,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -18400,9 +18400,9 @@
       "subregion": "Western Europe",
       "population": 632275,
       "economy": {
-        "gdp": 17551954000,
-        "gdpPerCapita": 27760,
-        "treasury": 641199574,
+        "gdp": 90000000000,
+        "gdpPerCapita": 142343,
+        "treasury": 3287836879,
         "taxRate": 0.333,
         "stability": 81,
         "legislativeSupport": 0.55
@@ -18545,9 +18545,9 @@
       "subregion": "Eastern Asia",
       "population": 649342,
       "economy": {
-        "gdp": 8216773668,
-        "gdpPerCapita": 12654,
-        "treasury": 194189566,
+        "gdp": 7792104000,
+        "gdpPerCapita": 12000,
+        "treasury": 184153216,
         "taxRate": 0.322,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -18690,9 +18690,9 @@
       "subregion": "Eastern Africa",
       "population": 27691019,
       "economy": {
-        "gdp": 277380937323,
-        "gdpPerCapita": 10017,
-        "treasury": 14351847906,
+        "gdp": 60920241800,
+        "gdpPerCapita": 2200,
+        "treasury": 3152048058,
         "taxRate": 0.345,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -18835,9 +18835,9 @@
       "subregion": "Eastern Africa",
       "population": 19129955,
       "economy": {
-        "gdp": 223323094670,
-        "gdpPerCapita": 11674,
-        "treasury": 6948448675,
+        "gdp": 42085901000,
+        "gdpPerCapita": 2200,
+        "treasury": 1309455806,
         "taxRate": 0.154,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -18980,9 +18980,9 @@
       "subregion": "South-Eastern Asia",
       "population": 32365998,
       "economy": {
-        "gdp": 218308656510,
-        "gdpPerCapita": 6745,
-        "treasury": 5403873272,
+        "gdp": 440000000000,
+        "gdpPerCapita": 13595,
+        "treasury": 10891479420,
         "taxRate": 0.278,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -19125,9 +19125,9 @@
       "subregion": "Southern Asia",
       "population": 540542,
       "economy": {
-        "gdp": 4101092154,
-        "gdpPerCapita": 7587,
-        "treasury": 86588792,
+        "gdp": 1351355000,
+        "gdpPerCapita": 2500,
+        "treasury": 28531960,
         "taxRate": 0.264,
         "stability": 92,
         "legislativeSupport": 0.55
@@ -19270,9 +19270,9 @@
       "subregion": "Western Africa",
       "population": 20250834,
       "economy": {
-        "gdp": 446571391368,
-        "gdpPerCapita": 22052,
-        "treasury": 5674960583,
+        "gdp": 44551834800,
+        "gdpPerCapita": 2200,
+        "treasury": 566157867,
         "taxRate": 0.235,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -19415,9 +19415,9 @@
       "subregion": "Southern Europe",
       "population": 525285,
       "economy": {
-        "gdp": 11197500345,
-        "gdpPerCapita": 21317,
-        "treasury": 385972012,
+        "gdp": 13132125000,
+        "gdpPerCapita": 25000,
+        "treasury": 452657517,
         "taxRate": 0.345,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -19560,9 +19560,9 @@
       "subregion": "Micronesia",
       "population": 59194,
       "economy": {
-        "gdp": 1397392758,
-        "gdpPerCapita": 23607,
-        "treasury": 37193961,
+        "gdp": 461713200,
+        "gdpPerCapita": 7800,
+        "treasury": 12289274,
         "taxRate": 0.27,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -19705,9 +19705,9 @@
       "subregion": "Caribbean",
       "population": 378243,
       "economy": {
-        "gdp": 7366282425,
-        "gdpPerCapita": 19475,
-        "treasury": 223927539,
+        "gdp": 4538916000,
+        "gdpPerCapita": 12000,
+        "treasury": 137978458,
         "taxRate": 0.322,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -19850,9 +19850,9 @@
       "subregion": "Western Africa",
       "population": 4649660,
       "economy": {
-        "gdp": 98344958660,
-        "gdpPerCapita": 21151,
-        "treasury": 3076958938,
+        "gdp": 10229252000,
+        "gdpPerCapita": 2200,
+        "treasury": 320046790,
         "taxRate": 0.146,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -19995,9 +19995,9 @@
       "subregion": "Eastern Africa",
       "population": 1265740,
       "economy": {
-        "gdp": 24579405060,
-        "gdpPerCapita": 19419,
-        "treasury": 348802730,
+        "gdp": 2784628000,
+        "gdpPerCapita": 2200,
+        "treasury": 39516247,
         "taxRate": 0.192,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -20140,9 +20140,9 @@
       "subregion": "Eastern Africa",
       "population": 226915,
       "economy": {
-        "gdp": 1889294290,
-        "gdpPerCapita": 8326,
-        "treasury": 34511006,
+        "gdp": 748819500,
+        "gdpPerCapita": 3300,
+        "treasury": 13678395,
         "taxRate": 0.187,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -20285,9 +20285,9 @@
       "subregion": "Central America",
       "population": 128932753,
       "economy": {
-        "gdp": 2523213976210,
-        "gdpPerCapita": 19570,
-        "treasury": 117030590830,
+        "gdp": 1810000000000,
+        "gdpPerCapita": 14038,
+        "treasury": 83950616713,
         "taxRate": 0.179,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -20430,9 +20430,9 @@
       "subregion": "Micronesia",
       "population": 115021,
       "economy": {
-        "gdp": 767535133,
-        "gdpPerCapita": 6673,
-        "treasury": 25265558,
+        "gdp": 690126000,
+        "gdpPerCapita": 6000,
+        "treasury": 22717421,
         "taxRate": 0.26,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -20575,9 +20575,9 @@
       "subregion": "Eastern Europe",
       "population": 2617820,
       "economy": {
-        "gdp": 27997584900,
-        "gdpPerCapita": 10695,
-        "treasury": 1547951554,
+        "gdp": 23560380000,
+        "gdpPerCapita": 9000,
+        "treasury": 1302624029,
         "taxRate": 0.265,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -20720,9 +20720,9 @@
       "subregion": "Western Europe",
       "population": 39244,
       "economy": {
-        "gdp": 254575828,
-        "gdpPerCapita": 6487,
-        "treasury": 3821047,
+        "gdp": 3061032000,
+        "gdpPerCapita": 78000,
+        "treasury": 45944453,
         "taxRate": 0.262,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -20865,9 +20865,9 @@
       "subregion": "Eastern Asia",
       "population": 3278292,
       "economy": {
-        "gdp": 51554419992,
-        "gdpPerCapita": 15726,
-        "treasury": 551940922,
+        "gdp": 39339504000,
+        "gdpPerCapita": 12000,
+        "treasury": 421168197,
         "taxRate": 0.197,
         "stability": 87,
         "legislativeSupport": 0.55
@@ -21010,9 +21010,9 @@
       "subregion": "Southern Europe",
       "population": 621718,
       "economy": {
-        "gdp": 10269537924,
-        "gdpPerCapita": 16518,
-        "treasury": 592652082,
+        "gdp": 15542950000,
+        "gdpPerCapita": 25000,
+        "treasury": 896979177,
         "taxRate": 0.382,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -21155,9 +21155,9 @@
       "subregion": "Caribbean",
       "population": 4922,
       "economy": {
-        "gdp": 37082348,
-        "gdpPerCapita": 7534,
-        "treasury": 1094295,
+        "gdp": 76783200,
+        "gdpPerCapita": 15600,
+        "treasury": 2265862,
         "taxRate": 0.228,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -21300,9 +21300,9 @@
       "subregion": "Northern Africa",
       "population": 36910558,
       "economy": {
-        "gdp": 350355016536,
-        "gdpPerCapita": 9492,
-        "treasury": 16005600494,
+        "gdp": 150000000000,
+        "gdpPerCapita": 4064,
+        "treasury": 6852592259,
         "taxRate": 0.151,
         "stability": 88,
         "legislativeSupport": 0.55
@@ -21445,9 +21445,9 @@
       "subregion": "Eastern Africa",
       "population": 31255435,
       "economy": {
-        "gdp": 618357526040,
-        "gdpPerCapita": 19784,
-        "treasury": 36112424151,
+        "gdp": 68761957000,
+        "gdpPerCapita": 2200,
+        "treasury": 4015736612,
         "taxRate": 0.251,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -21590,9 +21590,9 @@
       "subregion": "South-Eastern Asia",
       "population": 54409794,
       "economy": {
-        "gdp": 582293615388,
-        "gdpPerCapita": 10702,
-        "treasury": 9878055689,
+        "gdp": 299253867000,
+        "gdpPerCapita": 5500,
+        "treasury": 5076556372,
         "taxRate": 0.328,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -21735,9 +21735,9 @@
       "subregion": "Southern Africa",
       "population": 2540916,
       "economy": {
-        "gdp": 86589335448,
-        "gdpPerCapita": 34078,
-        "treasury": 1274063427,
+        "gdp": 5590015200,
+        "gdpPerCapita": 2200,
+        "treasury": 82250705,
         "taxRate": 0.182,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -21880,9 +21880,9 @@
       "subregion": "Micronesia",
       "population": 10834,
       "economy": {
-        "gdp": 392385812,
-        "gdpPerCapita": 36218,
-        "treasury": 7693082,
+        "gdp": 84505200,
+        "gdpPerCapita": 7800,
+        "treasury": 1656802,
         "taxRate": 0.379,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -22025,9 +22025,9 @@
       "subregion": "Southern Asia",
       "population": 29136808,
       "economy": {
-        "gdp": 667757365744,
-        "gdpPerCapita": 22918,
-        "treasury": 21300182938,
+        "gdp": 72842020000,
+        "gdpPerCapita": 2500,
+        "treasury": 2323521134,
         "taxRate": 0.355,
         "stability": 92,
         "legislativeSupport": 0.55
@@ -22170,9 +22170,9 @@
       "subregion": "Western Europe",
       "population": 17441139,
       "economy": {
-        "gdp": 472637425761,
-        "gdpPerCapita": 27099,
-        "treasury": 18189481307,
+        "gdp": 1120000000000,
+        "gdpPerCapita": 64216,
+        "treasury": 43103271035,
         "taxRate": 0.267,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -22315,9 +22315,9 @@
       "subregion": "Melanesia",
       "population": 271960,
       "economy": {
-        "gdp": 6715508280,
-        "gdpPerCapita": 24693,
-        "treasury": 324374050,
+        "gdp": 1223820000,
+        "gdpPerCapita": 4500,
+        "treasury": 59113240,
         "taxRate": 0.312,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -22460,9 +22460,9 @@
       "subregion": "Australia and New Zealand",
       "population": 5084300,
       "economy": {
-        "gdp": 117188030700,
-        "gdpPerCapita": 23049,
-        "treasury": 2812929252,
+        "gdp": 250000000000,
+        "gdpPerCapita": 49171,
+        "treasury": 6000888562,
         "taxRate": 0.377,
         "stability": 85,
         "legislativeSupport": 0.55
@@ -22605,9 +22605,9 @@
       "subregion": "Central America",
       "population": 6624554,
       "economy": {
-        "gdp": 122295891394,
-        "gdpPerCapita": 18461,
-        "treasury": 2158887352,
+        "gdp": 39747324000,
+        "gdpPerCapita": 6000,
+        "treasury": 701658854,
         "taxRate": 0.348,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -22750,9 +22750,9 @@
       "subregion": "Western Africa",
       "population": 24206636,
       "economy": {
-        "gdp": 776403643064,
-        "gdpPerCapita": 32074,
-        "treasury": 21132546858,
+        "gdp": 53254599200,
+        "gdpPerCapita": 2200,
+        "treasury": 1449510603,
         "taxRate": 0.193,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -22895,9 +22895,9 @@
       "subregion": "Western Africa",
       "population": 206139587,
       "economy": {
-        "gdp": 5149573022847,
-        "gdpPerCapita": 24981,
-        "treasury": 257229960961,
+        "gdp": 360000000000,
+        "gdpPerCapita": 1746,
+        "treasury": 17982614391,
         "taxRate": 0.165,
         "stability": 81,
         "legislativeSupport": 0.55
@@ -23040,9 +23040,9 @@
       "subregion": "Polynesia",
       "population": 1470,
       "economy": {
-        "gdp": 36504510,
-        "gdpPerCapita": 24833,
-        "treasury": 2091517,
+        "gdp": 17199000,
+        "gdpPerCapita": 11700,
+        "treasury": 985413,
         "taxRate": 0.211,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -23185,9 +23185,9 @@
       "subregion": "Australia and New Zealand",
       "population": 2302,
       "economy": {
-        "gdp": 92109926,
-        "gdpPerCapita": 40013,
-        "treasury": 3430888,
+        "gdp": 202000500,
+        "gdpPerCapita": 87750,
+        "treasury": 7524065,
         "taxRate": 0.151,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -23330,9 +23330,9 @@
       "subregion": "Southern Europe",
       "population": 2083380,
       "economy": {
-        "gdp": 38344608900,
-        "gdpPerCapita": 18405,
-        "treasury": 1723089561,
+        "gdp": 52084500000,
+        "gdpPerCapita": 25000,
+        "treasury": 2340518284,
         "taxRate": 0.367,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -23475,9 +23475,9 @@
       "subregion": "Micronesia",
       "population": 57557,
       "economy": {
-        "gdp": 1104979286,
-        "gdpPerCapita": 19198,
-        "treasury": 52258774,
+        "gdp": 448944600,
+        "gdpPerCapita": 7800,
+        "treasury": 21232339,
         "taxRate": 0.333,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -23620,9 +23620,9 @@
       "subregion": "Northern Europe",
       "population": 5379475,
       "economy": {
-        "gdp": 170814469675,
-        "gdpPerCapita": 31753,
-        "treasury": 2277564641,
+        "gdp": 520000000000,
+        "gdpPerCapita": 96664,
+        "treasury": 6933450167,
         "taxRate": 0.331,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -23765,9 +23765,9 @@
       "subregion": "Western Asia",
       "population": 5106622,
       "economy": {
-        "gdp": 218854499054,
-        "gdpPerCapita": 42857,
-        "treasury": 2984672566,
+        "gdp": 51066220000,
+        "gdpPerCapita": 10000,
+        "treasury": 696425920,
         "taxRate": 0.342,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -23910,9 +23910,9 @@
       "subregion": "Southern Asia",
       "population": 220892331,
       "economy": {
-        "gdp": 5786937287538,
-        "gdpPerCapita": 26198,
-        "treasury": 299806031484,
+        "gdp": 350000000000,
+        "gdpPerCapita": 1584,
+        "treasury": 18132581330,
         "taxRate": 0.221,
         "stability": 91,
         "legislativeSupport": 0.55
@@ -24055,9 +24055,9 @@
       "subregion": "Micronesia",
       "population": 18092,
       "economy": {
-        "gdp": 882762956,
-        "gdpPerCapita": 48793,
-        "treasury": 45179804,
+        "gdp": 141117600,
+        "gdpPerCapita": 7800,
+        "treasury": 7222398,
         "taxRate": 0.188,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -24200,9 +24200,9 @@
       "subregion": "Western Asia",
       "population": 4803269,
       "economy": {
-        "gdp": 157090912645,
-        "gdpPerCapita": 32705,
-        "treasury": 1763663584,
+        "gdp": 48032690000,
+        "gdpPerCapita": 10000,
+        "treasury": 539264205,
         "taxRate": 0.37,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -24345,9 +24345,9 @@
       "subregion": "Central America",
       "population": 4314768,
       "economy": {
-        "gdp": 124640703216,
-        "gdpPerCapita": 28887,
-        "treasury": 1256545940,
+        "gdp": 25888608000,
+        "gdpPerCapita": 6000,
+        "treasury": 260991991,
         "taxRate": 0.202,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -24490,9 +24490,9 @@
       "subregion": "Melanesia",
       "population": 8947027,
       "economy": {
-        "gdp": 291538874795,
-        "gdpPerCapita": 32585,
-        "treasury": 13237641844,
+        "gdp": 26841081000,
+        "gdpPerCapita": 3000,
+        "treasury": 1218748674,
         "taxRate": 0.312,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -24635,9 +24635,9 @@
       "subregion": "South America",
       "population": 7132530,
       "economy": {
-        "gdp": 307297922520,
-        "gdpPerCapita": 43084,
-        "treasury": 18084920859,
+        "gdp": 49927710000,
+        "gdpPerCapita": 7000,
+        "treasury": 2938316916,
         "taxRate": 0.331,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -24780,9 +24780,9 @@
       "subregion": "South America",
       "population": 32971846,
       "economy": {
-        "gdp": 1400578074388,
-        "gdpPerCapita": 42478,
-        "treasury": 69553343433,
+        "gdp": 250000000000,
+        "gdpPerCapita": 7582,
+        "treasury": 12415113571,
         "taxRate": 0.399,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -24925,9 +24925,9 @@
       "subregion": "South-Eastern Asia",
       "population": 109581085,
       "economy": {
-        "gdp": 2963510862740,
-        "gdpPerCapita": 27044,
-        "treasury": 91727991217,
+        "gdp": 437000000000,
+        "gdpPerCapita": 3988,
+        "treasury": 13526230886,
         "taxRate": 0.176,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -25070,9 +25070,9 @@
       "subregion": "Polynesia",
       "population": 56,
       "economy": {
-        "gdp": 2731232,
-        "gdpPerCapita": 48772,
-        "treasury": 38094,
+        "gdp": 655200,
+        "gdpPerCapita": 11700,
+        "treasury": 9138,
         "taxRate": 0.183,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -25215,9 +25215,9 @@
       "subregion": "Eastern Europe",
       "population": 37950802,
       "economy": {
-        "gdp": 1036588205828,
-        "gdpPerCapita": 27314,
-        "treasury": 47249288757,
+        "gdp": 880000000000,
+        "gdpPerCapita": 23188,
+        "treasury": 40111756889,
         "taxRate": 0.163,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -25360,9 +25360,9 @@
       "subregion": "Southern Europe",
       "population": 10305564,
       "economy": {
-        "gdp": 421909790160,
-        "gdpPerCapita": 40940,
-        "treasury": 19856753560,
+        "gdp": 287000000000,
+        "gdpPerCapita": 27849,
+        "treasury": 13507362011,
         "taxRate": 0.38,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -25505,9 +25505,9 @@
       "subregion": "Caribbean",
       "population": 3194034,
       "economy": {
-        "gdp": 131271603366,
-        "gdpPerCapita": 41099,
-        "treasury": 2331701662,
+        "gdp": 25552272000,
+        "gdpPerCapita": 8000,
+        "treasury": 453870247,
         "taxRate": 0.136,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -25650,9 +25650,9 @@
       "subregion": "Western Asia",
       "population": 2881060,
       "economy": {
-        "gdp": 35926818200,
-        "gdpPerCapita": 12470,
-        "treasury": 688910542,
+        "gdp": 245000000000,
+        "gdpPerCapita": 85038,
+        "treasury": 4697969129,
         "taxRate": 0.283,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -25795,9 +25795,9 @@
       "subregion": "Eastern Africa",
       "population": 840974,
       "economy": {
-        "gdp": 20491172484,
-        "gdpPerCapita": 24366,
-        "treasury": 850646850,
+        "gdp": 1850142800,
+        "gdpPerCapita": 2200,
+        "treasury": 76804690,
         "taxRate": 0.224,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -25940,9 +25940,9 @@
       "subregion": "Eastern Europe",
       "population": 19286123,
       "economy": {
-        "gdp": 505875006290,
-        "gdpPerCapita": 26230,
-        "treasury": 14963733755,
+        "gdp": 350000000000,
+        "gdpPerCapita": 18148,
+        "treasury": 10352966146,
         "taxRate": 0.224,
         "stability": 88,
         "legislativeSupport": 0.55
@@ -26085,9 +26085,9 @@
       "subregion": "Eastern Europe",
       "population": 144104080,
       "economy": {
-        "gdp": 4558588466720,
-        "gdpPerCapita": 31634,
-        "treasury": 229135307912,
+        "gdp": 2060000000000,
+        "gdpPerCapita": 14295,
+        "treasury": 103544932328,
         "taxRate": 0.25,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -26230,9 +26230,9 @@
       "subregion": "Eastern Africa",
       "population": 12952209,
       "economy": {
-        "gdp": 282500630499,
-        "gdpPerCapita": 21811,
-        "treasury": 13502007020,
+        "gdp": 28494859800,
+        "gdpPerCapita": 2200,
+        "treasury": 1361900667,
         "taxRate": 0.176,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -26375,9 +26375,9 @@
       "subregion": "Caribbean",
       "population": 9417,
       "economy": {
-        "gdp": 446186877,
-        "gdpPerCapita": 47381,
-        "treasury": 13423501,
+        "gdp": 146905200,
+        "gdpPerCapita": 15600,
+        "treasury": 4419633,
         "taxRate": 0.13,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -26520,9 +26520,9 @@
       "subregion": "Western Africa",
       "population": 4255,
       "economy": {
-        "gdp": 44371140,
-        "gdpPerCapita": 10428,
-        "treasury": 1188065,
+        "gdp": 18253950,
+        "gdpPerCapita": 4290,
+        "treasury": 488761,
         "taxRate": 0.197,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -26665,9 +26665,9 @@
       "subregion": "Caribbean",
       "population": 53192,
       "economy": {
-        "gdp": 1832730360,
-        "gdpPerCapita": 34455,
-        "treasury": 86780665,
+        "gdp": 829795200,
+        "gdpPerCapita": 15600,
+        "treasury": 39291202,
         "taxRate": 0.148,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -26810,9 +26810,9 @@
       "subregion": "Caribbean",
       "population": 183629,
       "economy": {
-        "gdp": 8020731091,
-        "gdpPerCapita": 43679,
-        "treasury": 148862854,
+        "gdp": 2203548000,
+        "gdpPerCapita": 12000,
+        "treasury": 40897325,
         "taxRate": 0.179,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -26955,9 +26955,9 @@
       "subregion": "Caribbean",
       "population": 38659,
       "economy": {
-        "gdp": 545749103,
-        "gdpPerCapita": 14117,
-        "treasury": 20644970,
+        "gdp": 603080400,
+        "gdpPerCapita": 15600,
+        "treasury": 22813737,
         "taxRate": 0.181,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -27100,9 +27100,9 @@
       "subregion": "Northern America",
       "population": 6069,
       "economy": {
-        "gdp": 141674736,
-        "gdpPerCapita": 23344,
-        "treasury": 7809546,
+        "gdp": 106510950,
+        "gdpPerCapita": 17550,
+        "treasury": 5871210,
         "taxRate": 0.221,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -27245,9 +27245,9 @@
       "subregion": "Caribbean",
       "population": 110947,
       "economy": {
-        "gdp": 4707481210,
-        "gdpPerCapita": 42430,
-        "treasury": 98595233,
+        "gdp": 1331364000,
+        "gdpPerCapita": 12000,
+        "treasury": 27884582,
         "taxRate": 0.235,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -27390,9 +27390,9 @@
       "subregion": "Polynesia",
       "population": 198410,
       "economy": {
-        "gdp": 4753506780,
-        "gdpPerCapita": 23958,
-        "treasury": 170314242,
+        "gdp": 1785690000,
+        "gdpPerCapita": 9000,
+        "treasury": 63979805,
         "taxRate": 0.289,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -27535,9 +27535,9 @@
       "subregion": "Southern Europe",
       "population": 33938,
       "economy": {
-        "gdp": 738049686,
-        "gdpPerCapita": 21747,
-        "treasury": 34756328,
+        "gdp": 1654477500,
+        "gdpPerCapita": 48750,
+        "treasury": 77912861,
         "taxRate": 0.304,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -27680,9 +27680,9 @@
       "subregion": "Middle Africa",
       "population": 219161,
       "economy": {
-        "gdp": 1157827563,
-        "gdpPerCapita": 5283,
-        "treasury": 66697924,
+        "gdp": 723231300,
+        "gdpPerCapita": 3300,
+        "treasury": 41662531,
         "taxRate": 0.166,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -27825,9 +27825,9 @@
       "subregion": "Western Asia",
       "population": 34813867,
       "economy": {
-        "gdp": 272836275679,
-        "gdpPerCapita": 7837,
-        "treasury": 14944598756,
+        "gdp": 1070000000000,
+        "gdpPerCapita": 30735,
+        "treasury": 58609217668,
         "taxRate": 0.323,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -27970,9 +27970,9 @@
       "subregion": "Western Africa",
       "population": 16743930,
       "economy": {
-        "gdp": 249752459880,
-        "gdpPerCapita": 14916,
-        "treasury": 14787681098,
+        "gdp": 36836646000,
+        "gdpPerCapita": 2200,
+        "treasury": 2181073908,
         "taxRate": 0.395,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -28115,9 +28115,9 @@
       "subregion": "Southern Europe",
       "population": 6908224,
       "economy": {
-        "gdp": 51860037568,
-        "gdpPerCapita": 7507,
-        "treasury": 666310102,
+        "gdp": 172705600000,
+        "gdpPerCapita": 25000,
+        "treasury": 2218962642,
         "taxRate": 0.155,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -28260,9 +28260,9 @@
       "subregion": "Eastern Africa",
       "population": 98462,
       "economy": {
-        "gdp": 1368129490,
-        "gdpPerCapita": 13895,
-        "treasury": 77024541,
+        "gdp": 422401980,
+        "gdpPerCapita": 4290,
+        "treasury": 23780877,
         "taxRate": 0.307,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -28405,9 +28405,9 @@
       "subregion": "Western Africa",
       "population": 7976985,
       "economy": {
-        "gdp": 132489743865,
-        "gdpPerCapita": 16609,
-        "treasury": 7063905937,
+        "gdp": 17549367000,
+        "gdpPerCapita": 2200,
+        "treasury": 935673012,
         "taxRate": 0.213,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -28550,9 +28550,9 @@
       "subregion": "South-Eastern Asia",
       "population": 5685807,
       "economy": {
-        "gdp": 114858987207,
-        "gdpPerCapita": 20201,
-        "treasury": 4979463322,
+        "gdp": 501000000000,
+        "gdpPerCapita": 88114,
+        "treasury": 21719772958,
         "taxRate": 0.187,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -28695,9 +28695,9 @@
       "subregion": "Caribbean",
       "population": 40812,
       "economy": {
-        "gdp": 195040548,
-        "gdpPerCapita": 4779,
-        "treasury": 3818492,
+        "gdp": 636667200,
+        "gdpPerCapita": 15600,
+        "treasury": 12464632,
         "taxRate": 0.214,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -28840,9 +28840,9 @@
       "subregion": "Eastern Europe",
       "population": 5458827,
       "economy": {
-        "gdp": 56640788952,
-        "gdpPerCapita": 10376,
-        "treasury": 2671231547,
+        "gdp": 135000000000,
+        "gdpPerCapita": 24731,
+        "treasury": 6366723796,
         "taxRate": 0.253,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -28985,9 +28985,9 @@
       "subregion": "Southern Europe",
       "population": 2100126,
       "economy": {
-        "gdp": 20289317286,
-        "gdpPerCapita": 9661,
-        "treasury": 543165344,
+        "gdp": 68000000000,
+        "gdpPerCapita": 32379,
+        "treasury": 1820428104,
         "taxRate": 0.261,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -29130,9 +29130,9 @@
       "subregion": "Melanesia",
       "population": 686878,
       "economy": {
-        "gdp": 11056675166,
-        "gdpPerCapita": 16097,
-        "treasury": 651652522,
+        "gdp": 2060634000,
+        "gdpPerCapita": 3000,
+        "treasury": 121448566,
         "taxRate": 0.304,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -29275,9 +29275,9 @@
       "subregion": "Eastern Africa",
       "population": 15893219,
       "economy": {
-        "gdp": 157072683377,
-        "gdpPerCapita": 9883,
-        "treasury": 7843516803,
+        "gdp": 34965081800,
+        "gdpPerCapita": 2200,
+        "treasury": 1746001919,
         "taxRate": 0.217,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -29420,9 +29420,9 @@
       "subregion": "Southern Africa",
       "population": 59308690,
       "economy": {
-        "gdp": 348023392920,
-        "gdpPerCapita": 5868,
-        "treasury": 10400809467,
+        "gdp": 380000000000,
+        "gdpPerCapita": 6407,
+        "treasury": 11356442348,
         "taxRate": 0.388,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -29565,9 +29565,9 @@
       "subregion": "South America",
       "population": 30,
       "economy": {
-        "gdp": 722100,
-        "gdpPerCapita": 24070,
-        "treasury": 19168,
+        "gdp": 409500,
+        "gdpPerCapita": 13650,
+        "treasury": 10870,
         "taxRate": 0.365,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -29710,9 +29710,9 @@
       "subregion": "Middle Africa",
       "population": 11193729,
       "economy": {
-        "gdp": 157249504992,
-        "gdpPerCapita": 14048,
-        "treasury": 4081129220,
+        "gdp": 24626203800,
+        "gdpPerCapita": 2200,
+        "treasury": 639129007,
         "taxRate": 0.152,
         "stability": 69,
         "legislativeSupport": 0.55
@@ -29855,9 +29855,9 @@
       "subregion": "Southern Europe",
       "population": 47351567,
       "economy": {
-        "gdp": 2065712110375,
-        "gdpPerCapita": 43625,
-        "treasury": 84619042487,
+        "gdp": 1580000000000,
+        "gdpPerCapita": 33367,
+        "treasury": 64722516975,
         "taxRate": 0.151,
         "stability": 87,
         "legislativeSupport": 0.55
@@ -30000,9 +30000,9 @@
       "subregion": "Southern Asia",
       "population": 21919000,
       "economy": {
-        "gdp": 698470854000,
-        "gdpPerCapita": 31866,
-        "treasury": 12071914552,
+        "gdp": 54797500000,
+        "gdpPerCapita": 2500,
+        "treasury": 947084240,
         "taxRate": 0.263,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -30145,9 +30145,9 @@
       "subregion": "Northern Africa",
       "population": 43849269,
       "economy": {
-        "gdp": 405781135326,
-        "gdpPerCapita": 9254,
-        "treasury": 17662853671,
+        "gdp": 153472441500,
+        "gdpPerCapita": 3500,
+        "treasury": 6680353128,
         "taxRate": 0.281,
         "stability": 90,
         "legislativeSupport": 0.55
@@ -30290,9 +30290,9 @@
       "subregion": "South America",
       "population": 586634,
       "economy": {
-        "gdp": 3909328976,
-        "gdpPerCapita": 6664,
-        "treasury": 183222567,
+        "gdp": 4106438000,
+        "gdpPerCapita": 7000,
+        "treasury": 192460680,
         "taxRate": 0.275,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -30435,9 +30435,9 @@
       "subregion": "Northern Europe",
       "population": 2562,
       "economy": {
-        "gdp": 58592940,
-        "gdpPerCapita": 22870,
-        "treasury": 2485394,
+        "gdp": 209827800,
+        "gdpPerCapita": 81900,
+        "treasury": 8900471,
         "taxRate": 0.183,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -30580,9 +30580,9 @@
       "subregion": "Northern Europe",
       "population": 10353442,
       "economy": {
-        "gdp": 171297697890,
-        "gdpPerCapita": 16545,
-        "treasury": 3066016306,
+        "gdp": 620000000000,
+        "gdpPerCapita": 59883,
+        "treasury": 11097230921,
         "taxRate": 0.354,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -30725,9 +30725,9 @@
       "subregion": "Western Europe",
       "population": 8636896,
       "economy": {
-        "gdp": 120821538144,
-        "gdpPerCapita": 13989,
-        "treasury": 2495541113,
+        "gdp": 940000000000,
+        "gdpPerCapita": 108835,
+        "treasury": 19415484046,
         "taxRate": 0.2,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -30870,9 +30870,9 @@
       "subregion": "Western Asia",
       "population": 17500657,
       "economy": {
-        "gdp": 272782740659,
-        "gdpPerCapita": 15587,
-        "treasury": 12028576751,
+        "gdp": 175006570000,
+        "gdpPerCapita": 10000,
+        "treasury": 7717057003,
         "taxRate": 0.361,
         "stability": 82,
         "legislativeSupport": 0.55
@@ -31015,9 +31015,9 @@
       "subregion": "Eastern Asia",
       "population": 23503349,
       "economy": {
-        "gdp": 334734696458,
-        "gdpPerCapita": 14242,
-        "treasury": 16421548801,
+        "gdp": 282040188000,
+        "gdpPerCapita": 12000,
+        "treasury": 13836440501,
         "taxRate": 0.234,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -31160,9 +31160,9 @@
       "subregion": "Central Asia",
       "population": 9537642,
       "economy": {
-        "gdp": 82653205572,
-        "gdpPerCapita": 8666,
-        "treasury": 2179431161,
+        "gdp": 38150568000,
+        "gdpPerCapita": 4000,
+        "treasury": 1005968687,
         "taxRate": 0.184,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -31305,9 +31305,9 @@
       "subregion": "Eastern Africa",
       "population": 59734213,
       "economy": {
-        "gdp": 299567078195,
-        "gdpPerCapita": 5015,
-        "treasury": 14754197224,
+        "gdp": 131415268600,
+        "gdpPerCapita": 2200,
+        "treasury": 6472429490,
         "taxRate": 0.353,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -31450,9 +31450,9 @@
       "subregion": "South-Eastern Asia",
       "population": 69799978,
       "economy": {
-        "gdp": 2941999272722,
-        "gdpPerCapita": 42149,
-        "treasury": 66917634484,
+        "gdp": 548000000000,
+        "gdpPerCapita": 7851,
+        "treasury": 12464606649,
         "taxRate": 0.145,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -31595,9 +31595,9 @@
       "subregion": "South-Eastern Asia",
       "population": 1318442,
       "economy": {
-        "gdp": 62707738404,
-        "gdpPerCapita": 47562,
-        "treasury": 1398649804,
+        "gdp": 7251431000,
+        "gdpPerCapita": 5500,
+        "treasury": 161737814,
         "taxRate": 0.374,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -31740,9 +31740,9 @@
       "subregion": "Western Africa",
       "population": 8278737,
       "economy": {
-        "gdp": 340529289021,
-        "gdpPerCapita": 41133,
-        "treasury": 13229680074,
+        "gdp": 18213221400,
+        "gdpPerCapita": 2200,
+        "treasury": 707589920,
         "taxRate": 0.184,
         "stability": 83,
         "legislativeSupport": 0.55
@@ -31885,9 +31885,9 @@
       "subregion": "Polynesia",
       "population": 1411,
       "economy": {
-        "gdp": 76689261,
-        "gdpPerCapita": 54351,
-        "treasury": 2213596,
+        "gdp": 16508700,
+        "gdpPerCapita": 11700,
+        "treasury": 476515,
         "taxRate": 0.155,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -32030,9 +32030,9 @@
       "subregion": "Polynesia",
       "population": 105697,
       "economy": {
-        "gdp": 1025789385,
-        "gdpPerCapita": 9705,
-        "treasury": 41297020,
+        "gdp": 951273000,
+        "gdpPerCapita": 9000,
+        "treasury": 38297082,
         "taxRate": 0.155,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -32175,9 +32175,9 @@
       "subregion": "Caribbean",
       "population": 1399491,
       "economy": {
-        "gdp": 21137912064,
-        "gdpPerCapita": 15104,
-        "treasury": 408134905,
+        "gdp": 11195928000,
+        "gdpPerCapita": 8000,
+        "treasury": 216173149,
         "taxRate": 0.31,
         "stability": 89,
         "legislativeSupport": 0.55
@@ -32320,9 +32320,9 @@
       "subregion": "Northern Africa",
       "population": 11818618,
       "economy": {
-        "gdp": 108223085026,
-        "gdpPerCapita": 9157,
-        "treasury": 1089927998,
+        "gdp": 41365163000,
+        "gdpPerCapita": 3500,
+        "treasury": 416593643,
         "taxRate": 0.162,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -32465,9 +32465,9 @@
       "subregion": "Western Asia",
       "population": 84339067,
       "economy": {
-        "gdp": 805269411716,
-        "gdpPerCapita": 9548,
-        "treasury": 42509886151,
+        "gdp": 1080000000000,
+        "gdpPerCapita": 12805,
+        "treasury": 57012816301,
         "taxRate": 0.241,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -32610,9 +32610,9 @@
       "subregion": "Central Asia",
       "population": 6031187,
       "economy": {
-        "gdp": 279943575792,
-        "gdpPerCapita": 46416,
-        "treasury": 14487856943,
+        "gdp": 24124748000,
+        "gdpPerCapita": 4000,
+        "treasury": 1248522660,
         "taxRate": 0.18,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -32755,9 +32755,9 @@
       "subregion": "Caribbean",
       "population": 38718,
       "economy": {
-        "gdp": 1669636314,
-        "gdpPerCapita": 43123,
-        "treasury": 21762918,
+        "gdp": 604000800,
+        "gdpPerCapita": 15600,
+        "treasury": 7872864,
         "taxRate": 0.344,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -32900,9 +32900,9 @@
       "subregion": "Polynesia",
       "population": 11792,
       "economy": {
-        "gdp": 135749504,
-        "gdpPerCapita": 11512,
-        "treasury": 4344169,
+        "gdp": 137966400,
+        "gdpPerCapita": 11700,
+        "treasury": 4415113,
         "taxRate": 0.22,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -33045,9 +33045,9 @@
       "subregion": "Eastern Africa",
       "population": 45741000,
       "economy": {
-        "gdp": 1220644326000,
-        "gdpPerCapita": 26686,
-        "treasury": 24696627440,
+        "gdp": 100630200000,
+        "gdpPerCapita": 2200,
+        "treasury": 2035995667,
         "taxRate": 0.379,
         "stability": 79,
         "legislativeSupport": 0.55
@@ -33190,9 +33190,9 @@
       "subregion": "Eastern Europe",
       "population": 44134693,
       "economy": {
-        "gdp": 1481072027694,
-        "gdpPerCapita": 33558,
-        "treasury": 46919876595,
+        "gdp": 200000000000,
+        "gdpPerCapita": 4532,
+        "treasury": 6335934474,
         "taxRate": 0.143,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -33335,9 +33335,9 @@
       "subregion": "Western Asia",
       "population": 9890400,
       "economy": {
-        "gdp": 357112672800,
-        "gdpPerCapita": 36107,
-        "treasury": 8822846993,
+        "gdp": 510000000000,
+        "gdpPerCapita": 51565,
+        "treasury": 12600090417,
         "taxRate": 0.319,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -33480,9 +33480,9 @@
       "subregion": "Northern Europe",
       "population": 67215293,
       "economy": {
-        "gdp": 2587788780500,
-        "gdpPerCapita": 38500,
-        "treasury": 112852734711,
+        "gdp": 3340000000000,
+        "gdpPerCapita": 49691,
+        "treasury": 145656452634,
         "taxRate": 0.133,
         "stability": 84,
         "legislativeSupport": 0.55
@@ -33625,9 +33625,9 @@
       "subregion": "Northern America",
       "population": 329484123,
       "economy": {
-        "gdp": 8827209139293,
-        "gdpPerCapita": 26791,
-        "treasury": 393303019271,
+        "gdp": 27360000000000,
+        "gdpPerCapita": 83039,
+        "treasury": 1219045616508,
         "taxRate": 0.212,
         "stability": 72,
         "legislativeSupport": 0.55
@@ -33770,9 +33770,9 @@
       "subregion": "South America",
       "population": 3473727,
       "economy": {
-        "gdp": 95117592714,
-        "gdpPerCapita": 27382,
-        "treasury": 3105052735,
+        "gdp": 24316089000,
+        "gdpPerCapita": 7000,
+        "treasury": 793783111,
         "taxRate": 0.312,
         "stability": 75,
         "legislativeSupport": 0.55
@@ -33915,9 +33915,9 @@
       "subregion": "Central Asia",
       "population": 34232050,
       "economy": {
-        "gdp": 1011454381350,
-        "gdpPerCapita": 29547,
-        "treasury": 60026642753,
+        "gdp": 136928200000,
+        "gdpPerCapita": 4000,
+        "treasury": 8126258876,
         "taxRate": 0.123,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -34060,9 +34060,9 @@
       "subregion": "Melanesia",
       "population": 307150,
       "economy": {
-        "gdp": 15197782000,
-        "gdpPerCapita": 49480,
-        "treasury": 470083054,
+        "gdp": 1382175000,
+        "gdpPerCapita": 4500,
+        "treasury": 42752097,
         "taxRate": 0.38,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -34205,9 +34205,9 @@
       "subregion": "Southern Europe",
       "population": 451,
       "economy": {
-        "gdp": 3178648,
-        "gdpPerCapita": 7048,
-        "treasury": 173108,
+        "gdp": 21986250,
+        "gdpPerCapita": 48750,
+        "treasury": 1197363,
         "taxRate": 0.31,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -34350,9 +34350,9 @@
       "subregion": "South America",
       "population": 28435943,
       "economy": {
-        "gdp": 960310231053,
-        "gdpPerCapita": 33771,
-        "treasury": 23958372811,
+        "gdp": 199051601000,
+        "gdpPerCapita": 7000,
+        "treasury": 4966054001,
         "taxRate": 0.39,
         "stability": 70,
         "legislativeSupport": 0.55
@@ -34495,9 +34495,9 @@
       "subregion": "South-Eastern Asia",
       "population": 97338583,
       "economy": {
-        "gdp": 4159374990173,
-        "gdpPerCapita": 42731,
-        "treasury": 81759938076,
+        "gdp": 430000000000,
+        "gdpPerCapita": 4418,
+        "treasury": 8452417360,
         "taxRate": 0.13,
         "stability": 81,
         "legislativeSupport": 0.55
@@ -34640,9 +34640,9 @@
       "subregion": "Caribbean",
       "population": 30237,
       "economy": {
-        "gdp": 1552488528,
-        "gdpPerCapita": 51344,
-        "treasury": 90339527,
+        "gdp": 471697200,
+        "gdpPerCapita": 15600,
+        "treasury": 27448127,
         "taxRate": 0.232,
         "stability": 80,
         "legislativeSupport": 0.55
@@ -34785,9 +34785,9 @@
       "subregion": "Caribbean",
       "population": 106290,
       "economy": {
-        "gdp": 5325341580,
-        "gdpPerCapita": 50102,
-        "treasury": 115173299,
+        "gdp": 1275480000,
+        "gdpPerCapita": 12000,
+        "treasury": 27585318,
         "taxRate": 0.392,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -34930,9 +34930,9 @@
       "subregion": "Polynesia",
       "population": 11750,
       "economy": {
-        "gdp": 378961000,
-        "gdpPerCapita": 32252,
-        "treasury": 7518180,
+        "gdp": 137475000,
+        "gdpPerCapita": 11700,
+        "treasury": 2727357,
         "taxRate": 0.368,
         "stability": 78,
         "legislativeSupport": 0.55
@@ -35075,9 +35075,9 @@
       "subregion": "Northern Africa",
       "population": 510713,
       "economy": {
-        "gdp": 22326329508,
-        "gdpPerCapita": 43716,
-        "treasury": 491091325,
+        "gdp": 1787495500,
+        "gdpPerCapita": 3500,
+        "treasury": 39317862,
         "taxRate": 0.148,
         "stability": 77,
         "legislativeSupport": 0.55
@@ -35220,9 +35220,9 @@
       "subregion": "Western Asia",
       "population": 29825968,
       "economy": {
-        "gdp": 815919180608,
-        "gdpPerCapita": 27356,
-        "treasury": 33323335160,
+        "gdp": 298259680000,
+        "gdpPerCapita": 10000,
+        "treasury": 12181362465,
         "taxRate": 0.143,
         "stability": 73,
         "legislativeSupport": 0.55
@@ -35365,9 +35365,9 @@
       "subregion": "Eastern Africa",
       "population": 18383956,
       "economy": {
-        "gdp": 670334187628,
-        "gdpPerCapita": 36463,
-        "treasury": 8821860254,
+        "gdp": 40444703200,
+        "gdpPerCapita": 2200,
+        "treasury": 532268123,
         "taxRate": 0.277,
         "stability": 74,
         "legislativeSupport": 0.55
@@ -35510,9 +35510,9 @@
       "subregion": "Eastern Africa",
       "population": 14862927,
       "economy": {
-        "gdp": 134613529839,
-        "gdpPerCapita": 9057,
-        "treasury": 4804986506,
+        "gdp": 32698439400,
+        "gdpPerCapita": 2200,
+        "treasury": 1167160242,
         "taxRate": 0.34,
         "stability": 76,
         "legislativeSupport": 0.55
@@ -35642,5 +35642,7 @@
         "coalReserves": 472433524
       }
     }
-  ]
+  ],
+  "gdpNormalizationApplied": true,
+  "gdpNormalizationDate": "2026-07-27T22:51:33.245Z"
 }

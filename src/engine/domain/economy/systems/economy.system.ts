@@ -65,12 +65,14 @@ export class EconomySystem implements ISystem {
 
       const currentGdp = typeof indicator.gdp === 'bigint' ? Number(indicator.gdp) : indicator.gdp;
 
-      // GDP growth: realistic annual rate ~2-5%, scaled per-tick.
+      // GDP growth: realistic annual rate ~2-5%, scaled per-tick (weekly).
+      // Ticks represent weeks, so the annual rate MUST be divided by 52.
       // Production capacity provides a small bonus, inflation subtracts.
       // The growth factor is capped to prevent hyperinflation in mass simulations.
       const productionBonus = Math.min(0.02, (totalOutput / 500) * 0.0001);
-      const growthFactor = Math.max(-0.02, Math.min(0.05, productionBonus - indicator.inflationRate * 0.0005));
-      const newGdp = Math.max(1, currentGdp * (1 + growthFactor));
+      const annualGrowthRate = Math.max(-0.02, Math.min(0.05, productionBonus - indicator.inflationRate * 0.0005));
+      const weeklyGrowthRate = annualGrowthRate / 52;
+      const newGdp = Math.max(1, currentGdp * (1 + weeklyGrowthRate));
 
       eventBus.publish<IEconomyGdpUpdatedPayload>(
         ECONOMY_GDP_UPDATED_EVENT,
@@ -78,7 +80,7 @@ export class EconomySystem implements ISystem {
           countryId: country.id,
           previousGdp: indicator.gdp,
           newGdp,
-          gdpGrowthRate: growthFactor,
+          gdpGrowthRate: weeklyGrowthRate,
         },
         ECONOMY_SYSTEM_ID,
         country.id,

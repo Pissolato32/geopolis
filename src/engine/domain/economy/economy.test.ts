@@ -12,8 +12,49 @@ import {
 } from './components/economy.components.js';
 import { ECONOMY_GDP_UPDATED_EVENT, ECONOMY_RESOURCE_SHORTAGE_EVENT } from './events/economy.events.js';
 import { EntityId } from '../../core/interfaces/entity.interface.js';
+import { ITypedEvent } from '../../core/interfaces/event-bus.interface.js';
 
 describe('Economy Domain', () => {
+  it('should apply weekly (not annual) GDP growth rate per tick', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('economy-growth-test');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    worldState.createEntity('country-gr' as EntityId, [
+      {
+        type: ECONOMIC_INDICATOR_TYPE,
+        gdp: 1_000_000,
+        inflationRate: 0.02,
+        treasury: 50_000,
+        taxRate: 0.2,
+      } as EconomicIndicatorComponent,
+      {
+        type: RESOURCE_PRODUCTION_TYPE,
+        energyOutput: 100,
+        foodOutput: 100,
+        mineralsOutput: 50,
+        industrialOutput: 300,
+      } as ResourceProductionComponent,
+    ]);
+
+    engine.registerSystem(new EconomySystem());
+    engine.runTicks(52);
+
+    const gdpEvents = timeline.query({ eventType: ECONOMY_GDP_UPDATED_EVENT });
+    expect(gdpEvents).toHaveLength(52);
+
+    // After 52 weekly ticks, GDP should have grown by roughly the annual rate (~2-5%),
+    // NOT by 52× the annual rate (which would be the hyper-growth bug).
+    const finalGdpEvent = gdpEvents[51]!;
+    const finalGdp = (finalGdpEvent.event as ITypedEvent<{ newGdp: number }>).payload.newGdp;
+
+    // With the fix: 52 weeks at ~0.03-0.08% per week → ~2-4% annual growth
+    // The old bug would have produced ~100-260% growth (2-5% per tick × 52 ticks)
+    expect(finalGdp).toBeGreaterThan(1_000_000);
+    expect(finalGdp).toBeLessThan(1_100_000); // must stay under 10% growth for one year
+  });
+
   it('should process economic simulation over 5 ticks and emit GDP events', () => {
     const timeline = new Timeline();
     const eventBus = new EventBus(timeline);
