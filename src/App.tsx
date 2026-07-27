@@ -10,8 +10,12 @@ import { GlobalSearch } from "./GlobalSearch.js";
 import { MarketTicker } from "./MarketTicker.js";
 import { CabinetModal } from "./CabinetModal.js";
 import { gameSocket } from "./gameSocket.js";
+import type { ConnectionStatus, SimSpeed } from "./gameSocket.js";
 import { loadOrSeedWorld } from "./gameStore.js";
-import type { SimSpeed } from "./gameSocket.js";
+import { ToastContainer, pushToast } from "./Toast.js";
+import { ErrorBoundary } from "./ErrorBoundary.js";
+import { useOnlineStatus } from "./useOnlineStatus.js";
+import { reportError } from "./errors.js";
 import type { CabinetCard, WorldSeed } from "./shared/types.js";
 import seedData from "../data/world-seed-2026.json";
 
@@ -37,6 +41,8 @@ export default function App() {
   const [simPaused, setSimPaused] = useState(true);
   const [simSpeed, setSimSpeed] = useState<SimSpeed>(0);
   const [cabinetCards, setCabinetCards] = useState<CabinetCard[]>([]);
+  const [connStatus, setConnStatus] = useState<ConnectionStatus>("offline");
+  const { online, wasOffline } = useOnlineStatus();
 
   useEffect(() => {
     let cancelled = false;
@@ -81,14 +87,25 @@ export default function App() {
     setSimPaused(s.paused);
     setSimSpeed(s.speed);
   }), []);
-
   useEffect(() => gameSocket.onCabinetCards(setCabinetCards), []);
+  useEffect(() => gameSocket.onConnectionChange(setConnStatus), []);
+
+  useEffect(() => {
+    if (wasOffline && online) {
+      pushToast({ kind: "success", title: "Back online", message: "Connection restored. Your queued actions have been sent.", dismissable: true, duration: 4000 });
+    }
+  }, [wasOffline, online]);
 
   const advanceTurn = async () => {
     if (turnBusy) return;
     setTurnBusy(true);
     try {
       await gameSocket.advanceTurn();
+    } catch (err) {
+      reportError(err, {
+        category: "api",
+        source: "App.advanceTurn",
+      });
     } finally {
       setTimeout(() => setTurnBusy(false), 400);
     }
@@ -130,12 +147,24 @@ export default function App() {
           <p>{errMsg}</p>
           <button className="btn btn-accent" onClick={() => location.reload()}>Retry</button>
         </div>
+        <ToastContainer />
       </div>
     );
   }
 
+  const connLabel =
+    connStatus === "live" ? "Live" :
+    connStatus === "connecting" ? "Connecting…" :
+    connStatus === "reconnecting" ? "Reconnecting…" :
+    connStatus === "sim" ? "Offline Sim" : "Offline";
+  const connClass =
+    connStatus === "live" ? "status-ok" :
+    connStatus === "connecting" || connStatus === "reconnecting" ? "status-warn" :
+    "status-error";
+
   return (
     <div className="app-shell">
+      <ErrorBoundary>
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark" aria-hidden>◤</span>
@@ -257,7 +286,14 @@ export default function App() {
               {turnBusy ? "…" : "⚡"}
             </button>
           </div>
-          <span className="status status-ok">● {seed.countryCount} nations online</span>
+          <span className={`status ${connClass}`} title={`Connection: ${connLabel}`}>
+            ● {connLabel}{connStatus === "live" ? ` · ${seed.countryCount} nations` : ""}
+          </span>
+          {!online && (
+            <span className="status status-error" title="You are offline">
+              ● No Internet
+            </span>
+          )}
         </div>
       </header>
 
@@ -277,6 +313,8 @@ export default function App() {
           onResolved={() => setCabinetCards([])}
         />
       )}
+      </ErrorBoundary>
+      <ToastContainer />
     </div>
   );
 }

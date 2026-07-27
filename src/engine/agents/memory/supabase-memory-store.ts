@@ -5,6 +5,8 @@ import {
   IAgentDecision,
   IAgentEpisode,
   IEpisodicFilter,
+  IAgentGrievance,
+  IGrievanceFilter,
 } from './memory-store.interface.js';
 import { InMemoryAgentMemoryStore } from './in-memory-memory-store.js';
 
@@ -25,6 +27,16 @@ interface IAgentEpisodeRow {
   start_tick: number;
   end_tick: number;
   created_at: number;
+}
+
+interface IAgentGrievanceRow {
+  country_id: string;
+  perpetrator_id: string;
+  grievance_type: string;
+  description: string;
+  tick: number;
+  severity: number;
+  timestamp: number;
 }
 
 function getSupabaseConfig(): { url: string; key: string } | null {
@@ -148,10 +160,71 @@ export class SupabaseAgentMemoryStore implements IAgentMemoryStore {
     });
   }
 
+  saveGrievance(countryId: EntityId, grievance: IAgentGrievance): void {
+    this.fallback.saveGrievance(countryId, grievance);
+
+    void this.client.from('agent_grievances').insert({
+      country_id: countryId,
+      perpetrator_id: grievance.perpetratorId,
+      grievance_type: grievance.grievanceType,
+      description: grievance.description,
+      tick: grievance.tick,
+      severity: grievance.severity,
+      timestamp: grievance.timestamp,
+    }).then(({ error }) => {
+      if (error) {
+        console.warn(`[AgentMemory] Failed to persist grievance for ${countryId}: ${error.message}`);
+      }
+    });
+  }
+
+  async getGrievances(filter: IGrievanceFilter): Promise<IAgentGrievance[]> {
+    let query = this.client
+      .from('agent_grievances')
+      .select('country_id, perpetrator_id, grievance_type, description, tick, severity, timestamp');
+
+    if (filter.countryId) {
+      query = query.eq('country_id', filter.countryId);
+    }
+    if (filter.perpetratorId) {
+      query = query.eq('perpetrator_id', filter.perpetratorId);
+    }
+    if (filter.grievanceType) {
+      query = query.eq('grievance_type', filter.grievanceType);
+    }
+    if (filter.sinceTick !== undefined) {
+      query = query.gte('tick', filter.sinceTick);
+    }
+
+    const limit = filter.limit ?? 50;
+    query = query.order('tick', { ascending: false }).limit(limit);
+
+    const { data, error } = await query;
+
+    if (error || !data) {
+      return this.fallback.getGrievances(filter);
+    }
+
+    return (data as unknown[]).map((raw) => {
+      const row = raw as IAgentGrievanceRow;
+      return {
+        grievanceId: `grievance-${row.country_id}-${row.perpetrator_id}-${row.tick}`,
+        countryId: row.country_id as EntityId,
+        perpetratorId: row.perpetrator_id as EntityId,
+        grievanceType: row.grievance_type as IAgentGrievance['grievanceType'],
+        description: row.description,
+        tick: row.tick,
+        severity: row.severity,
+        timestamp: row.timestamp,
+      };
+    });
+  }
+
   clear(countryId: EntityId): void {
     this.fallback.clear(countryId);
 
     void this.client.from('agent_decisions').delete().eq('country_id', countryId);
     void this.client.from('agent_episodes').delete().eq('country_id', countryId);
+    void this.client.from('agent_grievances').delete().eq('country_id', countryId);
   }
 }

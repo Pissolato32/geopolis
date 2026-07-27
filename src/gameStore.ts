@@ -7,11 +7,24 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { Country, DiplomaticPosture, GameEvent, MarketPrice, PlayerPolicy, Relationship, Unit, UnitType, WorldSeed } from "./shared/types.js";
+import { reportError, safePersist } from "./errors.js";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  reportError(new Error("Missing Supabase environment configuration"), {
+    category: "persistence",
+    severity: "critical",
+    source: "gameStore.init",
+    userMessage: "The game database is not configured. Progress will not be saved.",
+  });
+}
+
+export const supabase = createClient(
+  SUPABASE_URL ?? "http://localhost:54321",
+  SUPABASE_ANON_KEY ?? "dummy-key",
+);
 
 const GAME_NAME = "Modern World 2026";
 
@@ -86,37 +99,49 @@ export async function loadOrSeedWorld(seed: WorldSeed): Promise<PersistedWorld> 
 
 /** Persist a new event to the events table. */
 export async function persistEvent(gameId: string, evt: GameEvent): Promise<void> {
-  await supabase.from("events").insert({
-    game_id: gameId,
-    type: evt.type,
-    at: evt.at,
-    payload: evt as unknown as Record<string, unknown>,
-  });
+  await safePersist(async () => {
+    const { error } = await supabase.from("events").insert({
+      game_id: gameId,
+      type: evt.type,
+      at: evt.at,
+      payload: evt as unknown as Record<string, unknown>,
+    });
+    if (error) throw new Error(`persistEvent: ${error.message}`);
+  }, "gameStore.persistEvent");
 }
 
 /** Update a unit's position (after a move-unit intent). */
 export async function persistUnitMove(gameId: string, unitId: string, lat: number, lng: number): Promise<void> {
-  await supabase
-    .from("units")
-    .update({ lat, lng })
-    .eq("game_id", gameId)
-    .eq("id", unitId);
+  await safePersist(async () => {
+    const { error } = await supabase
+      .from("units")
+      .update({ lat, lng })
+      .eq("game_id", gameId)
+      .eq("id", unitId);
+    if (error) throw new Error(`persistUnitMove: ${error.message}`);
+  }, "gameStore.persistUnitMove");
 }
 
 /** Delete a unit (after a disband-unit intent). */
 export async function persistUnitDisband(gameId: string, unitId: string): Promise<void> {
-  await supabase.from("units").delete().eq("game_id", gameId).eq("id", unitId);
+  await safePersist(async () => {
+    const { error } = await supabase.from("units").delete().eq("game_id", gameId).eq("id", unitId);
+    if (error) throw new Error(`persistUnitDisband: ${error.message}`);
+  }, "gameStore.persistUnitDisband");
 }
 
 /** Overwrite market prices (after a market tick). */
 export async function persistMarket(gameId: string, market: MarketPrice[]): Promise<void> {
-  for (const p of market) {
-    await supabase
-      .from("market_prices")
-      .update({ price: p.price, delta: p.delta })
-      .eq("game_id", gameId)
-      .eq("resource", p.resource);
-  }
+  await safePersist(async () => {
+    for (const p of market) {
+      const { error } = await supabase
+        .from("market_prices")
+        .update({ price: p.price, delta: p.delta })
+        .eq("game_id", gameId)
+        .eq("resource", p.resource);
+      if (error) throw new Error(`persistMarket: ${error.message}`);
+    }
+  }, "gameStore.persistMarket");
 }
 
 /** Persist a player policy change (tax rate, readiness, or posture). */
@@ -130,12 +155,14 @@ export async function persistPlayerPolicy(
   if (patch.readiness !== undefined) update.readiness = patch.readiness;
   if (patch.posture !== undefined) update.posture = patch.posture;
   if (Object.keys(update).length === 0) return;
-  const { error } = await supabase
-    .from("countries")
-    .update(update)
-    .eq("game_id", gameId)
-    .eq("code", countryCode);
-  if (error) console.warn("[store] persistPlayerPolicy", error.message);
+  await safePersist(async () => {
+    const { error } = await supabase
+      .from("countries")
+      .update(update)
+      .eq("game_id", gameId)
+      .eq("code", countryCode);
+    if (error) throw new Error(`persistPlayerPolicy: ${error.message}`);
+  }, "gameStore.persistPlayerPolicy");
 }
 
 /** Persist the results of a simulation turn: country stats, relationships, surviving units, and the tick counter. */
@@ -145,58 +172,66 @@ export async function persistTurnResults(
   countries: Country[],
   units: Unit[]
 ): Promise<void> {
-  // 1. advance the tick counter
-  await supabase.from("games").update({ current_tick: tick }).eq("id", gameId);
+  await safePersist(async () => {
+    // 1. advance the tick counter
+    const { error: tickErr } = await supabase.from("games").update({ current_tick: tick }).eq("id", gameId);
+    if (tickErr) throw new Error(`persistTurnResults.tick: ${tickErr.message}`);
 
-  // 2. update country economy + military stats (batch upserts)
-  const BATCH = 50;
-  for (let i = 0; i < countries.length; i += BATCH) {
-    const chunk = countries.slice(i, i + BATCH);
-    await Promise.all(
-      chunk.map((c) =>
-        supabase
-          .from("countries")
-          .update({
-            gdp: c.economy.gdp,
-            treasury: c.economy.treasury,
-            stability: c.economy.stability,
-            readiness: c.military.readiness,
-            morale: c.military.morale,
-          })
+    // 2. update country economy + military stats (batch upserts)
+    const BATCH = 50;
+    for (let i = 0; i < countries.length; i += BATCH) {
+      const chunk = countries.slice(i, i + BATCH);
+      await Promise.all(
+        chunk.map(async (c) => {
+          const { error } = await supabase
+            .from("countries")
+            .update({
+              gdp: c.economy.gdp,
+              treasury: c.economy.treasury,
+              stability: c.economy.stability,
+              readiness: c.military.readiness,
+              morale: c.military.morale,
+            })
+            .eq("game_id", gameId)
+            .eq("code", c.id);
+          if (error) throw new Error(`persistTurnResults.country[${c.id}]: ${error.message}`);
+        })
+      );
+    }
+
+    // 3. update relationships (only countries that have them)
+    const countriesWithRels = countries.filter((c) => c.relationships.length > 0);
+    for (const c of countriesWithRels) {
+      for (const r of c.relationships) {
+        const { error } = await supabase
+          .from("relationships")
+          .update({ affinity: r.affinity, tension: r.tension })
           .eq("game_id", gameId)
-          .eq("code", c.id)
-      )
-    );
-  }
+          .eq("country_code", c.id)
+          .eq("counterpart_code", r.countryCode);
+        if (error) throw new Error(`persistTurnResults.rel[${c.id}->${r.countryCode}]: ${error.message}`);
+      }
+    }
 
-  // 3. update relationships (only countries that have them)
-  const countriesWithRels = countries.filter((c) => c.relationships.length > 0);
-  for (const c of countriesWithRels) {
-    for (const r of c.relationships) {
-      await supabase
-        .from("relationships")
-        .update({ affinity: r.affinity, tension: r.tension })
+    // 4. reconcile units: delete units no longer in the roster, update survivors
+    const survivorIds = new Set(units.map((u) => u.id));
+    const { data: dbUnits, error: dbErr } = await supabase.from("units").select("id").eq("game_id", gameId);
+    if (dbErr) throw new Error(`persistTurnResults.fetchUnits: ${dbErr.message}`);
+    for (const dbU of (dbUnits as { id: string }[] | null) ?? []) {
+      if (!survivorIds.has(dbU.id)) {
+        const { error } = await supabase.from("units").delete().eq("game_id", gameId).eq("id", dbU.id);
+        if (error) throw new Error(`persistTurnResults.deleteUnit[${dbU.id}]: ${error.message}`);
+      }
+    }
+    for (const u of units) {
+      const { error } = await supabase
+        .from("units")
+        .update({ readiness: u.readiness, morale: u.morale, lat: u.latlng[0], lng: u.latlng[1] })
         .eq("game_id", gameId)
-        .eq("country_code", c.id)
-        .eq("counterpart_code", r.countryCode);
+        .eq("id", u.id);
+      if (error) throw new Error(`persistTurnResults.updateUnit[${u.id}]: ${error.message}`);
     }
-  }
-
-  // 4. reconcile units: delete units no longer in the roster, update survivors
-  const survivorIds = new Set(units.map((u) => u.id));
-  const { data: dbUnits } = await supabase.from("units").select("id").eq("game_id", gameId);
-  for (const dbU of (dbUnits as { id: string }[] | null) ?? []) {
-    if (!survivorIds.has(dbU.id)) {
-      await supabase.from("units").delete().eq("game_id", gameId).eq("id", dbU.id);
-    }
-  }
-  for (const u of units) {
-    await supabase
-      .from("units")
-      .update({ readiness: u.readiness, morale: u.morale, lat: u.latlng[0], lng: u.latlng[1] })
-      .eq("game_id", gameId)
-      .eq("id", u.id);
-  }
+  }, "gameStore.persistTurnResults");
 }
 
 /** Fetch recent events for the log (last 200). */
@@ -208,7 +243,11 @@ export async function fetchRecentEvents(gameId: string): Promise<GameEvent[]> {
     .order("at", { ascending: false })
     .limit(200);
   if (error) {
-    console.warn("[store] fetchRecentEvents", error.message);
+    reportError(new Error(`fetchRecentEvents: ${error.message}`), {
+      category: "persistence",
+      severity: "warning",
+      source: "gameStore.fetchRecentEvents",
+    });
     return [];
   }
   return ((data as { payload: GameEvent }[] | null) ?? []).map((r) => r.payload).reverse();
@@ -223,7 +262,11 @@ async function findGame(): Promise<GameRow | null> {
     .eq("name", GAME_NAME)
     .maybeSingle();
   if (error) {
-    console.warn("[store] findGame", error.message);
+    reportError(new Error(`findGame: ${error.message}`), {
+      category: "persistence",
+      severity: "warning",
+      source: "gameStore.findGame",
+    });
     return null;
   }
   return (data as GameRow | null) ?? null;

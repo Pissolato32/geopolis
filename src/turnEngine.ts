@@ -195,9 +195,18 @@ export function processTurn(
             affinity: patch.affinity ?? r.affinity,
           };
         });
+        const newEco = d.ecoPatch
+          ? {
+              ...c.economy,
+              taxRate: d.ecoPatch.taxRate ?? c.economy.taxRate,
+              treasury: c.economy.treasury + (d.ecoPatch.treasuryDelta ?? 0),
+              stability: clamp(c.economy.stability + (d.ecoPatch.stabilityDelta ?? 0), 1, 100),
+            }
+          : c.economy;
         updated[idx] = {
           ...c,
           relationships: newRels,
+          economy: newEco,
           military: d.milPatch
             ? {
                 ...c.military,

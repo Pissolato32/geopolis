@@ -8,6 +8,7 @@ import type { Country, GameEvent, IntentResponse, MarketPrice, PlayerPolicy, Str
 import { persistEvent, persistMarket, persistPlayerPolicy, persistTurnResults, persistUnitDisband, persistUnitMove, type PersistedWorld } from "./gameStore.js";
 import { processTurn } from "./turnEngine.js";
 import { selectOptionForPosture } from "./ministerAI.js";
+import { reportError, ApiError, WebSocketError } from "./errors.js";
 
 type EventListener = (evt: GameEvent) => void;
 type IntentListener = (res: IntentResponse) => void;
@@ -16,12 +17,16 @@ type TickListener = (tick: number) => void;
 type PlayerListener = (code: string) => void;
 type SimStateListener = (state: SimState) => void;
 type CabinetCardsListener = (cards: CabinetCard[]) => void;
+export type ConnectionStatus = "connecting" | "live" | "reconnecting" | "offline" | "sim";
+type ConnectionListener = (status: ConnectionStatus) => void;
 
 export type SimSpeed = 0 | 1 | 2 | 5;
 export interface SimState { paused: boolean; speed: SimSpeed; }
 
 const WS_URL = `ws://${location.host}/ws`;
 const BACKEND_PROBE = "/health";
+const MAX_RECONNECT_ATTEMPTS = 5;
+const BASE_RECONNECT_DELAY = 1000;
 
 class GameSocket {
   private ws: WebSocket | null = null;
@@ -29,7 +34,11 @@ class GameSocket {
   private intentListeners = new Set<IntentListener>();
   private unitsListeners = new Set<UnitsListener>();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectAttempts = 0;
   private mode: "unknown" | "live" | "sim" = "unknown";
+  private connectionStatus: ConnectionStatus = "offline";
+  private connectionListeners = new Set<ConnectionListener>();
+  private offlineActionQueue: StrictIntent[] = [];
   private seed: WorldSeed | null = null;
   private gameId: string | null = null;
   private simTimer: ReturnType<typeof setInterval> | null = null;
@@ -65,13 +74,47 @@ class GameSocket {
     if (this.mode === "sim") this.ensureSimRunning();
   }
 
+  /** Get the current connection status for UI indicators. */
+  getConnectionStatus(): ConnectionStatus {
+    return this.connectionStatus;
+  }
+
+  /** Subscribe to connection status changes. */
+  onConnectionChange(l: ConnectionListener): () => void {
+    this.connectionListeners.add(l);
+    l(this.connectionStatus);
+    return () => this.connectionListeners.delete(l);
+  }
+
+  private setConnectionStatus(status: ConnectionStatus): void {
+    if (this.connectionStatus === status) return;
+    this.connectionStatus = status;
+    for (const l of this.connectionListeners) l(status);
+  }
+
+  /** Flush queued actions when back online. */
+  private flushOfflineQueue(): void {
+    if (this.offlineActionQueue.length === 0) return;
+    const queued = this.offlineActionQueue.splice(0);
+    for (const intent of queued) {
+      this.sendIntent(intent);
+    }
+  }
+
   connect(): void {
+    this.setConnectionStatus("connecting");
     fetch(BACKEND_PROBE)
       .then((r) => {
         if (r.ok) this.openWebSocket();
         else this.startSim();
       })
-      .catch(() => this.startSim());
+      .catch(() => {
+        reportError(new Error("Backend unreachable"), {
+          category: "network",
+          source: "gameSocket.connect",
+        });
+        this.startSim();
+      });
   }
 
   getUnits(): Unit[] {
@@ -264,27 +307,63 @@ class GameSocket {
   private openWebSocket(): void {
     this.mode = "live";
     this.stopSim();
+    this.setConnectionStatus("connecting");
     try {
       this.ws = new WebSocket(WS_URL);
-    } catch {
+    } catch (err) {
+      reportError(err, { category: "websocket", source: "gameSocket.openWebSocket" });
       this.startSim();
       return;
     }
-    this.ws.onopen = () => console.info("[ws] connected to game server (live mode)");
+    this.ws.onopen = () => {
+      console.info("[ws] connected to game server (live mode)");
+      this.reconnectAttempts = 0;
+      this.setConnectionStatus("live");
+      this.flushOfflineQueue();
+    };
     this.ws.onmessage = (e) => this.handleMessage(e.data);
-    this.ws.onclose = () => {
-      console.warn("[ws] disconnected; will retry backend");
+    this.ws.onclose = (ev) => {
+      const reason = ev.code !== 1000 ? `code ${ev.code}` : "normal";
+      console.warn(`[ws] disconnected (${reason}); will retry backend`);
+      if (ev.code !== 1000) {
+        reportError(new WebSocketError(`WebSocket closed: ${reason}`), {
+          source: "gameSocket.onclose",
+        });
+      }
+      this.setConnectionStatus("reconnecting");
       this.scheduleReconnect();
     };
-    this.ws.onerror = () => this.ws?.close();
+    this.ws.onerror = () => {
+      reportError(new WebSocketError("WebSocket error"), {
+        source: "gameSocket.onerror",
+      });
+      this.ws?.close();
+    };
   }
 
   private scheduleReconnect() {
     if (this.reconnectTimer) return;
+    if (this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+      console.warn(`[ws] max reconnect attempts (${MAX_RECONNECT_ATTEMPTS}) reached — switching to simulator`);
+      reportError(new Error("Max reconnection attempts reached"), {
+        category: "websocket",
+        severity: "warning",
+        source: "gameSocket.scheduleReconnect",
+        userMessage: "Could not reconnect to the game server after several attempts. Running in offline mode.",
+      });
+      this.startSim();
+      return;
+    }
+    const attempt = this.reconnectAttempts;
+    const delay = Math.min(
+      BASE_RECONNECT_DELAY * Math.pow(2, attempt) + Math.random() * 500,
+      30000,
+    );
+    this.reconnectAttempts++;
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       this.connect();
-    }, 3000);
+    }, delay);
   }
 
   private handleMessage(raw: unknown) {
@@ -292,6 +371,11 @@ class GameSocket {
     try {
       msg = JSON.parse(typeof raw === "string" ? raw : raw as string);
     } catch {
+      reportError(new Error("Received unparseable WebSocket message"), {
+        category: "websocket",
+        severity: "warning",
+        source: "gameSocket.handleMessage",
+      });
       return;
     }
     if (typeof msg !== "object" || msg === null) return;
@@ -319,6 +403,17 @@ class GameSocket {
   }
 
   sendIntent(intent: StrictIntent): void {
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      this.offlineActionQueue.push(intent);
+      reportError(new Error("Action queued while offline"), {
+        category: "offline",
+        severity: "info",
+        source: "gameSocket.sendIntent",
+        userMessage: "You're offline. Your action will be sent when you reconnect.",
+      });
+      return;
+    }
+
     console.log("[intent] dispatch payload:", JSON.stringify(intent, null, 2));
 
     // Policy intents are handled locally (they modify the player's own nation)
@@ -375,7 +470,12 @@ class GameSocket {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(intent),
       });
-      if (!r.ok) return;
+      if (!r.ok) {
+        reportError(new ApiError(`Action rejected: ${r.status}`, r.status, "/api/v1/action"), {
+          source: "gameSocket.postAction",
+        });
+        return;
+      }
       const res = (await r.json()) as IntentResponse;
       for (const l of this.intentListeners) l(res);
       if (res.ok) {
@@ -383,9 +483,20 @@ class GameSocket {
           this.emit(evt);
           if (this.gameId) void persistEvent(this.gameId, evt);
         }
+      } else if (res.error) {
+        reportError(new Error(res.error), {
+          category: "api",
+          severity: "warning",
+          source: "gameSocket.postAction",
+          userMessage: res.error,
+        });
       }
-    } catch {
-      // network failed — fall back to local simulation
+    } catch (err) {
+      reportError(err, {
+        category: "network",
+        source: "gameSocket.postAction",
+        userMessage: "Could not send your action to the server. Processing locally instead.",
+      });
       const res = simulateIntent(intent, this.seed, this.units);
       for (const l of this.intentListeners) l(res);
     }
@@ -398,8 +509,17 @@ class GameSocket {
     if (this.mode !== "live") return false;
     try {
       const r = await fetch("/api/v1/tick", { method: "POST" });
+      if (!r.ok) {
+        reportError(new ApiError(`Tick failed: ${r.status}`, r.status, "/api/v1/tick"), {
+          source: "gameSocket.postServerTick",
+        });
+      }
       return r.ok;
-    } catch {
+    } catch (err) {
+      reportError(err, {
+        category: "network",
+        source: "gameSocket.postServerTick",
+      });
       return false;
     }
   }
@@ -537,6 +657,7 @@ class GameSocket {
     this.mode = "sim";
     this.ws = null;
     console.info("[ws] backend not reachable — running in-browser simulator");
+    this.setConnectionStatus("sim");
     this.ensureSimRunning();
   }
 
@@ -585,7 +706,7 @@ class GameSocket {
     try {
       if (this.mode === "live") {
         const ok = await this.postServerTick();
-        if (ok) return; // events will arrive over WS
+        if (ok) return;
       }
       const nextTick = this.currentTick + 1;
       const result = processTurn(this.countries, this.units, nextTick, this.playerCode);
@@ -594,10 +715,8 @@ class GameSocket {
       this.currentTick = nextTick;
       this.broadcastUnits();
       this.broadcastTick();
-      // queue any cabinet cards for the player
       this.pendingCabinetCards = result.cabinetCards;
       this.broadcastCabinetCards();
-      // emit events with a small stagger so the log feels alive
       for (let i = 0; i < result.events.length; i++) {
         const evt = result.events[i];
         setTimeout(() => {
@@ -605,10 +724,16 @@ class GameSocket {
           if (this.gameId) void persistEvent(this.gameId, evt);
         }, i * 60);
       }
-      // persist the mutated state
       if (this.gameId) {
         void persistTurnResults(this.gameId, nextTick, result.countries, result.units);
       }
+    } catch (err) {
+      reportError(err, {
+        category: "api",
+        severity: "critical",
+        source: "gameSocket.advanceTurn",
+        userMessage: "The simulation turn could not be completed. Your world state is intact.",
+      });
     } finally {
       this.turnInProgress = false;
     }

@@ -124,6 +124,8 @@ export interface AIDecision {
   relPatches: Map<string, { tension?: number; affinity?: number }>;
   /** Patches to apply to the acting nation's military stats. */
   milPatch?: { readiness?: number; morale?: number };
+  /** Patches to apply to the acting nation's economic stats. */
+  ecoPatch?: { taxRate?: number; treasuryDelta?: number; stabilityDelta?: number };
 }
 
 /** Run the AI director for one turn. Evaluates a random subset of non-player
@@ -418,6 +420,62 @@ function evaluateDiplomacy(
         ]),
       };
     }
+  }
+
+  // ---- Scenario F: Treasury in deficit → austerity measures ------------------
+  if (c.economy.treasury < 0 && Math.random() < 0.5) {
+    return {
+      events: [
+        {
+          type: "ai.decision",
+          at: atStr,
+          tick,
+          country: c.id,
+          action: "implement austerity measures",
+          rationale: "national treasury in deficit — spending cuts required",
+        },
+      ],
+      relPatches: new Map(),
+      ecoPatch: { treasuryDelta: 400, stabilityDelta: -8 },
+    };
+  }
+
+  // ---- Scenario G: High stability + low tax rate → raise taxes --------------
+  if (c.economy.stability >= 65 && c.economy.taxRate < 0.25 && Math.random() < 0.3) {
+    const newRate = Math.min(0.45, c.economy.taxRate + 0.05);
+    return {
+      events: [
+        {
+          type: "ai.decision",
+          at: atStr,
+          tick,
+          country: c.id,
+          action: `raise tax rate to ${(newRate * 100).toFixed(0)}%`,
+          rationale: "strong domestic stability permits revenue increase",
+        },
+      ],
+      relPatches: new Map(),
+      ecoPatch: { taxRate: newRate, stabilityDelta: -3 },
+    };
+  }
+
+  // ---- Scenario H: Low stability + high tax rate → cut taxes ---------------
+  if (c.economy.stability < 40 && c.economy.taxRate > 0.3 && Math.random() < 0.4) {
+    const newRate = Math.max(0.05, c.economy.taxRate - 0.05);
+    return {
+      events: [
+        {
+          type: "ai.decision",
+          at: atStr,
+          tick,
+          country: c.id,
+          action: `cut tax rate to ${(newRate * 100).toFixed(0)}%`,
+          rationale: "low stability — tax relief to restore public confidence",
+        },
+      ],
+      relPatches: new Map(),
+      ecoPatch: { taxRate: newRate, stabilityDelta: 5 },
+    };
   }
 
   return null;

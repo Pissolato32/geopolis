@@ -32,6 +32,13 @@ import {
   DIPLOMATIC_RELATION_TYPE,
 } from '../domain/diplomacy/components/relation.component.js';
 import {
+  ECONOMY_TRADE_ROUTE_TYPE,
+  TradeRouteComponent,
+} from '../domain/economy/components/trade.components.js';
+import {
+  MapTradeRouteDTO,
+} from '../core/interfaces/dto/map-view.dto.interface.js';
+import {
   MapViewDTO,
   MapEntityDTO,
   MapConflictDTO,
@@ -579,6 +586,7 @@ export class APIGatewayRouter {
     const metadata = worldState.getMetadata();
 
     const entities: MapEntityDTO[] = [];
+    const activeTradeRoutes: MapTradeRouteDTO[] = [];
     const activeConflicts: MapConflictDTO[] = [];
 
     for (const eid of worldState.getEntityIds()) {
@@ -631,13 +639,22 @@ export class APIGatewayRouter {
           region: String(eid),
         });
       }
+
+      const tradeRoute = entity.getComponent(ECONOMY_TRADE_ROUTE_TYPE) as TradeRouteComponent | undefined;
+      if (tradeRoute && tradeRoute.isActive) {
+        activeTradeRoutes.push({
+          source: tradeRoute.sourceCountryId,
+          target: tradeRoute.targetCountryId,
+          volume: tradeRoute.volumePerTick,
+        });
+      }
     }
 
     const dto: MapViewDTO = {
       tick: metadata.currentTick,
       scenarioId: metadata.scenarioId,
       entities,
-      activeTradeRoutes: [],
+      activeTradeRoutes,
       activeConflicts,
     };
 

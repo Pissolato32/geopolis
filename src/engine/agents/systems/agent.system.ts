@@ -10,10 +10,11 @@ import { StrictIntentParser } from '../parser/strict-intent-parser.js';
 import { ILlmProvider } from '../llm/llm-provider.interface.js';
 import { HeuristicAgentProvider, IHeuristicContext } from '../llm/heuristic.provider.js';
 import { GoalManager } from '../goal-manager.js';
-import { ECONOMIC_INDICATOR_TYPE, RESOURCE_PRODUCTION_TYPE } from '../../domain/economy/components/economy.components.js';
+import { ECONOMIC_INDICATOR_TYPE, RESOURCE_PRODUCTION_TYPE, EconomicIndicatorComponent } from '../../domain/economy/components/economy.components.js';
 import { GOVERNMENT_STABILITY_TYPE } from '../../domain/politics/components/politics.components.js';
 import { DIPLOMATIC_RELATION_TYPE } from '../../domain/diplomacy/components/relation.component.js';
 import { INTELLIGENCE_AGENCY_TYPE, IntelligenceAgencyComponent } from '../../domain/intelligence/components/intelligence.components.js';
+import { IDoctrine, DoctrineType, DOCTRINES, assignDoctrinesByGdp } from '../doctrines.js';
 
 export const AGENT_SYSTEM_ID = 'agent.evaluator';
 
@@ -21,6 +22,7 @@ interface IAgentRecord {
   countryId: EntityId;
   memory: AgentMemory;
   goalManager: GoalManager;
+  doctrine: IDoctrine | undefined;
 }
 
 export interface IAgentSystemConfig {
@@ -31,6 +33,8 @@ export interface IAgentSystemConfig {
   readonly memoryStore?: IAgentMemoryStore;
   /** Intel level for perception filter (0.0-1.0). Lower = more fog-of-war distortion. */
   readonly defaultIntelLevel?: number;
+  /** Manual doctrine assignments. If not provided, doctrines are auto-assigned by GDP. */
+  readonly doctrineAssignments?: Map<EntityId, DoctrineType>;
 }
 
 export class AgentSystem implements ISystem {
@@ -39,7 +43,12 @@ export class AgentSystem implements ISystem {
     name: 'Agent Evaluator System',
     priority: 40 as SystemPriority,
     requiredComponents: [],
-    subscribedEvents: [],
+    subscribedEvents: [
+      'economy.sanction-imposed',
+      'diplomacy.treaty-signed',
+      'diplomacy.treaty-broken',
+      'war.declared',
+    ],
     emittedEvents: [],
   };
 
@@ -50,6 +59,8 @@ export class AgentSystem implements ISystem {
   private readonly personality: Partial<IAgentPersonality> | undefined;
   private readonly memoryStore: IAgentMemoryStore;
   private readonly defaultIntelLevel: number;
+  private readonly manualDoctrines: Map<EntityId, DoctrineType> | undefined;
+  private doctrineAssignments: Map<EntityId, DoctrineType> | undefined;
 
   constructor(config: IAgentSystemConfig = {}) {
     this.provider = config.provider;
@@ -57,6 +68,7 @@ export class AgentSystem implements ISystem {
     this.personality = config.personality;
     this.memoryStore = config.memoryStore ?? new InMemoryAgentMemoryStore();
     this.defaultIntelLevel = config.defaultIntelLevel ?? 1.0;
+    this.manualDoctrines = config.doctrineAssignments;
 
     if (config.controlledEntities) {
       for (const id of config.controlledEntities) {
@@ -65,29 +77,114 @@ export class AgentSystem implements ISystem {
     }
   }
 
-  private registerAgent(id: EntityId): IAgentRecord {
+  private registerAgent(id: EntityId, doctrine?: IDoctrine): IAgentRecord {
     const fullPersonality: IAgentPersonality = {
-      aggressiveness: this.personality?.aggressiveness ?? 0.5,
-      riskTolerance: this.personality?.riskTolerance ?? 0.5,
-      trustPropensity: this.personality?.trustPropensity ?? 0.5,
+      aggressiveness: doctrine?.personality.aggressiveness ?? this.personality?.aggressiveness ?? 0.5,
+      riskTolerance: doctrine?.personality.riskTolerance ?? this.personality?.riskTolerance ?? 0.5,
+      trustPropensity: doctrine?.personality.trustPropensity ?? this.personality?.trustPropensity ?? 0.5,
     };
     const memory = new AgentMemory(id, this.personality, this.memoryStore);
     const goalManager = new GoalManager(id, fullPersonality);
-    const record: IAgentRecord = { countryId: id, memory, goalManager };
+
+    if (doctrine) {
+      for (const goal of doctrine.goals) {
+        goalManager.addGoal({
+          goalId: `${id}-doctrine-goal-${goal.priority}`,
+          description: goal.description,
+          priority: goal.priority,
+        }, 0);
+      }
+    }
+
+    const record: IAgentRecord = { countryId: id, memory, goalManager, doctrine };
     this.agents.push(record);
     return record;
+  }
+
+  initialize(eventBus: IEventBus, _worldState?: IWorldState): void {
+    this.bindGrievanceListeners(eventBus);
+  }
+
+  private bindGrievanceListeners(eventBus: IEventBus): void {
+    eventBus.subscribe('economy.sanction-imposed', (event) => {
+      const payload = event.payload as Record<string, unknown> | undefined;
+      const targetId = payload?.['targetCountryId'] as EntityId | undefined;
+      const sourceId = payload?.['sourceCountryId'] as EntityId | undefined;
+      if (!targetId || !sourceId) return;
+      const agent = this.agents.find((a) => a.countryId === targetId);
+      if (!agent) return;
+      agent.memory.recordGrievance(
+        sourceId,
+        'active-sanction',
+        `Sanction imposed by ${sourceId}: ${payload?.['sanctionType'] ?? 'unknown'}`,
+        event.tick ?? 0,
+        0.6,
+      );
+    });
+
+    eventBus.subscribe('war.declared', (event) => {
+      const payload = event.payload as Record<string, unknown> | undefined;
+      const targetId = payload?.['targetId'] as EntityId | undefined;
+      const aggressorId = payload?.['aggressorId'] as EntityId | undefined;
+      if (!targetId || !aggressorId) return;
+      const agent = this.agents.find((a) => a.countryId === targetId);
+      if (!agent) return;
+      agent.memory.recordGrievance(
+        aggressorId,
+        'unprovoked-threat',
+        `War declared by ${aggressorId}: ${payload?.['reason'] ?? 'unprovoked aggression'}`,
+        (payload?.['tick'] as number) ?? 0,
+        0.8,
+      );
+    });
   }
 
   discoverAgents(state: Readonly<IWorldState>): void {
     const existing = new Set(this.agents.map((a) => a.countryId));
     const countries = state.getEntitiesByComponent(ECONOMIC_INDICATOR_TYPE);
 
+    // Auto-assign doctrines by GDP if not manually set
+    if (!this.doctrineAssignments) {
+      if (this.manualDoctrines) {
+        this.doctrineAssignments = this.manualDoctrines;
+      } else {
+        const gdpRanking = new Map<EntityId, number>();
+        for (const entity of countries) {
+          const econ = entity.getComponent(ECONOMIC_INDICATOR_TYPE) as EconomicIndicatorComponent | undefined;
+          if (econ) {
+            gdpRanking.set(entity.id, Number(econ.gdp));
+          }
+        }
+        this.doctrineAssignments = assignDoctrinesByGdp(
+          [...countries.map((c) => c.id)],
+          gdpRanking,
+        );
+      }
+    }
+
     for (const entity of countries) {
       if (!existing.has(entity.id)) {
-        this.registerAgent(entity.id);
+        const doctrineType = this.doctrineAssignments.get(entity.id);
+        const doctrine = doctrineType ? DOCTRINES[doctrineType] : undefined;
+        if (doctrineType && doctrine) {
+          this.registerAgent(entity.id, doctrine);
+        } else {
+          this.registerAgent(entity.id);
+        }
         existing.add(entity.id);
       }
     }
+  }
+
+  /** Get the doctrine assigned to a country. */
+  getDoctrineForCountry(countryId: EntityId): IDoctrine | undefined {
+    const agent = this.agents.find((a) => a.countryId === countryId);
+    return agent?.doctrine;
+  }
+
+  /** Get all doctrine assignments. */
+  getDoctrineAssignments(): ReadonlyMap<EntityId, DoctrineType> | undefined {
+    return this.doctrineAssignments;
   }
 
   getAgentCount(): number {
@@ -157,11 +254,20 @@ export class AgentSystem implements ISystem {
       ? goals.slice(0, 5).map((g) => `- [P${g.priority}] ${g.description}`).join('\n')
       : 'Maintain stability and prosperity';
 
+    const doctrineSection = agent.doctrine
+      ? `GEOPOLITICAL DOCTRINE: ${agent.doctrine.name}\n${agent.doctrine.description}\n\nPreferred actions: ${agent.doctrine.preferredActions.join(', ')}\nAvoid: ${agent.doctrine.avoidedActions.join(', ')}\n`
+      : '';
+
+    const grievanceSummary = agent.memory.getGrievanceSummary();
+
     return `You are the autonomous political leader of ${agent.countryId}.
 ${agent.memory.getPersonalityProfile()}
 
+${doctrineSection}
 ACTIVE STRATEGIC GOALS (priority order):
 ${goalList}
+
+${grievanceSummary}
 
 You must respond with a single JSON action payload wrapped in a \`\`\`json code block.
 The payload must contain: actionType, actorEntityId, parameters, and narrativeSummary.
@@ -179,7 +285,9 @@ Choose from these action types:
 - war.move-ordered
 - war.request-peace
 - military.set-supply-source
-- military.order-garrison`;
+- military.order-garrison
+- resolve-cabinet-card
+- intelligence.gather`;
   }
 
   private collectHeuristicContext(
@@ -255,16 +363,20 @@ Choose from these action types:
       ? recentDecisions.map((d) => `  - Tick ${d.tick}: ${d.narrativeSummary}`).join('\n')
       : '  (no prior decisions)';
 
+    const grievanceSummary = agent.memory.getGrievanceSummary();
+
     return `TICK: ${tick}
 ACTIVE GOALS: ${goalStr}
 
 RECENT DECISIONS:
 ${historyStr}
 
+${grievanceSummary}
+
 PERCEIVED WORLD STATE (YAML):
 ${perceptionDump}
 
-Based on your personality and goals, formulate your strategic decision for this tick.
+Based on your personality, doctrine, and historical grievances, formulate your strategic decision for this tick.
 Return a JSON action payload in a \`\`\`json code block.`;
   }
 }

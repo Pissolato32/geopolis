@@ -1,6 +1,6 @@
 import { EntityId } from '../../core/interfaces/entity.interface.js';
 import { ITimeline, ITimelineEntry } from '../../core/interfaces/timeline.interface.js';
-import { IAgentMemoryStore, IAgentDecision, IAgentEpisode } from './memory-store.interface.js';
+import { IAgentMemoryStore, IAgentDecision, IAgentEpisode, IAgentGrievance, GrievanceType, IGrievanceFilter } from './memory-store.interface.js';
 import { InMemoryAgentMemoryStore } from './in-memory-memory-store.js';
 
 export interface IAgentPersonality {
@@ -128,6 +128,94 @@ export class AgentMemory {
     const result = this.store.queryEpisodes({ countryId: this.countryId, sinceTick, limit });
     if (Array.isArray(result)) return result;
     return [];
+  }
+
+  /** Record a historical grievance against a perpetrator nation.
+   *  Grievances include broken treaties, active sanctions, and unprovoked threats. */
+  public recordGrievance(
+    perpetratorId: EntityId,
+    grievanceType: GrievanceType,
+    description: string,
+    tick: number,
+    severity: number = 0.5,
+  ): void {
+    const grievance: IAgentGrievance = {
+      grievanceId: `grievance-${this.countryId}-${perpetratorId}-${grievanceType}-${tick}`,
+      countryId: this.countryId,
+      perpetratorId,
+      grievanceType,
+      description,
+      tick,
+      severity: Math.max(0, Math.min(1, severity)),
+      timestamp: Date.now(),
+    };
+    this.store.saveGrievance(this.countryId, grievance);
+  }
+
+  /** Get all grievances this nation holds, optionally filtered by perpetrator. */
+  public getGrievances(perpetratorId?: EntityId): readonly IAgentGrievance[] {
+    const filter: IGrievanceFilter = {
+      countryId: this.countryId,
+      perpetratorId,
+      limit: 100,
+    };
+    const result = this.store.getGrievances(filter);
+    if (Array.isArray(result)) return result;
+    return [];
+  }
+
+  /** Get grievances against a specific perpetrator, sorted by severity (most severe first). */
+  public getGrievancesAgainst(perpetratorId: EntityId): readonly IAgentGrievance[] {
+    const all = this.getGrievances(perpetratorId);
+    return [...all].sort((a, b) => b.severity - a.severity);
+  }
+
+  /** Calculate the distrust penalty for a given perpetrator based on
+n   *  accumulated grievances. Returns a value from 0 (no penalty) to -50.
+   *  Each grievance contributes a penalty proportional to its severity:
+   *    - broken-treaty:  severity * 50
+   *    - betrayal:       severity * 50
+   *    - active-sanction: severity * 35
+   *    - unprovoked-threat: severity * 25
+   *  Multiple grievances stack, capped at -50 total. */
+  public getDistrustPenalty(perpetratorId: EntityId): number {
+    const grievances = this.getGrievancesAgainst(perpetratorId);
+    if (grievances.length === 0) return 0;
+
+    let totalPenalty = 0;
+    for (const g of grievances) {
+      const basePenalty: Record<GrievanceType, number> = {
+        'broken-treaty': 50,
+        'betrayal': 50,
+        'active-sanction': 35,
+        'unprovoked-threat': 25,
+      };
+      totalPenalty += g.severity * basePenalty[g.grievanceType]!;
+    }
+
+    // Clamp to -50 maximum distrust penalty
+    return Math.max(-50, -totalPenalty);
+  }
+
+  /** Get a human-readable summary of grievances for prompt construction. */
+  public getGrievanceSummary(): string {
+    const grievances = this.getGrievances();
+    if (grievances.length === 0) return 'No recorded grievances.';
+
+    const byPerpetrator = new Map<EntityId, IAgentGrievance[]>();
+    for (const g of grievances) {
+      const list = byPerpetrator.get(g.perpetratorId) ?? [];
+      list.push(g);
+      byPerpetrator.set(g.perpetratorId, list);
+    }
+
+    const lines: string[] = ['Historical Grievances:'];
+    for (const [perp, list] of byPerpetrator) {
+      const distrust = this.getDistrustPenalty(perp);
+      const types = list.map((g) => g.grievanceType).join(', ');
+      lines.push(`  - ${perp}: ${list.length} grievance(s) [${types}] → distrust penalty: ${distrust} affinity`);
+    }
+    return lines.join('\n');
   }
 
   private dominantActionType(types: readonly string[]): string {

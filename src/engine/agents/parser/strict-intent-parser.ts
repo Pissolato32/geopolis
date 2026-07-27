@@ -101,6 +101,15 @@ export class StrictIntentParser implements IIntentParser {
           errors.push('establish-trade-route requires positive volumePerTick');
         }
         break;
+      case 'resolve-cabinet-card':
+        if (!params['cardId']) errors.push('resolve-cabinet-card requires cardId parameter');
+        if (typeof params['delegated'] !== 'boolean') {
+          errors.push('resolve-cabinet-card requires delegated boolean parameter');
+        }
+        break;
+      case 'intelligence.gather':
+        if (!params['targetCountryId']) errors.push('gather requires targetCountryId parameter');
+        break;
       case 'economy.close-trade-route':
         if (!params['routeId']) errors.push('close-trade-route requires routeId');
         break;

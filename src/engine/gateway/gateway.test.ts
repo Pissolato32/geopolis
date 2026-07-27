@@ -258,4 +258,23 @@ describe('Phase 5: API Gateway & Headless Exposure (ADR-001 / ADR-002)', () => {
     expect(ru!.economicStatus).toBe('stable');
     expect(data.activeConflicts.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('should include active trade routes in map view data', async () => {
+    const { engine, worldState } = createEngine();
+    const router = new APIGatewayRouter({ engine });
+
+    worldState.createEntity('country-de' as EntityId, [
+      { type: 'geo.position', lat: 52, lng: 13 } as never,
+      { type: 'economy.indicator', gdp: 4000n, inflationRate: 0.02, treasury: 800n, taxRate: 0.2 } as never,
+      { type: 'economy.trade-route', sourceCountryId: 'country-de' as EntityId, targetCountryId: 'country-us' as EntityId, resourceType: 'industrial', volumePerTick: 50, isActive: true, establishedTick: 0, blockadeLevel: 0 } as never,
+    ]);
+
+    const response = await router.dispatch({ path: '/api/v1/map', method: 'GET' });
+    const data = response.data as MapViewDTO;
+    const tradeRoute = data.activeTradeRoutes.find(
+      (r) => r.source === 'country-de' && r.target === 'country-us',
+    );
+    expect(tradeRoute).toBeDefined();
+    expect(tradeRoute!.volume).toBe(50);
+  });
 });
