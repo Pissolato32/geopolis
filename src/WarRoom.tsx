@@ -17,7 +17,6 @@ interface WarRoomProps {
 interface ConflictData {
   id: string;
   belligerents: string[];
-  alliedBlocs: string[];
   attackerId: string;
   defenderId: string;
   attackerWins: number;
@@ -25,7 +24,6 @@ interface ConflictData {
   totalEngagements: number;
   attackerCasualties: number;
   defenderCasualties: number;
-  lastTick: number;
 }
 
 function getCountryName(seed: WorldSeed, code: string): string {
@@ -38,7 +36,6 @@ function getCountryFlag(seed: WorldSeed, code: string): string {
 }
 
 export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }: WarRoomProps) {
-  // Parse combat-resolved events to build conflict list
   const conflicts = useMemo(() => {
     const combatEvents = events.filter((e) => e.type === "war.combat-resolved");
     const conflictMap = new Map<string, ConflictData>();
@@ -56,7 +53,6 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
         conflictMap.set(pairId, {
           id: pairId,
           belligerents: [attackerId, defenderId],
-          alliedBlocs: [],
           attackerId,
           defenderId,
           attackerWins: 0,
@@ -64,7 +60,6 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
           totalEngagements: 0,
           attackerCasualties: 0,
           defenderCasualties: 0,
-          lastTick: 0,
         });
       }
 
@@ -82,19 +77,11 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
     return Array.from(conflictMap.values()).sort((a, b) => b.totalEngagements - a.totalEngagements);
   }, [events]);
 
-  // Mask casualty numbers based on intel level
   function maskCasualties(casualties: number): string {
     if (casualties === 0) return "None reported";
     if (intelLevel >= 0.9) return casualties.toLocaleString();
-    if (intelLevel >= 0.6) {
-      // Approximate to nearest 100
-      return `~${Math.round(casualties / 100) * 100}`;
-    }
-    if (intelLevel >= 0.3) {
-      // Approximate to nearest 500
-      return `~${Math.round(casualties / 500) * 500}`;
-    }
-    // Very low intel — just show a vague category
+    if (intelLevel >= 0.6) return `~${Math.round(casualties / 100) * 100}`;
+    if (intelLevel >= 0.3) return `~${Math.round(casualties / 500) * 500}`;
     if (casualties < 500) return "Light";
     if (casualties < 2000) return "Moderate";
     return "Heavy";
@@ -103,129 +90,122 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-3xl max-h-[80vh] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+    <div className="war-room-overlay" onClick={onClose}>
+      <div className="war-room-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-6 py-4 backdrop-blur">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⚔️</span>
-            <h2 className="text-xl font-bold text-slate-100">War Room — Active Conflicts</h2>
+        <div className="war-room-header">
+          <div className="war-room-title-group">
+            <span className="war-room-icon">⚔</span>
+            <h2 className="war-room-title">War Room — Active Conflicts</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
-          >
-            Close
+          <button className="war-room-close" onClick={onClose} aria-label="Close">
+            ✕
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="war-room-body">
           {conflicts.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
-              <span className="block text-4xl mb-3">🕊️</span>
-              <p className="text-lg font-medium">No active conflicts</p>
-              <p className="text-sm mt-1">The world is at peace... for now.</p>
+            <div className="war-room-empty">
+              <span className="war-room-empty-icon">🕊</span>
+              <p className="war-room-empty-title">No active conflicts</p>
+              <p className="war-room-empty-sub">The world is at peace... for now.</p>
             </div>
           ) : (
-            conflicts.map((conflict) => {
-              const totalWins = conflict.attackerWins + conflict.defenderWins;
-              const attackerAdvantage = totalWins > 0
-                ? (conflict.attackerWins / totalWins) * 100
-                : 50;
-              const defenderAdvantage = 100 - attackerAdvantage;
+            <div className="war-room-conflict-list">
+              {conflicts.map((conflict) => {
+                const totalWins = conflict.attackerWins + conflict.defenderWins;
+                const attackerAdvantage = totalWins > 0
+                  ? (conflict.attackerWins / totalWins) * 100
+                  : 50;
+                const defenderAdvantage = 100 - attackerAdvantage;
+                const attackerFlag = getCountryFlag(seed, conflict.attackerId);
+                const defenderFlag = getCountryFlag(seed, conflict.defenderId);
+                const attackerName = conflict.attackerId === playerCode
+                  ? "You"
+                  : getCountryName(seed, conflict.attackerId);
+                const defenderName = conflict.defenderId === playerCode
+                  ? "You"
+                  : getCountryName(seed, conflict.defenderId);
 
-              return (
-                <div
-                  key={conflict.id}
-                  className="rounded-xl border border-slate-700 bg-slate-800/50 p-4 space-y-3"
-                >
-                  {/* Belligerents header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {getCountryFlag(seed, conflict.attackerId) && (
-                        <img
-                          src={getCountryFlag(seed, conflict.attackerId)}
-                          alt=""
-                          className="w-6 h-4 rounded-sm object-cover"
+                return (
+                  <div key={conflict.id} className="war-room-conflict-card">
+                    {/* Belligerents row */}
+                    <div className="war-room-belligerents">
+                      <div className="war-room-belligerent">
+                        {attackerFlag && (
+                          <img src={attackerFlag} alt="" className="war-room-flag" />
+                        )}
+                        <span className="war-room-belligerent-name">{attackerName}</span>
+                      </div>
+                      <span className="war-room-vs">vs</span>
+                      <div className="war-room-belligerent">
+                        {defenderFlag && (
+                          <img src={defenderFlag} alt="" className="war-room-flag" />
+                        )}
+                        <span className="war-room-belligerent-name">{defenderName}</span>
+                      </div>
+                      <span className="war-room-engagements">
+                        {conflict.totalEngagements} engagement{conflict.totalEngagements !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+
+                    {/* Advantage bar */}
+                    <div className="war-room-advantage">
+                      <div className="war-room-advantage-labels">
+                        <span className="war-room-advantage-attacker">
+                          {attackerName}: {Math.round(attackerAdvantage)}%
+                        </span>
+                        <span className="war-room-advantage-defender">
+                          {Math.round(defenderAdvantage)}% :{defenderName}
+                        </span>
+                      </div>
+                      <div className="war-room-bar-track">
+                        <div
+                          className="war-room-bar-attacker"
+                          style={{ width: `${attackerAdvantage}%` }}
                         />
-                      )}
-                      <span className="font-semibold text-slate-200">
-                        {getCountryName(seed, conflict.attackerId)}
-                      </span>
-                      <span className="text-slate-500 text-sm">vs</span>
-                      {getCountryFlag(seed, conflict.defenderId) && (
-                        <img
-                          src={getCountryFlag(seed, conflict.defenderId)}
-                          alt=""
-                          className="w-6 h-4 rounded-sm object-cover"
+                        <div
+                          className="war-room-bar-defender"
+                          style={{ width: `${defenderAdvantage}%` }}
                         />
+                      </div>
+                    </div>
+
+                    {/* Casualties */}
+                    <div className="war-room-casualties">
+                      <div className="war-room-casualty-item">
+                        <span className="war-room-casualty-label">{attackerName} casualties</span>
+                        <span className="war-room-casualty-value">
+                          {maskCasualties(conflict.attackerCasualties)}
+                        </span>
+                      </div>
+                      <div className="war-room-casualty-item">
+                        <span className="war-room-casualty-label">{defenderName} casualties</span>
+                        <span className="war-room-casualty-value">
+                          {maskCasualties(conflict.defenderCasualties)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Intel accuracy indicator */}
+                    <div className="war-room-intel">
+                      <span className="war-room-intel-label">Intel accuracy</span>
+                      <div className="war-room-intel-bar">
+                        <div
+                          className="war-room-intel-fill"
+                          style={{ width: `${intelLevel * 100}%` }}
+                        />
+                      </div>
+                      <span className="war-room-intel-pct">{Math.round(intelLevel * 100)}%</span>
+                      {intelLevel < 0.5 && (
+                        <span className="war-room-intel-warning">Casualty figures are estimates</span>
                       )}
-                      <span className="font-semibold text-slate-200">
-                        {getCountryName(seed, conflict.defenderId)}
-                      </span>
-                    </div>
-                    <span className="text-xs text-slate-500">
-                      {conflict.totalEngagements} engagement{conflict.totalEngagements !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-
-                  {/* Momentum / Advantage bar */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-red-400 font-medium">
-                        {conflict.attackerId === playerCode ? "You" : getCountryName(seed, conflict.attackerId)}
-                        : {Math.round(attackerAdvantage)}%
-                      </span>
-                      <span className="text-blue-400 font-medium">
-                        {Math.round(defenderAdvantage)}% :{conflict.defenderId === playerCode ? "You" : getCountryName(seed, conflict.defenderId)}
-                      </span>
-                    </div>
-                    <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-700">
-                      <div
-                        className="bg-gradient-to-r from-red-600 to-red-500 transition-all duration-500"
-                        style={{ width: `${attackerAdvantage}%` }}
-                      />
-                      <div
-                        className="bg-gradient-to-l from-blue-600 to-blue-500 transition-all duration-500"
-                        style={{ width: `${defenderAdvantage}%` }}
-                      />
                     </div>
                   </div>
-
-                  {/* Casualties (masked by intel) */}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-500">Casualties:</span>
-                      <span className="text-slate-300 font-medium">
-                        {maskCasualties(conflict.attackerCasualties)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-500">Casualties:</span>
-                      <span className="text-slate-300 font-medium">
-                        {maskCasualties(conflict.defenderCasualties)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Intel level indicator */}
-                  <div className="flex items-center gap-2 text-xs text-slate-500 border-t border-slate-700/50 pt-2">
-                    <span>Intel accuracy:</span>
-                    <div className="flex h-1.5 w-24 overflow-hidden rounded-full bg-slate-700">
-                      <div
-                        className="bg-emerald-500 transition-all"
-                        style={{ width: `${intelLevel * 100}%` }}
-                      />
-                    </div>
-                    <span>{Math.round(intelLevel * 100)}%</span>
-                    {intelLevel < 0.5 && (
-                      <span className="text-amber-500 ml-2">⚠ Casualty figures are estimates</span>
-                    )}
-                  </div>
-                </div>
-              );
-            })
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
