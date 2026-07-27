@@ -67,32 +67,32 @@ export function KPIHeaderBar({ briefing }: Props) {
         <div className="kpi-card">
           <span className="kpi-card-label">Popularidade</span>
           <span className="kpi-card-value">{m.popularity}%</span>
-          <TrendBadge value={1.5} />
+          <TrendBadge value={m.trends.popularity} />
         </div>
         <div className="kpi-card">
           <span className="kpi-card-label">PIB</span>
           <span className="kpi-card-value">+{m.gdpGrowth}%</span>
-          <TrendBadge value={0.4} />
+          <TrendBadge value={m.trends.gdpGrowth} />
         </div>
         <div className="kpi-card">
           <span className="kpi-card-label">Inflação</span>
           <span className="kpi-card-value">{m.inflation}%</span>
-          <TrendBadge value={-0.2} invert />
+          <TrendBadge value={m.trends.inflation} invert />
         </div>
         <div className="kpi-card">
           <span className="kpi-card-label">Dívida/PIB</span>
           <span className="kpi-card-value">{m.debtToGdp}%</span>
-          <TrendBadge value={0.3} invert />
+          <TrendBadge value={m.trends.debtToGdp} invert />
         </div>
         <div className="kpi-card">
           <span className="kpi-card-label">Câmbio</span>
           <span className="kpi-card-value">R${m.exchangeRate.toFixed(2)}</span>
-          <TrendBadge value={-0.08} suffix="" invert />
+          <TrendBadge value={m.trends.exchangeRate} suffix="" invert />
         </div>
         <div className="kpi-card">
           <span className="kpi-card-label">Déficit</span>
           <span className="kpi-card-value">{m.deficit}%</span>
-          <TrendBadge value={0.1} invert />
+          <TrendBadge value={m.trends.deficit} invert />
         </div>
       </div>
 

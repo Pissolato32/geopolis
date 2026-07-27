@@ -1,5 +1,7 @@
 // Presidential Briefing data contract — consumed by the Command Center UI.
 
+import type { StrictIntent } from "../shared/types.js";
+
 export interface IPresidentialBriefing {
   header: {
     turn: number;
@@ -52,6 +54,7 @@ export interface IPresidentialBriefing {
       description: string;
       estimatedCost: string;
       projectedImpact: string;
+      intent?: StrictIntent;
     }>;
   }>;
   reservedArchive: Array<{
@@ -69,6 +72,14 @@ export interface IPresidentialBriefing {
     militaryReadiness: { army: number; navy: number; airForce: number };
     exchangeRate: number;
     deficit: number;
+    trends: {
+      popularity: number;
+      gdpGrowth: number;
+      inflation: number;
+      debtToGdp: number;
+      exchangeRate: number;
+      deficit: number;
+    };
   };
 }
 

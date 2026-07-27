@@ -2,7 +2,7 @@
 // data structure so the Briefing Dashboard reflects the actual running simulation
 // instead of hardcoded mock data.
 
-import type { Country, GameEvent, MarketPrice, Relationship, Unit } from "../shared/types.js";
+import type { Country, GameEvent, MarketPrice, Relationship, Unit, StrictIntent } from "../shared/types.js";
 import type { IPresidentialBriefing } from "./briefingTypes.js";
 
 interface BriefingInput {
@@ -59,6 +59,10 @@ function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
 }
 
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
 function eventsForTick(events: GameEvent[], tick: number): GameEvent[] {
   return events.filter((e) => {
     if ("tick" in e && typeof e.tick === "number") return e.tick === tick;
@@ -86,7 +90,7 @@ export function generateBriefing(input: BriefingInput): IPresidentialBriefing {
   const execSummary = buildExecutiveSummary(player, turnEvents, narrativeBeats, tick);
 
   // ---- State Metrics ----
-  const stateMetrics = buildStateMetrics(player, countries);
+  const stateMetrics = buildStateMetrics(player, countries, turnEvents);
 
   // ---- Domain Results ----
   const domainResults = buildDomainResults(player, turnEvents, units, playerCode);
@@ -167,24 +171,27 @@ function buildExecutiveSummary(
   return parts.join(" ");
 }
 
-function buildStateMetrics(player: Country | undefined, countries: Country[]) {
+function buildStateMetrics(player: Country | undefined, countries: Country[], turnEvents: GameEvent[]) {
   if (!player) {
     return {
       escalation: 0, popularity: 0, gdpGrowth: 0, inflation: 0,
       debtToGdp: 0, congressSupport: { senators: 0, deputies: 0 },
       militaryReadiness: { army: 0, navy: 0, airForce: 0 },
       exchangeRate: 0, deficit: 0,
+      trends: { popularity: 0, gdpGrowth: 0, inflation: 0, debtToGdp: 0, exchangeRate: 0, deficit: 0 },
     };
   }
   const globalTension = countries.reduce((sum, c) => {
     const topRel: Relationship[] = topN(c.relationships, (r: Relationship) => r.tension, 3);
     return sum + topRel.reduce((s, r) => s + r.tension, 0) / 3;
-  }, 0) / countries.length;
+  }, 0) / Math.max(countries.length, 1);
   const escalation = clamp(Math.round(globalTension / 20), 0, 5);
   const popularity = clamp(Math.round(player.economy.stability * 0.8 + player.military.morale * 0.2), 0, 100);
-  const gdpGrowth = (player.economy.treasury / player.economy.gdp) * 100;
+  const gdpGrowth = (player.economy.treasury / Math.max(player.economy.gdp, 1)) * 100;
   const inflation = clamp(8 - player.economy.stability * 0.06, 0, 15);
   const debtToGdp = clamp(90 - player.economy.stability * 0.3, 20, 120);
+  const exchangeRate = clamp(5 + (100 - player.economy.stability) * 0.02, 3, 8);
+  const deficit = clamp(6 - player.economy.stability * 0.05, 0, 12);
   const congressSupport = {
     senators: Math.round(player.economy.legislativeSupport * 81),
     deputies: Math.round(player.economy.legislativeSupport * 513),
@@ -197,13 +204,14 @@ function buildStateMetrics(player: Country | undefined, countries: Country[]) {
   return {
     escalation,
     popularity,
-    gdpGrowth: Math.round(gdpGrowth * 10) / 10,
-    inflation: Math.round(inflation * 10) / 10,
-    debtToGdp: Math.round(debtToGdp * 10) / 10,
+    gdpGrowth: round2(gdpGrowth),
+    inflation: round2(inflation),
+    debtToGdp: round2(debtToGdp),
     congressSupport,
     militaryReadiness,
-    exchangeRate: clamp(5 + (100 - player.economy.stability) * 0.02, 3, 8),
-    deficit: clamp(6 - player.economy.stability * 0.05, 0, 12),
+    exchangeRate: round2(exchangeRate),
+    deficit: round2(deficit),
+    trends: computeTrends(turnEvents, player),
   };
 }
 
@@ -545,6 +553,7 @@ function buildDecisionOptions(
   const topThreat: Relationship | undefined = topN(player.relationships, (r: Relationship) => r.tension, 1)[0];
   if (topThreat && topThreat.tension >= 40) {
     const target = countries.find((c) => c.id === topThreat.countryCode);
+    const newReadiness = clamp(player.military.readiness + 10, 0, 100);
     options.push({
       domain: "security",
       domainLabel: "Segurança & Defesa",
@@ -553,9 +562,10 @@ function buildDecisionOptions(
           id: "sec-a",
           code: "A",
           title: `Aumentar prontidão contra ${target?.name ?? topThreat.countryCode}`,
-          description: `Elevar prontidão militar e posicionar unidades defensivas. Tensão bilateral em ${topThreat.tension} pontos exige postura dissuasória.`,
+          description: `Elevar prontidão militar para ${newReadiness}% e posicionar unidades defensivas. Tensão bilateral em ${topThreat.tension} pontos exige postura dissuasória.`,
           estimatedCost: `Fiscal: ${fmtMoney(player.economy.gdp * 0.01)} · Moral: -5%`,
           projectedImpact: "Reduz risco de agressão. Pode escalar tensão bilateral.",
+          intent: { intent: "set-readiness", from: player.id, level: newReadiness } as StrictIntent,
         },
         {
           id: "sec-b",
@@ -564,12 +574,14 @@ function buildDecisionOptions(
           description: "Preservar níveis atuais de prontidão e iniciar conversas bilaterais para reduzir tensão.",
           estimatedCost: "Fiscal: mínimo · Político: baixo",
           projectedImpact: "Reduz tensão em 60% dos casos. Risco: adversário pode interpretar como fraqueza.",
+          intent: { intent: "improve-relations", from: player.id, target: topThreat.countryCode } as StrictIntent,
         },
       ],
     });
   }
 
   // Economy decisions
+  const higherTax = clamp(player.economy.taxRate + 0.02, 0, 1);
   options.push({
     domain: "economy",
     domainLabel: "Política Econômica",
@@ -577,10 +589,11 @@ function buildDecisionOptions(
       {
         id: "eco-a",
         code: "A",
-        title: `Aumentar alíquota para ${((player.economy.taxRate + 0.02) * 100).toFixed(1)}%`,
+        title: `Aumentar alíquota para ${(higherTax * 100).toFixed(1)}%`,
         description: "Elevar a arrecadação em 2 pontos percentuais para reforçar o tesouro e investir em projetos estratégicos.",
         estimatedCost: `Arrecadação adicional: ${fmtMoney(player.economy.gdp * 0.02)} · Estabilidade: -3%`,
         projectedImpact: "Tesouro reforçado. Pressão popular e empresarial moderada.",
+        intent: { intent: "set-tax", from: player.id, rate: round2(higherTax) } as StrictIntent,
       },
       {
         id: "eco-b",
@@ -608,6 +621,7 @@ function buildDecisionOptions(
           description: `Aproveitar a afinidade positiva (+${topAlly.affinity}) para formalizar um acordo comercial de longo prazo.`,
           estimatedCost: "Fiscal: mínimo · Diplomático: médio",
           projectedImpact: "Aumenta PIB bilateral. Fortalece aliança estratégica.",
+          intent: { intent: "propose-trade", from: player.id, target: topAlly.countryCode } as StrictIntent,
         },
         {
           id: "dip-b",
@@ -677,4 +691,48 @@ function buildReservedArchive(
   }
 
   return archive.slice(0, 5);
+}
+
+function computeTrends(turnEvents: GameEvent[], player: Country): IPresidentialBriefing["stateMetrics"]["trends"] {
+  let popularityDelta = 0;
+  let gdpDelta = 0;
+  let inflationDelta = 0;
+  let debtDelta = 0;
+  let exchangeDelta = 0;
+  let deficitDelta = 0;
+
+  for (const e of turnEvents) {
+    if (e.type === "turn.economy-growth" && e.country === player.id) {
+      gdpDelta += e.gdpGrowth;
+      popularityDelta += e.gdpGrowth * 0.3;
+    }
+    if (e.type === "turn.stability-shift" && e.country === player.id) {
+      popularityDelta += e.delta * 0.5;
+      inflationDelta -= e.delta * 0.02;
+    }
+    if (e.type === "war.declared") {
+      popularityDelta -= 1.5;
+      deficitDelta += 0.3;
+    }
+    if (e.type === "diplomacy.treaty-signed") {
+      popularityDelta += 0.8;
+    }
+    if (e.type === "policy.tax-set" && e.country === player.id) {
+      gdpDelta -= (e.rate - 0.2) * 2;
+      deficitDelta -= 0.5;
+    }
+    if (e.type === "policy.readiness-set" && e.country === player.id) {
+      deficitDelta += 0.2;
+      popularityDelta -= 0.3;
+    }
+  }
+
+  return {
+    popularity: round2(popularityDelta),
+    gdpGrowth: round2(gdpDelta),
+    inflation: round2(inflationDelta),
+    debtToGdp: round2(debtDelta),
+    exchangeRate: round2(exchangeDelta),
+    deficit: round2(deficitDelta),
+  };
 }

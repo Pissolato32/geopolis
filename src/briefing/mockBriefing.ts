@@ -400,5 +400,13 @@ export const mockBriefing: IPresidentialBriefing = {
     militaryReadiness: { army: 84, navy: 75, airForce: 83 },
     exchangeRate: 5.12,
     deficit: 6.2,
+    trends: {
+      popularity: 1.5,
+      gdpGrowth: 0.4,
+      inflation: -0.2,
+      debtToGdp: 0.3,
+      exchangeRate: -0.08,
+      deficit: 0.1,
+    },
   },
 };

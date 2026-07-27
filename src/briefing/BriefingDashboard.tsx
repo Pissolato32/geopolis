@@ -3,12 +3,15 @@
 
 import { useState } from "react";
 import type { BriefingTab, IPresidentialBriefing } from "./briefingTypes.js";
+import type { StrictIntent } from "../shared/types.js";
 import { KPIHeaderBar } from "./KPIHeaderBar.js";
 import { Tab1Briefing } from "./Tab1Briefing.js";
 import { Tab2Domains } from "./Tab2Domains.js";
 import { Tab3Intel } from "./Tab3Intel.js";
 import { Tab4Decisions } from "./Tab4Decisions.js";
 import { Tab5Archive } from "./Tab5Archive.js";
+import { gameSocket } from "../gameSocket.js";
+import { pushToast } from "../Toast.js";
 
 interface Props {
   briefing: IPresidentialBriefing;
@@ -26,9 +29,18 @@ export function BriefingDashboard({ briefing }: Props) {
   const [tab, setTab] = useState<BriefingTab>("briefing");
 
   const handleDecisionSubmit = (selections: Record<string, string>) => {
-    // In future: transmit to game engine via gameSocket.
-    // For now the UI confirms and holds the selection.
-    void selections;
+    let dispatched = 0;
+    for (const group of briefing.decisionOptions) {
+      const optionId = selections[group.domain];
+      if (!optionId) continue;
+      const option = group.options.find((o) => o.id === optionId);
+      if (!option?.intent) continue;
+      gameSocket.sendIntent(option.intent as StrictIntent);
+      dispatched++;
+    }
+    if (dispatched > 0) {
+      pushToast({ kind: "info", title: "Gabinete", message: `${dispatched} decisão(ões) transmitida(s) ao gabinete`, dismissable: true, duration: 5000 });
+    }
   };
 
   return (
