@@ -26,6 +26,9 @@ import {
   WAR_MOVE_ORDERED_EVENT,
   WAR_PEACE_REQUESTED_EVENT,
 } from '../domain/war/events/war.events.js';
+import { SeedSyncPipeline } from '../scenarios/seed-sync-pipeline.js';
+import { SeedValidationSuite } from '../scenarios/seed-validation-suite.js';
+import { GeopoliticalAnomalyResolver } from '../scenarios/geopolitical-anomaly-resolver.js';
 
 export interface IAPIGatewayRouterConfig {
   engine: ITickEngine;
@@ -122,6 +125,10 @@ export class APIGatewayRouter {
 
       if (path === '/api/v1/military/peace' && method === 'POST') {
         return this.handlePostMilitaryPeace(payload) as IGatewayResponse<TRes>;
+      }
+
+      if (path === '/api/v1/seed/update' && method === 'POST') {
+        return await this.handlePostSeedUpdate(payload) as IGatewayResponse<TRes>;
       }
 
       return {
@@ -591,6 +598,70 @@ export class APIGatewayRouter {
         initiator: req.initiator,
         target: req.target,
         status: 'peace-requested',
+      },
+    };
+  }
+
+  private async handlePostSeedUpdate(payload: unknown): Promise<IGatewayResponse> {
+    const req = payload as { forceFullSync?: boolean } | undefined;
+    const forceFull = req?.forceFullSync ?? false;
+
+    const pipeline = new SeedSyncPipeline();
+    const syncResult = await pipeline.sync();
+
+    if (syncResult.status === 'no-cache') {
+      return {
+        statusCode: 503,
+        success: false,
+        error: 'No baseline seed available for sync',
+      };
+    }
+
+    // Load baseline for anomaly resolution and validation
+    const baseline = SeedSyncPipeline.loadBaseline();
+    if (!baseline) {
+      return {
+        statusCode: 503,
+        success: false,
+        error: 'Baseline seed file not found on disk',
+      };
+    }
+
+    // Run anomaly resolver
+    const resolver = new GeopoliticalAnomalyResolver();
+    const resolution = resolver.resolve(baseline, baseline);
+
+    // Run pre-consolidation test gate
+    const validationSuite = new SeedValidationSuite();
+    const updatedSeed = { ...baseline, countries: resolution.resolvedCountries };
+    const validation = validationSuite.validate(updatedSeed);
+
+    if (!validation.passed) {
+      return {
+        statusCode: 422,
+        success: false,
+        error: 'Seed validation failed — falling back to baseline',
+        data: {
+          syncStatus: syncResult.status,
+          validationErrors: validation.errors,
+          anomaliesDetected: resolution.logs.length,
+        },
+      };
+    }
+
+    return {
+      statusCode: 200,
+      success: true,
+      data: {
+        status: syncResult.status === 'up-to-date' ? 'success' : 'success',
+        updatedEntities: syncResult.updatedEntities,
+        deltaSizeKb: syncResult.deltaSizeKb,
+        anomaliesDetected: resolution.logs.length,
+        newEntities: resolution.newEntities,
+        removedEntities: resolution.removedEntities,
+        validationDurationMs: validation.totalDurationMs,
+        seedVersion: syncResult.seedVersion,
+        forceFullSync: forceFull,
       },
     };
   }
