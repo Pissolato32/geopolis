@@ -6,9 +6,10 @@
 // responsible for persisting the mutated countries/relationships/units back
 // to Supabase.
 
-import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard } from "./shared/types.js";
+import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard, ActiveTreaty } from "./shared/types.js";
 import { runAIDirector } from "./aiDirector.js";
 import { generateNarrativeBeats, buildProfiles } from "./narrativeDirector.js";
+import { createDefaultCabinet } from "./campaign/advisorTypes.js";
 
 /** Evaluate the player country state and generate 0–3 dynamic cabinet cards. */
 function generateCabinetCards(player: Country): CabinetCard[] {
@@ -336,18 +337,57 @@ export function processTurn(
     if (!friend) continue;
     if (Math.random() < 0.4) {
       treaties++;
+      const treatyKind = Math.random() < 0.5 ? "trade" : "non-aggression";
+      const treatyDur = Math.round(2 + Math.random() * 8);
       events.push({
         type: "diplomacy.treaty-signed",
         at: at(),
         parties: [a.id, friend.countryCode],
-        kind: Math.random() < 0.5 ? "trade" : "non-aggression",
-        durationYears: Math.round(2 + Math.random() * 8),
+        kind: treatyKind,
+        durationYears: treatyDur,
       });
+      // Track the active treaty on both nations
+      const treaty: ActiveTreaty = {
+        id: `treaty-${a.id}-${friend.countryCode}-${tick}`,
+        parties: [a.id, friend.countryCode],
+        kind: treatyKind,
+        signedTick: tick,
+        durationYears: treatyDur,
+      };
+      const aIdx = updated.findIndex((x) => x.id === a.id);
+      const bIdx = updated.findIndex((x) => x.id === friend.countryCode);
+      if (aIdx >= 0) {
+        updated[aIdx] = {
+          ...updated[aIdx]!,
+          activeTreaties: [...(updated[aIdx]!.activeTreaties ?? []), treaty],
+        };
+      }
+      if (bIdx >= 0) {
+        updated[bIdx] = {
+          ...updated[bIdx]!,
+          activeTreaties: [...(updated[bIdx]!.activeTreaties ?? []), treaty],
+        };
+      }
     }
   }
 
   // ---- 5. Cabinet cards: evaluate player country state -------------------
   const playerCountry = playerCode ? updated.find((c) => c.id === playerCode) : undefined;
+
+  // Initialize cabinet for any country that doesn't have one yet
+  for (let i = 0; i < updated.length; i++) {
+    if (!updated[i]!.cabinet) {
+      updated[i] = { ...updated[i]!, cabinet: createDefaultCabinet(tick) };
+    }
+    // Expire old cooldowns
+    if (updated[i]!.cooldowns && updated[i]!.cooldowns!.length > 0) {
+      const active = updated[i]!.cooldowns!.filter((c) => c.expiresAtTick > tick);
+      if (active.length !== updated[i]!.cooldowns!.length) {
+        updated[i] = { ...updated[i]!, cooldowns: active };
+      }
+    }
+  }
+
   const cabinetCards = playerCountry ? generateCabinetCards(playerCountry) : [];
 
   // ---- 5b. Narrative beats: transform significant events into prose --------

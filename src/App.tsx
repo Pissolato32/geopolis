@@ -22,8 +22,11 @@ import type { CabinetCard, GameEvent, WorldSeed } from "./shared/types.js";
 import seedData from "../data/world-seed-2026.json";
 import { CampaignModal } from "./campaign/CampaignModal.js";
 import { loadCampaign, saveCampaign, clearCampaign, type CampaignState } from "./campaign/campaignState.js";
-import { generateAdvisorAgenda, evaluateDirectiveByAdvisors } from "./campaign/advisorEngine.js";
+import { generateAdvisorAgenda, evaluateDirectiveByAdvisors, competingOptionToIntent } from "./campaign/advisorEngine.js";
 import type { AdvisorCard, AdvisorAgenda, ByodAdvisorResponse } from "./campaign/advisorTypes.js";
+import { CabinetManagerModal } from "./campaign/CabinetManagerModal.js";
+import { applyAdvisorFeedback, ADVISOR_SLOTS } from "./campaign/advisorTypes.js";
+import type { AdvisorSlotId, AdvisorState, CompetingOption, CabinetState } from "./shared/types.js";
 
 const SEED = seedData as WorldSeed;
 
@@ -55,8 +58,10 @@ export default function App() {
   const [campaign, setCampaign] = useState<CampaignState | null>(null);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [advisorAgenda, setAdvisorAgenda] = useState<AdvisorAgenda>({ cards: [], councilSummary: "" });
+  const [advisorAgenda, setAdvisorAgenda] = useState<AdvisorAgenda>({ cards: [], competingCards: [], councilSummary: "", vacantSlots: [] });
   const [advisorResponses, setAdvisorResponses] = useState<ByodAdvisorResponse[]>([]);
+  const [showCabinetManager, setShowCabinetManager] = useState(false);
+  const [cabinetOverride, setCabinetOverride] = useState<CabinetState | null>(null);
   const { online, wasOffline } = useOnlineStatus();
 
   useEffect(() => {
@@ -199,18 +204,22 @@ export default function App() {
 
   // Generate advisor agenda when tick changes or events update
   const currentPlayer = gameSocket.getCountries().find((c) => c.id === playerCode);
+  const effectiveCabinet = cabinetOverride ?? currentPlayer?.cabinet;
+  const playerWithCabinet = effectiveCabinet && currentPlayer
+    ? { ...currentPlayer, cabinet: effectiveCabinet }
+    : currentPlayer;
   useEffect(() => {
-    if (!currentPlayer || !campaignLocked) return;
+    if (!playerWithCabinet || !campaignLocked) return;
     const agenda = generateAdvisorAgenda({
       tick,
-      player: currentPlayer,
+      player: playerWithCabinet,
       countries: gameSocket.getCountries(),
       events,
       previousCards: advisorAgenda.cards,
     });
     setAdvisorAgenda(agenda);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tick, campaignLocked]);
+  }, [tick, campaignLocked, cabinetOverride]);
 
   const handleAdvisorDirective = (text: string) => {
     if (!currentPlayer) return;
@@ -229,6 +238,55 @@ export default function App() {
         duration: 5000,
       });
     }
+  };
+
+  const handleCompetingOptionChosen = (option: CompetingOption, _cardId: string) => {
+    const intent = competingOptionToIntent(option, playerCode);
+    if (intent) {
+      gameSocket.sendIntent(intent);
+    }
+    // Apply satisfaction/loyalty feedback to the cabinet
+    if (currentPlayer?.cabinet) {
+      const rejectedSlots = advisorAgenda.competingCards
+        .find((c) => c.id === _cardId)?.options
+        .filter((o) => o.slotId !== option.slotId)
+        .map((o) => o.slotId) ?? [];
+      const updated = applyAdvisorFeedback(currentPlayer.cabinet, option.slotId, rejectedSlots);
+      setCabinetOverride(updated);
+    }
+    pushToast({
+      kind: "success",
+      title: "Competing Proposal Accepted",
+      message: `${option.advisorName}'s proposal accepted. Satisfaction +${option.satisfactionDelta}%.`,
+      dismissable: true,
+      duration: 5000,
+    });
+  };
+
+  const handleAppointAdvisor = (slotId: AdvisorSlotId, advisor: AdvisorState) => {
+    if (!currentPlayer?.cabinet) return;
+    const updated = { ...currentPlayer.cabinet, [slotId]: advisor };
+    setCabinetOverride(updated);
+    pushToast({
+      kind: "success",
+      title: "Advisor Appointed",
+      message: `${advisor.name} appointed as ${ADVISOR_SLOTS[slotId].label}.`,
+      dismissable: true,
+      duration: 4000,
+    });
+  };
+
+  const handleLeaveVacant = (slotId: AdvisorSlotId) => {
+    if (!currentPlayer?.cabinet) return;
+    const updated = { ...currentPlayer.cabinet, [slotId]: null };
+    setCabinetOverride(updated);
+    pushToast({
+      kind: "info",
+      title: "Post Left Vacant",
+      message: `${ADVISOR_SLOTS[slotId].label} is now vacant. No advisor cards from this council.`,
+      dismissable: true,
+      duration: 4000,
+    });
   };
 
   if (showCampaignModal) {
@@ -467,6 +525,8 @@ export default function App() {
           advisorResponses={advisorResponses}
           onAdvisorDirective={handleAdvisorDirective}
           onCardDispatch={handleCardDispatch}
+          onCompetingOptionChosen={handleCompetingOptionChosen}
+          onOpenCabinetManager={() => setShowCabinetManager(true)}
           campaignLocked={campaignLocked}
           playerCode={playerCode}
         />
@@ -497,6 +557,16 @@ export default function App() {
         <CabinetModal
           cards={cabinetCards}
           onResolved={() => setCabinetCards([])}
+        />
+      )}
+
+      {showCabinetManager && currentPlayer?.cabinet && (
+        <CabinetManagerModal
+          cabinet={cabinetOverride ?? currentPlayer.cabinet}
+          tick={tick}
+          onAppoint={handleAppointAdvisor}
+          onLeaveVacant={handleLeaveVacant}
+          onClose={() => setShowCabinetManager(false)}
         />
       )}
       </ErrorBoundary>

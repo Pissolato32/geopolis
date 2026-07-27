@@ -6,6 +6,7 @@ import type { BriefingTab, IPresidentialBriefing } from "./briefingTypes.js";
 import type { StrictIntent } from "../shared/types.js";
 import type { AnalysisSnapshot } from "./byodTypes.js";
 import type { AdvisorAgenda, AdvisorCard, ByodAdvisorResponse } from "../campaign/advisorTypes.js";
+import type { CompetingOption } from "../shared/types.js";
 import { KPIHeaderBar } from "./KPIHeaderBar.js";
 import { Tab1Briefing } from "./Tab1Briefing.js";
 import { Tab2Domains } from "./Tab2Domains.js";
@@ -22,6 +23,8 @@ interface Props {
   advisorResponses?: ByodAdvisorResponse[];
   onAdvisorDirective?: (text: string) => void;
   onCardDispatch?: (card: AdvisorCard) => void;
+  onCompetingOptionChosen?: (option: CompetingOption, cardId: string) => void;
+  onOpenCabinetManager?: () => void;
   campaignLocked?: boolean;
   playerCode?: string;
 }
@@ -61,6 +64,8 @@ export function BriefingDashboard({
   advisorResponses = [],
   onAdvisorDirective,
   onCardDispatch,
+  onCompetingOptionChosen,
+  onOpenCabinetManager,
   campaignLocked = false,
 }: Props) {
   const [tab, setTab] = useState<BriefingTab>("briefing");
@@ -113,6 +118,8 @@ export function BriefingDashboard({
                 advisorResponses={advisorResponses}
                 onDirectiveSubmit={onAdvisorDirective}
                 onCardDispatch={onCardDispatch}
+                onCompetingOptionChosen={onCompetingOptionChosen ?? (() => {})}
+                onOpenCabinetManager={onOpenCabinetManager ?? (() => {})}
                 dispatched={false}
               />
             )}

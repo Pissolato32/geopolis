@@ -25,6 +25,88 @@ export interface Relationship {
   tension: number; // 0..100
 }
 
+/** Government regime type — determines cabinet flavor text, not advisor availability. */
+export type RegimeType = "democracy" | "autocracy" | "dictatorship" | "monarchy" | "technocracy";
+
+/** The 5 universal advisor slots present in every regime type. */
+export type AdvisorSlotId =
+  | "finance"      // Financial & Economic Advisor
+  | "treasury"     // Treasury & Fiscal Advisor
+  | "defense"      // Defense & National Security Advisor
+  | "foreign"      // Foreign Affairs Advisor
+  | "stability";   // Internal Stability & Social Advisor
+
+/** Ideological profile for advisor candidates. */
+export type AdvisorIdeology =
+  | "keynesian-growth"
+  | "fiscal-conservative"
+  | "hawkish"
+  | "social-democrat"
+  | "pragmatist"
+  | "isolationist";
+
+/** A sitting advisor or null for a vacant post. */
+export interface AdvisorState {
+  slotId: AdvisorSlotId;
+  name: string;
+  ideology: AdvisorIdeology;
+  satisfaction: number;   // 0..100
+  loyalty: number;        // 0..100
+  appointedTick: number;
+}
+
+/** A candidate for appointment presented in the dismiss/appoint modal. */
+export interface AdvisorCandidate {
+  id: string;
+  name: string;
+  ideology: AdvisorIdeology;
+  bio: string;
+  satisfactionPrediction: number;  // predicted starting satisfaction
+  loyaltyPrediction: number;       // predicted starting loyalty
+}
+
+/** Full cabinet state for a nation — 5 slots, each nullable. */
+export type CabinetState = Record<AdvisorSlotId, AdvisorState | null>;
+
+/** An active treaty between two nations, tracked in world state. */
+export interface ActiveTreaty {
+  id: string;
+  parties: [string, string];   // alpha-3 codes
+  kind: "non-aggression" | "trade" | "alliance";
+  signedTick: number;
+  durationYears: number;
+}
+
+/** Policy cooldown tracking — suppresses repetitive cards after execution. */
+export interface PolicyCooldown {
+  policyType: string;   // e.g. "set-tax", "set-readiness"
+  expiresAtTick: number;
+}
+
+/** A single competing option on a multi-advisor decision card. */
+export interface CompetingOption {
+  id: string;
+  slotId: AdvisorSlotId;
+  advisorName: string;
+  ideology: AdvisorIdeology;
+  objective: string;         // the advisor's primary goal
+  targetKpi: string;         // which KPI this targets
+  label: string;             // e.g. "Set tax to 22%"
+  effects: CardOptionEffects;
+  satisfactionDelta: number; // predicted satisfaction change if chosen
+}
+
+/** A decision card with competing advisor proposals. */
+export interface CompetingCard {
+  id: string;
+  title: string;
+  description: string;
+  category: CabinetCard["category"];
+  kpiTrigger: string;        // what KPI issue triggered this card
+  options: CompetingOption[];
+  tickCreated: number;
+}
+
 export interface Country {
   id: string; // alpha-3 code
   numericCode: string; // ISO 3166-1 numeric (joins to world-atlas geometry id)
@@ -38,6 +120,10 @@ export interface Country {
   military: CountryMilitary;
   posture: DiplomaticPosture;
   relationships: Relationship[];
+  regimeType?: RegimeType;
+  cabinet?: CabinetState;
+  activeTreaties?: ActiveTreaty[];
+  cooldowns?: PolicyCooldown[];
 }
 
 /** Player's espionage knowledge about a foreign nation (0 = blind, 100 = full). */

@@ -141,7 +141,7 @@ export function CampaignModal({ seed, onConfirm }: Props) {
               <div className="campaign-section-label">Your Advisory Council</div>
               <div className="campaign-advisor-row">
                 {Object.values(ADVISORS).map((a) => (
-                  <div key={a.domain} className="campaign-advisor-chip" style={{ borderColor: a.accentColor }}>
+                  <div key={a.name} className="campaign-advisor-chip" style={{ borderColor: a.accentColor }}>
                     <span className="campaign-advisor-icon">{a.icon}</span>
                     <div>
                       <span className="campaign-advisor-name">{a.name}</span>

@@ -2416,3 +2416,463 @@ body {
   background: rgba(74, 227, 196, 0.2);
 }
 
+/* ---- Cabinet Manager Modal ---- */
+.cabinet-manager-modal {
+  width: 92%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(160deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--border-2);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  padding: 28px 32px;
+}
+.cabinet-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.cabinet-manager-header h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.cabinet-manager-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.cabinet-manager-close {
+  background: none;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 16px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.cabinet-manager-close:hover {
+  border-color: var(--text-faint);
+  color: var(--text);
+}
+.cabinet-manager-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cabinet-manager-slot {
+  padding: 14px 16px;
+  background: rgba(13, 20, 27, 0.5);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+.cabinet-manager-slot.vacant {
+  border-left-color: var(--warn);
+}
+.cabinet-manager-slot-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.cabinet-manager-slot-icon {
+  font-size: 18px;
+}
+.cabinet-manager-slot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cabinet-manager-slot-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.cabinet-manager-slot-focus {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+}
+.cabinet-manager-advisor-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.cabinet-manager-ideology {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+.cabinet-manager-ratings {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.cabinet-manager-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.rating-label {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.rating-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rating-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.rating-fill.satisfaction {
+  background: linear-gradient(90deg, #5ad07a, #4ae2c4);
+}
+.rating-fill.loyalty {
+  background: linear-gradient(90deg, #4a9cc4, #6ab8e8);
+}
+.rating-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--mono);
+  min-width: 32px;
+  text-align: right;
+}
+.cabinet-manager-dismiss-btn,
+.cabinet-manager-appoint-btn {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.cabinet-manager-dismiss-btn:hover {
+  border-color: var(--warn);
+  color: var(--warn);
+  background: rgba(232, 93, 90, 0.08);
+}
+.cabinet-manager-appoint-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(74, 227, 196, 0.08);
+}
+.cabinet-manager-vacant-banner {
+  padding: 8px 12px;
+  background: rgba(232, 167, 90, 0.1);
+  border: 1px solid rgba(232, 167, 90, 0.3);
+  border-radius: 6px;
+  color: var(--warn);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.cabinet-manager-vacant-note {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+/* ---- Cabinet candidates ---- */
+.cabinet-candidates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cabinet-candidate-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: rgba(13, 20, 27, 0.5);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+.cabinet-candidate-card:hover {
+  border-color: var(--accent);
+  background: rgba(74, 227, 196, 0.06);
+  transform: translateY(-1px);
+}
+.cabinet-candidate-card.vacant-option {
+  border-left-color: var(--warn);
+}
+.cabinet-candidate-card.vacant-option:hover {
+  border-color: var(--warn);
+  background: rgba(232, 167, 90, 0.06);
+}
+.cabinet-candidate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cabinet-candidate-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.cabinet-candidate-ideology {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+.cabinet-candidate-bio {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+.cabinet-candidate-predictions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.cabinet-candidate-predictions .prediction-label {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+}
+.cabinet-candidate-predictions .prediction-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+/* ---- Advisor roster strip ---- */
+.advisor-roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.advisor-roster-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(13, 20, 27, 0.4);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+}
+.advisor-roster-chip.vacant {
+  border-left-color: var(--warn);
+  opacity: 0.6;
+}
+.advisor-roster-icon {
+  font-size: 14px;
+}
+.advisor-roster-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+.advisor-roster-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.advisor-roster-title {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Vacant post banners ---- */
+.advisor-vacant-banners {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.advisor-vacant-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(232, 167, 90, 0.08);
+  border: 1px solid rgba(232, 167, 90, 0.25);
+  border-radius: 6px;
+}
+.advisor-vacant-icon {
+  font-size: 14px;
+  color: var(--warn);
+}
+.advisor-vacant-text {
+  font-size: 12px;
+  color: var(--warn);
+  font-weight: 600;
+}
+
+/* ---- Competing proposal cards ---- */
+.advisor-competing-cards {
+  margin-bottom: 16px;
+}
+.advisor-competing-card {
+  padding: 16px;
+  background: rgba(13, 20, 27, 0.5);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.advisor-competing-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.advisor-competing-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.advisor-competing-card-trigger {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+.advisor-competing-card-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+.advisor-competing-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+.advisor-competing-option {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(8, 12, 16, 0.4);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+.advisor-competing-option:hover {
+  border-color: var(--accent);
+  background: rgba(74, 227, 196, 0.06);
+  transform: translateY(-1px);
+}
+.advisor-competing-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.advisor-competing-option-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.advisor-competing-option-icon {
+  font-size: 14px;
+}
+.advisor-competing-option-advisor {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.advisor-competing-option-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.advisor-competing-option-ideology {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text-faint);
+}
+.advisor-competing-option-objective,
+.advisor-competing-option-kpi,
+.advisor-competing-option-action,
+.advisor-competing-option-satisfaction {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+}
+.competing-label {
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 9px;
+  white-space: nowrap;
+  min-width: 70px;
+}
+.competing-value {
+  color: var(--text-dim);
+}
+.competing-action {
+  font-weight: 600;
+  color: var(--accent);
+}
+.satisfaction-positive {
+  color: #5ad07a;
+  font-weight: 600;
+}
+
+/* ---- Cabinet manager open button ---- */
+.cabinet-manager-open-btn {
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: 8px;
+}
+.cabinet-manager-open-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(74, 227, 196, 0.08);
+}
+
