@@ -1,9 +1,10 @@
 // BriefingDashboard — the Presidential Strategy Briefing Command Center.
 // Composes the KPI header, tabbed navigation, and all five tab panels.
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { BriefingTab, IPresidentialBriefing } from "./briefingTypes.js";
 import type { StrictIntent } from "../shared/types.js";
+import type { AnalysisSnapshot } from "./byodTypes.js";
 import { KPIHeaderBar } from "./KPIHeaderBar.js";
 import { Tab1Briefing } from "./Tab1Briefing.js";
 import { Tab2Domains } from "./Tab2Domains.js";
@@ -17,6 +18,27 @@ interface Props {
   briefing: IPresidentialBriefing;
 }
 
+function buildSnapshot(): AnalysisSnapshot {
+  const countries = gameSocket.getCountries();
+  const market = gameSocket.getMarket();
+  const units = gameSocket.getUnits();
+  return {
+    tick: gameSocket.getTick(),
+    playerCode: gameSocket.getPlayerCode(),
+    countries: countries.map((c) => ({
+      id: c.id,
+      name: c.name,
+      gdp: c.economy.gdp,
+      gdpGrowth: c.economy.stability,
+      tension: c.relationships.length > 0 ? Math.max(...c.relationships.map((r) => r.tension)) : 0,
+      readiness: c.military.readiness,
+      relationships: c.relationships.map((r) => ({ countryCode: r.countryCode, tension: r.tension, affinity: r.affinity })),
+    })),
+    market: market.map((m) => ({ resource: m.resource, price: m.price, delta: m.delta })),
+    units: units.map((u) => ({ ownerCode: u.ownerCode, type: u.type, readiness: u.readiness, latlng: u.latlng })),
+  };
+}
+
 const TABS: Array<{ id: BriefingTab; label: string; icon: string }> = [
   { id: "briefing", label: "Briefing Executivo", icon: "◢" },
   { id: "domains", label: "Resultados por Domínio", icon: "◈" },
@@ -27,6 +49,7 @@ const TABS: Array<{ id: BriefingTab; label: string; icon: string }> = [
 
 export function BriefingDashboard({ briefing }: Props) {
   const [tab, setTab] = useState<BriefingTab>("briefing");
+  const snapshot = useMemo(() => buildSnapshot(), []);
 
   const handleDecisionSubmit = (selections: Record<string, string>) => {
     let dispatched = 0;
@@ -66,7 +89,7 @@ export function BriefingDashboard({ briefing }: Props) {
         {tab === "briefing" && <Tab1Briefing briefing={briefing} />}
         {tab === "domains" && <Tab2Domains briefing={briefing} />}
         {tab === "intel" && <Tab3Intel briefing={briefing} />}
-        {tab === "decisions" && <Tab4Decisions briefing={briefing} onSubmit={handleDecisionSubmit} />}
+        {tab === "decisions" && <Tab4Decisions briefing={briefing} snapshot={snapshot} onSubmit={handleDecisionSubmit} />}
         {tab === "archive" && <Tab5Archive briefing={briefing} />}
       </div>
     </div>

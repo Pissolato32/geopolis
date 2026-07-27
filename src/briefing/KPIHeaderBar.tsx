@@ -1,6 +1,7 @@
 // KPIHeaderBar — top metrics bar with trend indicators and escalation gauge.
 
 import type { IPresidentialBriefing } from "./briefingTypes.js";
+import { round2 } from "./format.js";
 
 interface Props {
   briefing: IPresidentialBriefing;
@@ -11,7 +12,7 @@ function TrendBadge({ value, suffix = "%", invert = false }: { value: number; su
   const good = invert ? !positive : positive;
   return (
     <span className={`kpi-trend ${good ? "trend-up" : "trend-down"}`}>
-      {positive ? "▲" : "▼"} {Math.abs(value).toFixed(1)}{suffix}
+      {positive ? "▲" : "▼"} {round2(Math.abs(value)).toFixed(1)}{suffix}
     </span>
   );
 }
@@ -41,7 +42,7 @@ function MiniBar({ label, value, max = 100, unit = "%" }: { label: string; value
       <div className="minibar-track">
         <div className="minibar-fill" style={{ width: `${pct}%` }} />
       </div>
-      <span className="minibar-value">{value}{unit}</span>
+      <span className="minibar-value">{round2(value)}{unit}</span>
     </div>
   );
 }
@@ -86,7 +87,7 @@ export function KPIHeaderBar({ briefing }: Props) {
         </div>
         <div className="kpi-card">
           <span className="kpi-card-label">Câmbio</span>
-          <span className="kpi-card-value">R${m.exchangeRate.toFixed(2)}</span>
+          <span className="kpi-card-value">R${round2(m.exchangeRate).toFixed(2)}</span>
           <TrendBadge value={m.trends.exchangeRate} suffix="" invert />
         </div>
         <div className="kpi-card">

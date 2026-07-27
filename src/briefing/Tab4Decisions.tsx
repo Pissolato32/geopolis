@@ -1,10 +1,14 @@
-// Tab4Decisions — Strategic Decision Room with option selection.
+// Tab4Decisions — Strategic Decision Room with option selection + BYOD
+// freeform directive input.
 
 import { useState } from "react";
 import type { IPresidentialBriefing } from "./briefingTypes.js";
+import type { AnalysisSnapshot } from "./byodTypes.js";
+import { ByodDirectivePanel } from "./ByodDirectivePanel.js";
 
 interface Props {
   briefing: IPresidentialBriefing;
+  snapshot: AnalysisSnapshot;
   onSubmit: (selections: Record<string, string>) => void;
 }
 
@@ -14,7 +18,7 @@ const DOMAIN_ICONS: Record<string, string> = {
   economy: "▲",
 };
 
-export function Tab4Decisions({ briefing, onSubmit }: Props) {
+export function Tab4Decisions({ briefing, snapshot, onSubmit }: Props) {
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -94,6 +98,10 @@ export function Tab4Decisions({ briefing, onSubmit }: Props) {
           {allSelected ? "▶ Transmitir Decisões ao Gabinete" : `Selecione todas as opções (${pendingCount} restante(s))`}
         </button>
       )}
+
+      <div className="byod-divider" />
+
+      <ByodDirectivePanel snapshot={snapshot} />
     </div>
   );
 }

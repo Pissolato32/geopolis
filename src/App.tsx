@@ -165,10 +165,10 @@ export default function App() {
   }
 
   const connLabel =
-    connStatus === "live" ? "Live" :
+    connStatus === "live" ? "Live Engine WebSocket" :
     connStatus === "connecting" ? "Connecting…" :
     connStatus === "reconnecting" ? "Reconnecting…" :
-    connStatus === "sim" ? "Offline Sim" : "Offline";
+    connStatus === "sim" ? "Local Simulator Mode" : "Offline";
   const connClass =
     connStatus === "live" ? "status-ok" :
     connStatus === "connecting" || connStatus === "reconnecting" ? "status-warn" :

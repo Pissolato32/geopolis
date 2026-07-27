@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ConflictZone, Country, IntelLevel, Unit, UnitType, WorldSeed } from "./shared/types.js";
 import { gameSocket } from "./gameSocket.js";
 import { selection } from "./selectionManager.js";
+import { round2 } from "./briefing/format.js";
 
 const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const CLUSTER_RADIUS_DEG = 8; // 8° lat/lng grouping radius
@@ -34,7 +35,9 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
   const [units, setUnits] = useState<Unit[]>([]);
   const [tensionMode, setTensionMode] = useState(false);
   const [intelMode, setIntelMode] = useState(false);
+  const [tradeMode, setTradeMode] = useState(false);
   const [trajectories, setTrajectories] = useState<Trajectory[]>([]);
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; country: Country } | null>(null);
 
   const selectedRef = useRef<Country | null>(null);
 
@@ -129,7 +132,25 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     return () => ro.disconnect();
   }, []);
 
-  // tension lookup: alpha3 -> tension vs selected country
+  // trade routes: pairs of allied nations (tension < 15) with reciprocal affinity > 60
+  const tradeRoutes = useMemo(() => {
+    if (!tradeMode) return [];
+    const routes: Array<{ from: [number, number]; to: [number, number]; affinity: number }> = [];
+    const seen = new Set<string>();
+    for (const c of seed.countries) {
+      for (const r of c.relationships) {
+        if (r.tension < 15 && r.affinity > 60) {
+          const target = byAlpha3.current.get(r.countryCode);
+          if (!target) continue;
+          const key = [c.id, r.countryCode].sort().join("-");
+          if (seen.has(key)) continue;
+          seen.add(key);
+          routes.push({ from: c.latlng, to: target.latlng, affinity: r.affinity });
+        }
+      }
+    }
+    return routes;
+  }, [tradeMode, seed]);
   const tensionMap = useMemo(() => {
     const m = new Map<string, number>();
     if (!tensionMode || !selectedRef.current) return m;
@@ -213,6 +234,16 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
       }
     }
 
+    // trade route vectors
+    if (tradeMode) {
+      for (const route of tradeRoutes) {
+        const fromXY = projection(route.from);
+        const toXY = projection(route.to);
+        if (!fromXY || !toXY) continue;
+        drawTradeRoute(ctx, fromXY[0], fromXY[1], toXY[0], toXY[1], route.affinity);
+      }
+    }
+
     // military unit layer — ONLY active conflict zones are drawn.
     // Peaceful/neutral units are never rendered on the map canvas.
     const zones = clusterConflictZones(units, CLUSTER_RADIUS_DEG);
@@ -249,7 +280,7 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     }, 1000);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [features, size, hoveredId, units, tensionMode, intelMode, tensionMap, trajectories]);
+  }, [features, size, hoveredId, units, tensionMode, intelMode, tradeMode, tensionMap, trajectories, tradeRoutes]);
 
   // pointer handling — hover + hit detection (country polygons then units)
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -277,6 +308,17 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     }
     setHoveredId((prev) => (prev === foundId ? prev : foundId));
     canvas.style.cursor = foundId ? "pointer" : "default";
+    // Update tooltip for hovered country
+    if (foundId) {
+      const country = byNumeric.current.get(foundId);
+      if (country) {
+        setTooltip({ x: mx, y: my, country });
+      } else {
+        setTooltip(null);
+      }
+    } else {
+      setTooltip(null);
+    }
   };
 
   const hitUnit = (mx: number, my: number): Unit | null => {
@@ -308,7 +350,7 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     selection.selectCountry(country ?? null);
   };
 
-  const handleLeave = () => setHoveredId(null);
+  const handleLeave = () => { setHoveredId(null); setTooltip(null); };
 
   return (
     <div ref={containerRef} className="map-container">
@@ -327,6 +369,13 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
         >
           Map Mode: Fog of War {intelMode ? "ON" : "OFF"}
         </button>
+        <button
+          className={tradeMode ? "chip chip-trade active" : "chip"}
+          onClick={() => setTradeMode((m) => !m)}
+          title="Show trade route vectors between allied nations"
+        >
+          Map Mode: Trade Routes {tradeMode ? "ON" : "OFF"}
+        </button>
       </div>
       <canvas
         ref={canvasRef}
@@ -335,6 +384,17 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
         onMouseLeave={handleLeave}
       />
       {features.length === 0 && <div className="map-loading">Loading world map…</div>}
+      {tooltip && (
+        <div
+          className="map-tooltip"
+          style={{ left: tooltip.x + 16, top: tooltip.y + 16 }}
+        >
+          <div className="map-tooltip-name">{tooltip.country.name}</div>
+          <div className="map-tooltip-row"><span>GDP Growth</span><span>{round2(tooltip.country.economy.stability)}%</span></div>
+          <div className="map-tooltip-row"><span>Tension</span><span>{round2(tooltip.country.relationships.length > 0 ? Math.max(...tooltip.country.relationships.map((r) => r.tension)) : 0)}</span></div>
+          <div className="map-tooltip-row"><span>Readiness</span><span>{round2(tooltip.country.military.readiness)}%</span></div>
+        </div>
+      )}
     </div>
   );
 }
@@ -462,6 +522,36 @@ function drawTrajectory(
   ctx.lineTo(x2 - ah * Math.cos(angle + Math.PI / 6), y2 - ah * Math.sin(angle + Math.PI / 6));
   ctx.closePath();
   ctx.fillStyle = `rgba(26, 188, 156, ${alpha})`;
+  ctx.fill();
+  ctx.restore();
+}
+
+/** Draw a solid green trade route line with arrowhead, opacity scaled by affinity. */
+function drawTradeRoute(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  affinity: number
+): void {
+  ctx.save();
+  const alpha = 0.2 + (affinity / 100) * 0.4;
+  ctx.strokeStyle = `rgba(46, 204, 113, ${alpha})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  // arrowhead
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const ah = 6;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - ah * Math.cos(angle - Math.PI / 6), y2 - ah * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(x2 - ah * Math.cos(angle + Math.PI / 6), y2 - ah * Math.sin(angle + Math.PI / 6));
+  ctx.closePath();
+  ctx.fillStyle = `rgba(46, 204, 113, ${alpha})`;
   ctx.fill();
   ctx.restore();
 }

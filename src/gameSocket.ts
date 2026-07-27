@@ -171,6 +171,26 @@ class GameSocket {
     return this.playerCode;
   }
 
+  /** Dump the current world state as a JSON-serializable snapshot for the
+   *  BYOD directive analyzer. */
+  dumpStateForAnalysis(): unknown {
+    return {
+      tick: this.currentTick,
+      playerCode: this.playerCode,
+      countries: this.countries.map((c) => ({
+        id: c.id,
+        name: c.name,
+        gdp: c.economy.gdp,
+        gdpGrowth: c.economy.stability,
+        tension: c.relationships.length > 0 ? Math.max(...c.relationships.map((r) => r.tension)) : 0,
+        readiness: c.military.readiness,
+        relationships: c.relationships.map((r) => ({ countryCode: r.countryCode, tension: r.tension, affinity: r.affinity })),
+      })),
+      market: this.market,
+      units: this.units.map((u) => ({ ownerCode: u.ownerCode, type: u.type, readiness: u.readiness, latlng: u.latlng })),
+    };
+  }
+
   setPlayerCountry(code: string): void {
     const c = this.countries.find((x) => x.id === code);
     if (!c) return;
@@ -434,8 +454,13 @@ class GameSocket {
     if (intent.intent === "resolve-cabinet-card") { this.handleResolveCabinetCard(intent); return; }
 
     // Covert ops in sim mode: generate events locally
-    if (intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage") {
+    if (intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage" || intent.intent === "conduct-recon") {
       if (this.mode === "sim") { this.handleCovertOpSim(intent); return; }
+    }
+
+    // BYOD directive intents in sim mode: generate events locally
+    if (intent.intent === "adjust-tariffs" || intent.intent === "impose-sanction" || intent.intent === "propose-trade") {
+      if (this.mode === "sim") { this.handleByodSim(intent); return; }
     }
 
     if (this.mode === "live" && this.ws && this.ws.readyState === WebSocket.OPEN) {
@@ -598,7 +623,7 @@ class GameSocket {
 
   /** Handle covert ops (send-aid, gather-intel, fund-sabotage) in sim mode.
    *  Generates the appropriate events locally and updates intel state. */
-  private handleCovertOpSim(intent: Extract<StrictIntent, { intent: "send-aid" | "gather-intel" | "fund-sabotage" }>): void {
+  private handleCovertOpSim(intent: Extract<StrictIntent, { intent: "send-aid" | "gather-intel" | "fund-sabotage" | "conduct-recon" }>): void {
     const at = new Date().toISOString();
     const pc = this.playerCode;
     const res: IntentResponse = { ok: true, acknowledged: intent, events: [] };
@@ -611,6 +636,12 @@ class GameSocket {
     } else if (intent.intent === "gather-intel") {
       const current = this.intelMap.get(intent.target) ?? 0;
       const newLevel = Math.min(100, current + 25);
+      const evt: GameEvent = { type: "intel.gathered", at, player: pc, target: intent.target, intelLevel: newLevel, cost: intent.cost };
+      this.emit(evt);
+      if (this.gameId) void persistEvent(this.gameId, evt);
+    } else if (intent.intent === "conduct-recon") {
+      const current = this.intelMap.get(intent.target) ?? 0;
+      const newLevel = Math.min(100, current + 20);
       const evt: GameEvent = { type: "intel.gathered", at, player: pc, target: intent.target, intelLevel: newLevel, cost: intent.cost };
       this.emit(evt);
       if (this.gameId) void persistEvent(this.gameId, evt);
@@ -631,6 +662,49 @@ class GameSocket {
 
   /** Resolve a cabinet card: apply the chosen option's effects to the
    *  player country, or delegate to the minister AI for automatic selection. */
+  /** Handle BYOD directive intents (adjust-tariffs, impose-sanction, propose-trade) in sim mode. */
+  private handleByodSim(intent: Extract<StrictIntent, { intent: "adjust-tariffs" | "impose-sanction" | "propose-trade" }>): void {
+    const at = new Date().toISOString();
+    const pc = this.playerCode;
+    const res: IntentResponse = { ok: true, acknowledged: intent, events: [] };
+    for (const l of this.intentListeners) l(res);
+
+    if (intent.intent === "adjust-tariffs") {
+      const evt: GameEvent = { type: "economy.market-update", at, prices: this.market } as unknown as GameEvent;
+      this.emit({ type: "economy.indicator", at, country: pc, gdp: 0, treasury: 0, delta: 0 } as unknown as GameEvent);
+      this.emit(evt);
+      if (this.gameId) { void persistEvent(this.gameId, evt); void persistPlayerPolicy(this.gameId, pc, {}); }
+    } else if (intent.intent === "impose-sanction") {
+      const target = this.countries.find((c) => c.id === intent.target);
+      const tensionHit = intent.kind === "military" ? 25 : intent.kind === "economic" ? 15 : 10;
+      const evt: GameEvent = { type: "diplomacy.treaty-signed", at, parties: [pc, intent.target], kind: "sanction", durationYears: 0 } as unknown as GameEvent;
+      this.emit(evt);
+      if (target && this.gameId) void persistEvent(this.gameId, evt);
+      // Apply tension to relationships
+      if (target) {
+        const idx = this.countries.findIndex((c) => c.id === pc);
+        if (idx >= 0) {
+          const updated = { ...this.countries[idx]!, relationships: this.countries[idx]!.relationships.map((r) => r.countryCode === intent.target ? { ...r, tension: Math.min(100, r.tension + tensionHit), affinity: Math.max(0, r.affinity - tensionHit * 0.5) } : r) };
+          this.countries = this.countries.map((c, i) => i === idx ? updated : c);
+        }
+      }
+    } else if (intent.intent === "propose-trade") {
+      const player = this.countries.find((c) => c.id === pc);
+      const target = this.countries.find((c) => c.id === intent.target);
+      if (player && target) {
+        const lift = Math.round(Math.min(player.economy.gdp, target.economy.gdp) * 0.001);
+        const idx = this.countries.findIndex((c) => c.id === pc);
+        if (idx >= 0) {
+          const updated: Country = { ...this.countries[idx]!, economy: { ...this.countries[idx]!.economy, gdp: this.countries[idx]!.economy.gdp + lift, treasury: this.countries[idx]!.economy.treasury + lift }, relationships: this.countries[idx]!.relationships.map((r) => r.countryCode === intent.target ? { ...r, tension: Math.max(0, r.tension - 10), affinity: Math.min(100, r.affinity + 10) } : r) };
+          this.countries = this.countries.map((c, i) => i === idx ? updated : c);
+        }
+      }
+      const evt: GameEvent = { type: "diplomacy.treaty-signed", at, parties: [pc, intent.target], kind: "trade", durationYears: 5 };
+      this.emit(evt);
+      if (this.gameId) void persistEvent(this.gameId, evt);
+    }
+  }
+
   private handleResolveCabinetCard(intent: Extract<StrictIntent, { intent: "resolve-cabinet-card" }>): void {
     const card = this.pendingCabinetCards.find((c) => c.id === intent.cardId);
     if (!card) return;
@@ -894,6 +968,7 @@ function simulateIntent(intent: StrictIntent, seed: WorldSeed | null, units: Uni
   if (
     intent.intent === "set-tax" || intent.intent === "set-readiness" || intent.intent === "set-posture" ||
     intent.intent === "send-aid" || intent.intent === "gather-intel" || intent.intent === "fund-sabotage" ||
+    intent.intent === "conduct-recon" || intent.intent === "adjust-tariffs" || intent.intent === "impose-sanction" ||
     intent.intent === "recruit-unit" || intent.intent === "resolve-cabinet-card"
   ) {
     return { ok: true, acknowledged: intent, events: [] };

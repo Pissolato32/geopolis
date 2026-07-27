@@ -155,6 +155,9 @@ export type StrictIntent =
   | { intent: "gather-intel"; from: string; target: string; cost: number }
   | { intent: "fund-sabotage"; from: string; target: string; cost: number }
   | { intent: "recruit-unit"; from: string; unitType: UnitType; cost: number }
+  | { intent: "adjust-tariffs"; from: string; target: string; rate: number }
+  | { intent: "impose-sanction"; from: string; target: string; kind: "economic" | "military" | "diplomatic" }
+  | { intent: "conduct-recon"; from: string; target: string; cost: number }
   | { intent: "resolve-cabinet-card"; from: string; cardId: string; optionId?: string; delegated: boolean };
 
 export type IntentResponse =
