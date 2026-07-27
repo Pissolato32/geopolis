@@ -57,6 +57,18 @@ export const WAR_CASUALTIES_TAKEN_EVENT = 'war.casualties-taken';
 export const WAR_EXHAUSTION_INCREASED_EVENT = 'war.exhaustion-increased';
 export const WAR_PEACE_SIGNED_EVENT = 'war.peace-signed';
 
+export const WAR_ADVANTAGE_SHIFTED_EVENT = 'war.advantage-shifted';
+
+export interface IWarAdvantageShiftedPayload {
+  readonly attackerId: string;
+  readonly defenderId: string;
+  readonly attackerPower: number;
+  readonly defenderPower: number;
+  readonly attackerAdvantagePct: number; // 0..100 share of total power
+  readonly defenderAdvantagePct: number;
+  readonly momentum: number; // -1.0 (defender dominant) .. +1.0 (attacker dominant)
+}
+
 export interface IWarCasualtiesTakenPayload {
   readonly countryId: string;
   readonly casualties: number;

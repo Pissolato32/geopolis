@@ -32,4 +32,7 @@ export interface CountryMilitaryDetailComponent extends IComponent {
   // Logistics
   readonly logisticsScore: number; // 0.0 to 1.0 — derived from ports, airports, railways
   readonly defenseBudget: number;
+  // Readiness & Morale (force multipliers)
+  readonly readiness: number; // 0.0 to 1.0 — current operational readiness
+  readonly morale: number; // 0.0 to 1.0 — current troop morale
 }

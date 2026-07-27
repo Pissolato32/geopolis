@@ -113,6 +113,10 @@ com LLM real e coordenação multi-agente.
 6. **M5**: Multi-agente (1 controller por país, agendamento round-robin) ✅
 7. **M6**: Distorção de Fog of War por nível de inteligência ✅
 
+> **Status: COMPLETED** — All milestones M0-M6 delivered. Agent AI expansion is
+> fully operational with LLM provider chain, persistent memory (Supabase-backed),
+> goal management, multi-agent scheduling, and perception distortion.
+
 ---
 
 ## Opção 2 — CLI / Visualização e Interface
@@ -280,36 +284,94 @@ interface MapViewDTO {
 
 ### Para destravar a **Opção 1 (Agentes Autônomos)**:
 
-- [ ] **Economia avançada operacional** — agentes precisam de um sistema
+- [x] **Economia avançada operacional** — agentes precisam de um sistema
       econômico rico para tomar decisões significativas (trade routes,
       markets, sanctions em funcionamento)
-- [ ] **Sistema de combate validado** — decisões militares são vazias sem
+- [x] **Sistema de combate validado** — decisões militares são vazias sem
       consequências reais de guerra
-- [ ] **Fog of War real** — já implementado mas precisa de seed com
+- [x] **Fog of War real** — já implementado mas precisa de seed com
       `IntelligenceAgencyComponent` para múltiplos países
-- [ ] **Action types expandidos** — o `AgentActionSystem` precisa cobrir
+- [x] **Action types expandidos** — o `AgentActionSystem` precisa cobrir
       no mínimo 8-10 action types para o agente ter o que fazer
-- [ ] **Testes de estresse com agentes** — 10+ agentes rodando por 100 ticks
+- [x] **Testes de estresse com agentes** — 10+ agentes rodando por 100 ticks
       sem degradação de performance
 
 ### Para destravar a **Opção 2 (CLI / Visualização)**:
 
-- [ ] **Entry-point mínimo funcional** — sem ele, não há processo para rodar
-- [ ] **Seed com 5+ países** — 2 países não justifica uma interface visual
-- [ ] **Sistema de combate e economia rodando** — a visualização precisa
+- [x] **Entry-point mínimo funcional** — sem ele, não há processo para rodar
+- [x] **Seed com 5+ países** — 2 países não justifica uma interface visual
+- [x] **Sistema de combate e economia rodando** — a visualização precisa
       de dados em movimento para ser interessante
-- [ ] **API de estado estável** — `APIGatewayRouter` precisa de pelo menos
+- [x] **API de estado estável** — `APIGatewayRouter` precisa de pelo menos
       uma semana sem mudanças de interface para validação
-- [ ] **Definição do formato de dados do mapa** — coordenadas, cores,
+- [x] **Definição do formato de dados do mapa** — coordenadas, cores,
       bordas precisam ser acordadas antes do frontend
+
+> **Global Defensive Code Hardening: COMPLETED** — All UI components that read
+> from the enriched `Country` object now use optional chaining and nullish
+> coalescing to degrade gracefully when seed data is incomplete. Files hardened:
+> `CountryProfile.tsx`, `WorldMap.tsx`, `CovertOpsPanel.tsx`, `MarketTicker.tsx`,
+> `BriefingDashboard.tsx`, `CampaignModal.tsx`.
+
+---
+
+## Phase 5 — Advanced Warfare Engine (IN PROGRESS)
+
+### Visão Geral
+
+Implementação do motor de combate avançado com GFP data, force multipliers
+dinâmicos, e event sourcing estrito. Localizado em `src/domain/war/`.
+
+### Estrutura Atual
+
+```
+src/domain/war/
+├── components/
+│   ├── military-detail.component.ts   # GFP data + readiness/morale force multipliers
+│   ├── war.components.ts              # MilitaryUnit + LogisticsSupply components
+│   ├── province.components.ts         # Province terrain/occupation
+│   └── terrain.components.ts          # Terrain modifiers
+├── events/
+│   └── war.events.ts                  # Combat, casualties, exhaustion, advantage-shifted
+├── systems/
+│   ├── combat.system.ts               # CombatSystem — event-driven resolution
+│   ├── combined-arms.ts               # Combat math: force multipliers + advantage
+│   ├── movement.system.ts             # Unit movement
+│   ├── occupation.system.ts           # Territory occupation
+│   ├── occupation-progress.system.ts  # Occupation progress tracking
+│   ├── province-combat.system.ts      # Province-level combat
+│   ├── frontline.system.ts            # Frontline management
+│   ├── supply.system.ts               # Supply line management
+│   ├── peace.system.ts                # Peace negotiations
+│   └── war.system.ts                  # War declaration/escalation
+└── war.test.ts
+```
+
+### Marcos de Entrega
+
+1. **W1**: Combat math with GFP data (combined-arms.ts) ✅
+2. **W2**: Force multipliers: logistics, airpower, readiness, morale ✅
+3. **W3**: Advantage tracking via `war.advantage-shifted` event ✅
+4. **W4**: Province-level combat resolution (in progress)
+5. **W5**: Supply line interdiction
+6. **W6**: Combined-arms synergy bonuses
+7. **W7**: Naval blockade mechanics
+
+### Event Types
+
+- `war.combat-resolved` — A skirmish has been resolved, victor determined
+- `war.casualties-taken` — A country has taken casualties
+- `war.exhaustion-increased` — War exhaustion has risen for a country
+- `war.advantage-shifted` — Combat power balance has shifted between belligerents
 
 ### Gatilhos Recomendados
 
-1. Completar **Fases E1-E7** da economia avançada
-2. Completar **Fases C1-C3** do sistema de combate (já implementado)
-3. Expandir **world seed** para 10+ entidades
-4. **Opção 2 (CLI/Interface)** primeiro — dá visibilidade e depuração
-5. Depois **Opção 1 (Agentes)** — IA significativa depende de mundo rico
+1. Completar **Fases E1-E7** da economia avançada ✅
+2. Completar **Fases C1-C3** do sistema de combate (já implementado) ✅
+3. Expandir **world seed** para 10+ entidades ✅
+4. **Opção 2 (CLI/Interface)** primeiro — dá visibilidade e depuração ✅
+5. Depois **Opção 1 (Agentes)** — IA significativa depende de mundo rico ✅
+6. **Phase 5 (Advanced Warfare Engine)** — IN PROGRESS
 
 > **Ordem recomendada:** Economia Avançada → CLI/Interface →
-> Seed Expansion → Agentes Autônomos
+> Seed Expansion → Agentes Autônomos → Advanced Warfare Engine

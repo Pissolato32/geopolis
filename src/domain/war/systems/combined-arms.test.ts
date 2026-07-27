@@ -68,8 +68,8 @@ describe("Combined Arms Math", () => {
   });
 
   it("logistics acts as a sustainment multiplier (0.5 to 1.0 range)", () => {
-    const lowLogistics = makeMilitaryDetail({ logisticsScore: 0.0 });
-    const highLogistics = makeMilitaryDetail({ logisticsScore: 1.0 });
+    const lowLogistics = makeMilitaryDetail({ logisticsScore: 0.0 } as Partial<CountryMilitaryDetailComponent>);
+    const highLogistics = makeMilitaryDetail({ logisticsScore: 1.0 } as Partial<CountryMilitaryDetailComponent>);
 
     const lowPower = calculateCombatPower(lowLogistics);
     const highPower = calculateCombatPower(highLogistics);
@@ -80,6 +80,41 @@ describe("Combined Arms Math", () => {
     expect(highPower.logisticsMultiplier).toBeCloseTo(1.0);
     // High logistics should roughly double the total power
     expect(highPower.totalPower).toBeGreaterThan(lowPower.totalPower * 1.8);
+  });
+
+  it("readiness acts as a force multiplier (0.6 to 1.2 range)", () => {
+    const lowReadiness = makeMilitaryDetail({ readiness: 0.0 } as Partial<CountryMilitaryDetailComponent>);
+    const highReadiness = makeMilitaryDetail({ readiness: 1.0 } as Partial<CountryMilitaryDetailComponent>);
+
+    const lowPower = calculateCombatPower(lowReadiness);
+    const highPower = calculateCombatPower(highReadiness);
+
+    expect(lowPower.readinessMultiplier).toBeCloseTo(0.6);
+    expect(highPower.readinessMultiplier).toBeCloseTo(1.2);
+    expect(highPower.totalPower).toBeGreaterThan(lowPower.totalPower * 1.5);
+  });
+
+  it("morale acts as a force multiplier (0.5 to 1.15 range)", () => {
+    const brokenMorale = makeMilitaryDetail({ morale: 0.0 } as Partial<CountryMilitaryDetailComponent>);
+    const highMorale = makeMilitaryDetail({ morale: 1.0 } as Partial<CountryMilitaryDetailComponent>);
+
+    const broken = calculateCombatPower(brokenMorale);
+    const elated = calculateCombatPower(highMorale);
+
+    expect(broken.moraleMultiplier).toBeCloseTo(0.5);
+    expect(elated.moraleMultiplier).toBeCloseTo(1.15);
+    expect(elated.totalPower).toBeGreaterThan(broken.totalPower * 1.8);
+  });
+
+  it("resolveCombat includes advantage percentages and momentum in the outcome", () => {
+    const attacker = makeMilitaryDetail({ activePersonnel: 300000, tanks: 1000 } as Partial<CountryMilitaryDetailComponent>);
+    const defender = makeMilitaryDetail({ activePersonnel: 100000, tanks: 100 } as Partial<CountryMilitaryDetailComponent>);
+
+    const outcome = resolveCombat("country-a", "country-b", attacker, defender, 0.1);
+
+    expect(outcome.attackerAdvantagePct).toBeGreaterThan(50);
+    expect(outcome.defenderAdvantagePct).toBeLessThan(50);
+    expect(outcome.momentum).toBeGreaterThan(0); // attacker dominant
   });
 
   it("airpower acts as a force multiplier on top of base power", () => {

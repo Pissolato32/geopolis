@@ -247,19 +247,32 @@ src/
 │   │   ├── components/
 │   │   ├── systems/
 │   │   └── events/
-│   ├── war/
+│   ├── war/                                                              # Phase 5 — Advanced Warfare Engine (IN PROGRESS)
 │   │   ├── components/
 │   │   │   ├── war.components.ts          # MilitaryUnitComponent, LogisticsSupplyComponent
-│   │   │   └── military-detail.component.ts # CountryMilitaryDetailComponent (GFP: manpower, airpower, land, naval, logistics)
+│   │   │   ├── military-detail.component.ts # CountryMilitaryDetailComponent (GFP: manpower, airpower, land, naval, logistics, readiness, morale)
+│   │   │   ├── province.components.ts     # Province terrain/occupation state
+│   │   │   └── terrain.components.ts      # Terrain modifiers
 │   │   ├── systems/
-│   │   │   ├── combined-arms.ts           # Pure combat math (logistics multiplier, airpower force multiplier)
-│   │   │   └── combat.system.ts           # Combat Resolution System — emits war.combat-resolved, war.casualties-taken, war.exhaustion-increased
+│   │   │   ├── combined-arms.ts           # Pure combat math (logistics, airpower, readiness, morale force multipliers + advantage calculation)
+│   │   │   ├── combat.system.ts           # CombatSystem — emits war.combat-resolved, war.casualties-taken, war.exhaustion-increased, war.advantage-shifted
+│   │   │   ├── movement.system.ts         # Unit movement system
+│   │   │   ├── occupation.system.ts       # Territory occupation system
+│   │   │   ├── occupation-progress.system.ts # Occupation progress tracking
+│   │   │   ├── province-combat.system.ts  # Province-level combat resolution
+│   │   │   ├── frontline.system.ts        # Frontline management
+│   │   │   ├── supply.system.ts           # Supply line management
+│   │   │   ├── peace.system.ts            # Peace negotiations
+│   │   │   └── war.system.ts              # War declaration/escalation
 │   │   └── events/
+│   │       └── war.events.ts             # war.combat-resolved, war.casualties-taken, war.exhaustion-increased, war.advantage-shifted, war.peace-signed
 │   ├── politics/
 │   │   ├── components/
 │   │   │   ├── politics.components.ts      # GovernmentStabilityComponent, PoliticalFactionComponent
 │   │   │   └── war-exhaustion.component.ts # WarExhaustionComponent (0-100 exhaustion, casualties, ticks at war)
 │   │   ├── systems/
+│   │   │   ├── politics.system.ts         # Political stability processing
+│   │   │   └── coup.system.ts             # Coup d'état mechanics
 │   │   └── events/
 │   ├── diplomacy/
 │   │   ├── components/

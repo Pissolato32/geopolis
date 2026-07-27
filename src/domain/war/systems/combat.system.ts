@@ -11,9 +11,11 @@ import {
   WAR_COMBAT_RESOLVED_EVENT,
   WAR_CASUALTIES_TAKEN_EVENT,
   WAR_EXHAUSTION_INCREASED_EVENT,
+  WAR_ADVANTAGE_SHIFTED_EVENT,
   IWarCombatResolvedPayload,
   IWarCasualtiesTakenPayload,
   IWarExhaustionIncreasedPayload,
+  IWarAdvantageShiftedPayload,
 } from '../events/war.events.js';
 import { resolveCombat } from './combined-arms.js';
 import {
@@ -45,6 +47,7 @@ export class CombatSystem implements ISystem {
       WAR_COMBAT_RESOLVED_EVENT,
       WAR_CASUALTIES_TAKEN_EVENT,
       WAR_EXHAUSTION_INCREASED_EVENT,
+      WAR_ADVANTAGE_SHIFTED_EVENT,
     ],
   };
 
@@ -113,7 +116,22 @@ export class CombatSystem implements ISystem {
 
         const outcome = resolveCombat(aId, bId, aDetail, bDetail);
 
-        // 1. Emit combat resolved event
+        // 1. Emit advantage-shifted event (before combat resolution)
+        eventBus.publish<IWarAdvantageShiftedPayload>(
+          WAR_ADVANTAGE_SHIFTED_EVENT,
+          {
+            attackerId: outcome.attackerId,
+            defenderId: outcome.defenderId,
+            attackerPower: outcome.attackerPower,
+            defenderPower: outcome.defenderPower,
+            attackerAdvantagePct: outcome.attackerAdvantagePct,
+            defenderAdvantagePct: outcome.defenderAdvantagePct,
+            momentum: outcome.momentum,
+          },
+          COMBAT_SYSTEM_ID,
+        );
+
+        // 2. Emit combat resolved event
         eventBus.publish<IWarCombatResolvedPayload>(
           WAR_COMBAT_RESOLVED_EVENT,
           {
@@ -129,11 +147,11 @@ export class CombatSystem implements ISystem {
           outcome.victorId as EntityId,
         );
 
-        // 2. Emit casualties-taken events for both sides
+        // 3. Emit casualties-taken events for both sides
         this.emitCasualties(eventBus, outcome.attackerId, outcome.attackerCasualties);
         this.emitCasualties(eventBus, outcome.defenderId, outcome.defenderCasualties);
 
-        // 3. Emit exhaustion-increased events for both sides
+        // 4. Emit exhaustion-increased events for both sides
         this.emitExhaustion(eventBus, outcome.attackerId, outcome.attackerExhaustionDelta);
         this.emitExhaustion(eventBus, outcome.defenderId, outcome.defenderExhaustionDelta);
       }

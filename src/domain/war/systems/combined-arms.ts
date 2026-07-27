@@ -14,6 +14,8 @@ export interface ICombatPowerBreakdown {
   readonly navalPower: number;
   readonly logisticsMultiplier: number;
   readonly airMultiplier: number;
+  readonly readinessMultiplier: number;
+  readonly moraleMultiplier: number;
   readonly totalPower: number;
 }
 
@@ -28,8 +30,11 @@ export interface ICombatPowerBreakdown {
  *
  *   airMultiplier = 1.0 + (airPower / (basePower + landPower + 1)) * 0.5
  *   logisticsMultiplier = 0.5 + logisticsScore * 0.5  (0.5 to 1.0)
+ *   readinessMultiplier = 0.6 + readiness * 0.6  (0.6 to 1.2)
+ *   moraleMultiplier = 0.5 + morale * 0.65  (0.5 to 1.15)
  *
  *   totalPower = (basePower + landPower + navalPower) * airMultiplier * logisticsMultiplier
+ *                * readinessMultiplier * moraleMultiplier
  */
 export function calculateCombatPower(detail: CountryMilitaryDetailComponent): ICombatPowerBreakdown {
   const basePower = detail.activePersonnel + detail.reservePersonnel * 0.3;
@@ -53,7 +58,20 @@ export function calculateCombatPower(detail: CountryMilitaryDetailComponent): IC
   const airMultiplier = 1.0 + (airPower / conventionalBase) * 0.5;
   const logisticsMultiplier = 0.5 + detail.logisticsScore * 0.5;
 
-  const totalPower = (basePower + landPower + navalPower) * airMultiplier * logisticsMultiplier;
+  // Readiness force multiplier: 0.6 (unprepared) to 1.2 (peak operational)
+  const readiness = detail.readiness ?? 0.5;
+  const readinessMultiplier = 0.6 + readiness * 0.6;
+
+  // Morale force multiplier: 0.5 (broken) to 1.15 (fanatic)
+  const morale = detail.morale ?? 0.5;
+  const moraleMultiplier = 0.5 + morale * 0.65;
+
+  const totalPower =
+    (basePower + landPower + navalPower) *
+    airMultiplier *
+    logisticsMultiplier *
+    readinessMultiplier *
+    moraleMultiplier;
 
   return {
     manpowerPower: basePower,
@@ -62,6 +80,8 @@ export function calculateCombatPower(detail: CountryMilitaryDetailComponent): IC
     navalPower,
     logisticsMultiplier,
     airMultiplier,
+    readinessMultiplier,
+    moraleMultiplier,
     totalPower,
   };
 }
@@ -95,6 +115,9 @@ export interface ICombatOutcome {
   readonly defenderCasualties: number;
   readonly attackerExhaustionDelta: number;
   readonly defenderExhaustionDelta: number;
+  readonly attackerAdvantagePct: number;
+  readonly defenderAdvantagePct: number;
+  readonly momentum: number;
 }
 
 export function resolveCombat(
@@ -120,6 +143,9 @@ export function resolveCombat(
       defenderCasualties: 0,
       attackerExhaustionDelta: 0,
       defenderExhaustionDelta: 0,
+      attackerAdvantagePct: 50,
+      defenderAdvantagePct: 50,
+      momentum: 0,
     };
   }
 
@@ -143,6 +169,11 @@ export function resolveCombat(
     ? baseExhaustion + loserCasualties * 0.02
     : baseExhaustion + winnerCasualties * 0.01;
 
+  const attackerAdvantagePct = Math.round((attackerBreakdown.totalPower / totalPower) * 1000) / 10;
+  const defenderAdvantagePct = Math.round((defenderBreakdown.totalPower / totalPower) * 1000) / 10;
+  // Momentum: -1.0 (defender dominant) to +1.0 (attacker dominant)
+  const momentum = (attackerBreakdown.totalPower - defenderBreakdown.totalPower) / totalPower;
+
   return {
     victorId,
     loserId,
@@ -154,5 +185,8 @@ export function resolveCombat(
     defenderCasualties,
     attackerExhaustionDelta: Math.round(attackerExhaustionDelta * 10) / 10,
     defenderExhaustionDelta: Math.round(defenderExhaustionDelta * 10) / 10,
+    attackerAdvantagePct,
+    defenderAdvantagePct,
+    momentum: Math.round(momentum * 1000) / 1000,
   };
 }
