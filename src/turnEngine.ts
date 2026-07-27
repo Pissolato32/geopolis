@@ -10,6 +10,7 @@ import type { Country, GameEvent, Relationship, TurnSummary, Unit, CabinetCard, 
 import { runAIDirector } from "./aiDirector.js";
 import { generateNarrativeBeats, buildProfiles } from "./narrativeDirector.js";
 import { createDefaultCabinet } from "./campaign/advisorTypes.js";
+import { createInitialResearchState, advanceResearch } from "./research/researchEngine.js";
 
 /** Evaluate the player country state and generate 0–3 dynamic cabinet cards. */
 function generateCabinetCards(player: Country): CabinetCard[] {
@@ -385,6 +386,30 @@ export function processTurn(
       if (active.length !== updated[i]!.cooldowns!.length) {
         updated[i] = { ...updated[i]!, cooldowns: active };
       }
+    }
+    // Initialize research state for any country that doesn't have one yet
+    if (!updated[i]!.research) {
+      updated[i] = { ...updated[i]!, research: createInitialResearchState(updated[i]!.id) };
+    }
+  }
+
+  // Advance research for all countries
+  for (let i = 0; i < updated.length; i++) {
+    const result = advanceResearch(updated[i]!, tick);
+    if (result.newlyUnlocked.length > 0) {
+      updated[i] = { ...updated[i]!, research: result.research };
+      for (const techId of result.newlyUnlocked) {
+        events.push({
+          type: "ai.decision",
+          at: at(),
+          tick,
+          country: updated[i]!.id,
+          action: `research breakthrough: ${techId}`,
+          rationale: "technology unlocked",
+        });
+      }
+    } else if (result.research !== updated[i]!.research) {
+      updated[i] = { ...updated[i]!, research: result.research };
     }
   }
 

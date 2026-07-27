@@ -107,6 +107,46 @@ export interface CompetingCard {
   tickCreated: number;
 }
 
+/** The 3 research branches in the technology tree. */
+export type TechBranch = "economy" | "defense" | "governance_intel";
+
+/** KPI modifiers applied when a tech node is unlocked. */
+export interface TechKpiModifiers {
+  gdpGrowthDelta?: number;       // e.g. +0.02 (2% GDP growth boost)
+  taxYieldBonus?: number;        // e.g. +0.015 (1.5% extra tax revenue)
+  readinessMaxBonus?: number;    // e.g. +5 (raises readiness cap by 5)
+  stabilityDelta?: number;       // e.g. +0.03 (3% stability boost)
+  intelFidelityBonus?: number;   // e.g. +0.10 (10% intel accuracy boost)
+}
+
+/** A single technology node in the research tree. */
+export interface ITechNode {
+  id: string;
+  name: string;
+  branch: TechBranch;
+  tier: 1 | 2 | 3;
+  costPoints: number;          // research points required to unlock
+  prerequisites: string[];     // tech IDs that must be unlocked first
+  description: string;
+  kpiModifiers: TechKpiModifiers;
+}
+
+/** Progress state for a single tech node being researched. */
+export interface TechProgress {
+  techId: string;
+  accumulatedPoints: number;   // 0..costPoints
+  unlocked: boolean;           // true when fully researched
+  unlockedTick?: number;       // tick when research completed
+}
+
+/** Full research state for a nation — all 3 branches. */
+export interface ResearchState {
+  countryId: string;
+  progress: Record<string, TechProgress>;  // keyed by techId
+  totalUnlocked: number;
+  researchPerTick: number;     // base research output per tick
+}
+
 export interface Country {
   id: string; // alpha-3 code
   numericCode: string; // ISO 3166-1 numeric (joins to world-atlas geometry id)
@@ -124,6 +164,7 @@ export interface Country {
   cabinet?: CabinetState;
   activeTreaties?: ActiveTreaty[];
   cooldowns?: PolicyCooldown[];
+  research?: ResearchState;
 }
 
 /** Player's espionage knowledge about a foreign nation (0 = blind, 100 = full). */
