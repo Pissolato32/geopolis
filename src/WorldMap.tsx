@@ -26,7 +26,7 @@ type CountryFeature = {
 
 const sphere: GeoPermissibleObjects = { type: "Sphere" } as GeoPermissibleObjects;
 
-export function WorldMap({ seed }: { seed: WorldSeed }) {
+export function WorldMap({ seed, onCountryPicked }: { seed: WorldSeed; onCountryPicked?: (c: Country) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [features, setFeatures] = useState<CountryFeature[]>([]);
@@ -347,6 +347,10 @@ export function WorldMap({ seed }: { seed: WorldSeed }) {
     }
     if (hoveredId == null) return;
     const country = byNumeric.current.get(hoveredId);
+    if (onCountryPicked && country) {
+      onCountryPicked(country);
+      return;
+    }
     selection.selectCountry(country ?? null);
   };
 

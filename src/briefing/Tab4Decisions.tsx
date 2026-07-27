@@ -10,6 +10,7 @@ interface Props {
   briefing: IPresidentialBriefing;
   snapshot: AnalysisSnapshot;
   onSubmit: (selections: Record<string, string>) => void;
+  campaignLocked?: boolean;
 }
 
 const DOMAIN_ICONS: Record<string, string> = {

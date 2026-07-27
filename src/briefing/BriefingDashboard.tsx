@@ -5,17 +5,25 @@ import { useMemo, useState } from "react";
 import type { BriefingTab, IPresidentialBriefing } from "./briefingTypes.js";
 import type { StrictIntent } from "../shared/types.js";
 import type { AnalysisSnapshot } from "./byodTypes.js";
+import type { AdvisorAgenda, AdvisorCard, ByodAdvisorResponse } from "../campaign/advisorTypes.js";
 import { KPIHeaderBar } from "./KPIHeaderBar.js";
 import { Tab1Briefing } from "./Tab1Briefing.js";
 import { Tab2Domains } from "./Tab2Domains.js";
 import { Tab3Intel } from "./Tab3Intel.js";
 import { Tab4Decisions } from "./Tab4Decisions.js";
 import { Tab5Archive } from "./Tab5Archive.js";
+import { AdvisorCouncil } from "../campaign/AdvisorCouncil.js";
 import { gameSocket } from "../gameSocket.js";
 import { pushToast } from "../Toast.js";
 
 interface Props {
   briefing: IPresidentialBriefing;
+  advisorAgenda?: AdvisorAgenda;
+  advisorResponses?: ByodAdvisorResponse[];
+  onAdvisorDirective?: (text: string) => void;
+  onCardDispatch?: (card: AdvisorCard) => void;
+  campaignLocked?: boolean;
+  playerCode?: string;
 }
 
 function buildSnapshot(): AnalysisSnapshot {
@@ -47,7 +55,14 @@ const TABS: Array<{ id: BriefingTab; label: string; icon: string }> = [
   { id: "archive", label: "Arquivo Reservado", icon: "▣" },
 ];
 
-export function BriefingDashboard({ briefing }: Props) {
+export function BriefingDashboard({
+  briefing,
+  advisorAgenda,
+  advisorResponses = [],
+  onAdvisorDirective,
+  onCardDispatch,
+  campaignLocked = false,
+}: Props) {
   const [tab, setTab] = useState<BriefingTab>("briefing");
   const snapshot = useMemo(() => buildSnapshot(), []);
 
@@ -89,7 +104,20 @@ export function BriefingDashboard({ briefing }: Props) {
         {tab === "briefing" && <Tab1Briefing briefing={briefing} />}
         {tab === "domains" && <Tab2Domains briefing={briefing} />}
         {tab === "intel" && <Tab3Intel briefing={briefing} />}
-        {tab === "decisions" && <Tab4Decisions briefing={briefing} snapshot={snapshot} onSubmit={handleDecisionSubmit} />}
+        {tab === "decisions" && (
+          <>
+            <Tab4Decisions briefing={briefing} snapshot={snapshot} onSubmit={handleDecisionSubmit} campaignLocked={campaignLocked} />
+            {advisorAgenda && onAdvisorDirective && onCardDispatch && (
+              <AdvisorCouncil
+                agenda={advisorAgenda}
+                advisorResponses={advisorResponses}
+                onDirectiveSubmit={onAdvisorDirective}
+                onCardDispatch={onCardDispatch}
+                dispatched={false}
+              />
+            )}
+          </>
+        )}
         {tab === "archive" && <Tab5Archive briefing={briefing} />}
       </div>
     </div>

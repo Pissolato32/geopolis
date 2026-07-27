@@ -20,6 +20,10 @@ import { useOnlineStatus } from "./useOnlineStatus.js";
 import { reportError } from "./errors.js";
 import type { CabinetCard, GameEvent, WorldSeed } from "./shared/types.js";
 import seedData from "../data/world-seed-2026.json";
+import { CampaignModal } from "./campaign/CampaignModal.js";
+import { loadCampaign, saveCampaign, clearCampaign, type CampaignState } from "./campaign/campaignState.js";
+import { generateAdvisorAgenda, evaluateDirectiveByAdvisors } from "./campaign/advisorEngine.js";
+import type { AdvisorCard, AdvisorAgenda, ByodAdvisorResponse } from "./campaign/advisorTypes.js";
 
 const SEED = seedData as WorldSeed;
 
@@ -48,6 +52,11 @@ export default function App() {
   const [connStatus, setConnStatus] = useState<ConnectionStatus>("offline");
   const [view, setView] = useState<ViewMode>("map");
   const [events, setEvents] = useState<GameEvent[]>([]);
+  const [campaign, setCampaign] = useState<CampaignState | null>(null);
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [advisorAgenda, setAdvisorAgenda] = useState<AdvisorAgenda>({ cards: [], councilSummary: "" });
+  const [advisorResponses, setAdvisorResponses] = useState<ByodAdvisorResponse[]>([]);
   const { online, wasOffline } = useOnlineStatus();
 
   useEffect(() => {
@@ -87,6 +96,18 @@ export default function App() {
     };
   }, [seed]);
 
+  // Load campaign state from localStorage on mount
+  useEffect(() => {
+    const saved = loadCampaign();
+    if (saved && saved.locked) {
+      gameSocket.setPlayerCountry(saved.playerCountryId);
+      setPlayerCode(saved.playerCountryId);
+      setCampaign(saved);
+    } else {
+      setShowCampaignModal(true);
+    }
+  }, []);
+
   useEffect(() => gameSocket.onTick(setTick), []);
   useEffect(() => gameSocket.onEvent((evt) => {
     setEvents((prev) => {
@@ -124,8 +145,45 @@ export default function App() {
   };
 
   const playerCountry = seed.countries.find((c) => c.id === playerCode);
+  const campaignLocked = campaign?.locked ?? false;
+
+  const handleCampaignConfirm = (countryId: string) => {
+    const state: CampaignState = {
+      playerCountryId: countryId,
+      startedAt: Date.now(),
+      scenarioId: activeScenario,
+      locked: true,
+    };
+    saveCampaign(state);
+    setCampaign(state);
+    gameSocket.setPlayerCountry(countryId);
+    setPlayerCode(countryId);
+    setShowCampaignModal(false);
+    pushToast({
+      kind: "success",
+      title: "Campaign Locked",
+      message: `You are now leading ${seed.countries.find((c) => c.id === countryId)?.name ?? countryId}.`,
+      dismissable: true,
+      duration: 5000,
+    });
+  };
+
+  const handleResetCampaign = () => {
+    clearCampaign();
+    setCampaign(null);
+    setShowResetConfirm(false);
+    setShowCampaignModal(true);
+    pushToast({
+      kind: "info",
+      title: "Campaign Reset",
+      message: "Select a new nation to begin a fresh campaign.",
+      dismissable: true,
+      duration: 4000,
+    });
+  };
 
   const pickPlayer = (code: string) => {
+    if (campaignLocked) return;
     gameSocket.setPlayerCountry(code);
     setPlayerCode(code);
     setPlayerOpen(false);
@@ -138,6 +196,49 @@ export default function App() {
       gameSocket.setSpeed(speed);
     }
   };
+
+  // Generate advisor agenda when tick changes or events update
+  const currentPlayer = gameSocket.getCountries().find((c) => c.id === playerCode);
+  useEffect(() => {
+    if (!currentPlayer || !campaignLocked) return;
+    const agenda = generateAdvisorAgenda({
+      tick,
+      player: currentPlayer,
+      countries: gameSocket.getCountries(),
+      events,
+      previousCards: advisorAgenda.cards,
+    });
+    setAdvisorAgenda(agenda);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tick, campaignLocked]);
+
+  const handleAdvisorDirective = (text: string) => {
+    if (!currentPlayer) return;
+    const responses = evaluateDirectiveByAdvisors(text, currentPlayer, gameSocket.getCountries());
+    setAdvisorResponses(responses);
+  };
+
+  const handleCardDispatch = (card: AdvisorCard) => {
+    if (card.intent) {
+      gameSocket.sendIntent(card.intent);
+      pushToast({
+        kind: "success",
+        title: "Advisor Directive Dispatched",
+        message: `"${card.title}" by ${card.advisorName} transmitted.`,
+        dismissable: true,
+        duration: 5000,
+      });
+    }
+  };
+
+  if (showCampaignModal) {
+    return (
+      <div className="app-shell">
+        <CampaignModal seed={seed} onConfirm={handleCampaignConfirm} />
+        <ToastContainer />
+      </div>
+    );
+  }
 
   if (status === "loading") {
     return (
@@ -187,51 +288,76 @@ export default function App() {
         </div>
         <GlobalSearch seed={seed} />
         <div className="topbar-status">
-          <div className={`player-picker${playerOpen ? " open" : ""}`}>
-            <button
-              className="player-trigger"
-              onClick={() => setPlayerOpen((o) => !o)}
-              title="Select your player country"
-            >
-              {playerCountry ? (
-                <>
-                  <img className="player-flag" src={playerCountry.flag} alt="" />
-                  <span>{playerCountry.id}</span>
-                </>
-              ) : (
-                <span>Select Player</span>
+          {campaignLocked ? (
+            <div className="player-picker locked" title="Campaign locked — nation cannot be changed">
+              <span className="player-trigger locked-trigger">
+                {playerCountry ? (
+                  <>
+                    <img className="player-flag" src={playerCountry.flag} alt="" />
+                    <span>{playerCountry.id}</span>
+                  </>
+                ) : (
+                  <span>No Nation</span>
+                )}
+                <span className="lock-icon" aria-hidden>🔒</span>
+              </span>
+            </div>
+          ) : (
+            <div className={`player-picker${playerOpen ? " open" : ""}`}>
+              <button
+                className="player-trigger"
+                onClick={() => setPlayerOpen((o) => !o)}
+                title="Select your player country"
+              >
+                {playerCountry ? (
+                  <>
+                    <img className="player-flag" src={playerCountry.flag} alt="" />
+                    <span>{playerCountry.id}</span>
+                  </>
+                ) : (
+                  <span>Select Player</span>
+                )}
+                <span className="player-icon" aria-hidden>▼</span>
+              </button>
+              {playerOpen && (
+                <div className="player-menu" role="menu">
+                  <input
+                    className="player-search"
+                    type="text"
+                    placeholder="Search country…"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setPlayerOpen(false);
+                    }}
+                  />
+                  {seed.countries
+                    .slice()
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .slice(0, 50)
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        className={`player-option${c.id === playerCode ? " active" : ""}`}
+                        onClick={() => pickPlayer(c.id)}
+                      >
+                        <img className="player-flag-sm" src={c.flag} alt="" />
+                        <span className="player-name">{c.name}</span>
+                        <span className="player-code">{c.id}</span>
+                      </button>
+                    ))}
+                </div>
               )}
-              <span className="player-icon" aria-hidden>▼</span>
+            </div>
+          )}
+          {campaignLocked && (
+            <button
+              className="reset-campaign-btn"
+              onClick={() => setShowResetConfirm(true)}
+              title="Start a new campaign"
+            >
+              ↻ New Campaign
             </button>
-            {playerOpen && (
-              <div className="player-menu" role="menu">
-                <input
-                  className="player-search"
-                  type="text"
-                  placeholder="Search country…"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") setPlayerOpen(false);
-                  }}
-                />
-                {seed.countries
-                  .slice()
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .slice(0, 50)
-                  .map((c) => (
-                    <button
-                      key={c.id}
-                      className={`player-option${c.id === playerCode ? " active" : ""}`}
-                      onClick={() => pickPlayer(c.id)}
-                    >
-                      <img className="player-flag-sm" src={c.flag} alt="" />
-                      <span className="player-name">{c.name}</span>
-                      <span className="player-code">{c.id}</span>
-                    </button>
-                  ))}
-              </div>
-            )}
-          </div>
+          )}
           <div className={`scenario-picker${scenarioOpen ? " open" : ""}`}>
             <button
               className="scenario-trigger"
@@ -328,14 +454,22 @@ export default function App() {
       {view === "map" && <MarketTicker />}
 
       {view === "briefing" ? (
-        <BriefingDashboard briefing={generateBriefing({
-          tick,
-          playerCode,
-          countries: gameSocket.getCountries(),
-          units: gameSocket.getUnits(),
-          market: gameSocket.getMarket(),
-          events,
-        })} />
+        <BriefingDashboard
+          briefing={generateBriefing({
+            tick,
+            playerCode,
+            countries: gameSocket.getCountries(),
+            units: gameSocket.getUnits(),
+            market: gameSocket.getMarket(),
+            events,
+          })}
+          advisorAgenda={advisorAgenda}
+          advisorResponses={advisorResponses}
+          onAdvisorDirective={handleAdvisorDirective}
+          onCardDispatch={handleCardDispatch}
+          campaignLocked={campaignLocked}
+          playerCode={playerCode}
+        />
       ) : (
         <main className="layout">
           <EventLog />
@@ -344,6 +478,19 @@ export default function App() {
           </section>
           <CountryProfile />
         </main>
+      )}
+
+      {showResetConfirm && (
+        <div className="campaign-overlay" onClick={() => setShowResetConfirm(false)}>
+          <div className="reset-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Start New Campaign?</h3>
+            <p>This will end your current campaign as {playerCountry?.name ?? playerCode} and let you select a new nation. All progress will be reset.</p>
+            <div className="reset-confirm-actions">
+              <button className="reset-cancel-btn" onClick={() => setShowResetConfirm(false)}>Cancel</button>
+              <button className="reset-confirm-btn" onClick={handleResetCampaign}>Confirm Reset</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {cabinetCards.length > 0 && (
