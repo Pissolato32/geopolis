@@ -101,13 +101,6 @@ describe('Benchmark Stress Test (1000 ticks)', () => {
       const data = JSON.parse(raw);
       const report = runBenchmark(data, 1000);
       reports.push(report);
-
-      console.log(
-        `  ${report.metrics.scenarioName}: ` +
-        `${report.metrics.ticksPerSecond} ticks/s, ` +
-        `avg ${report.metrics.avgTickMs}ms, ` +
-        `${Object.keys(report.eventBreakdown).length} event types`,
-      );
     }
 
     for (const report of reports) {

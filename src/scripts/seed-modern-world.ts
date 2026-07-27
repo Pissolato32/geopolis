@@ -179,8 +179,6 @@ async function main(): Promise<void> {
     .filter((c): c is Country => c !== null)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  logSeed(`[seed] ${countries.length} usable countries after filtering.`);
-
   // second pass: relationships need the full list
   for (const c of countries) {
     c.relationships = buildRelationships(c, countries);

@@ -23,7 +23,7 @@ type ConnectionListener = (status: ConnectionStatus) => void;
 export type SimSpeed = 0 | 1 | 2 | 5;
 export interface SimState { paused: boolean; speed: SimSpeed; }
 
-const WS_URL = `ws://${location.host}/ws`;
+const WS_URL = typeof location !== "undefined" ? `ws://${location.host}/ws` : "ws://localhost/ws";
 const BACKEND_PROBE = "/health";
 const MAX_RECONNECT_ATTEMPTS = 5;
 const BASE_RECONNECT_DELAY = 1000;
@@ -943,7 +943,7 @@ function simulateRandomEvent(seed: WorldSeed, units: Unit[]): GameEvent {
   };
 }
 
-function simulateIntent(intent: StrictIntent, seed: WorldSeed | null, units: Unit[]): IntentResponse {
+export function simulateIntent(intent: StrictIntent, seed: WorldSeed | null, units: Unit[]): IntentResponse {
   const at = new Date().toISOString();
   const findC = (code: string): Country | undefined => seed?.countries.find((c) => c.id === code);
 

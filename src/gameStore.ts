@@ -130,17 +130,20 @@ export async function persistUnitDisband(gameId: string, unitId: string): Promis
   }, "gameStore.persistUnitDisband");
 }
 
-/** Overwrite market prices (after a market tick). */
+/** Overwrite market prices (after a market tick). Single batched upsert. */
 export async function persistMarket(gameId: string, market: MarketPrice[]): Promise<void> {
+  if (market.length === 0) return;
   await safePersist(async () => {
-    for (const p of market) {
-      const { error } = await supabase
-        .from("market_prices")
-        .update({ price: p.price, delta: p.delta })
-        .eq("game_id", gameId)
-        .eq("resource", p.resource);
-      if (error) throw new Error(`persistMarket: ${error.message}`);
-    }
+    const records = market.map((p) => ({
+      game_id: gameId,
+      resource: p.resource,
+      price: p.price,
+      delta: p.delta,
+    }));
+    const { error } = await supabase
+      .from("market_prices")
+      .upsert(records, { onConflict: "game_id,resource" });
+    if (error) throw new Error(`persistMarket: ${error.message}`);
   }, "gameStore.persistMarket");
 }
 
@@ -200,37 +203,58 @@ export async function persistTurnResults(
       );
     }
 
-    // 3. update relationships (only countries that have them)
-    const countriesWithRels = countries.filter((c) => c.relationships.length > 0);
-    for (const c of countriesWithRels) {
+    // 3. update relationships — single batched upsert for all modified pairs
+    const relRecords: Record<string, unknown>[] = [];
+    for (const c of countries) {
       for (const r of c.relationships) {
+        relRecords.push({
+          game_id: gameId,
+          country_code: c.id,
+          counterpart_code: r.countryCode,
+          affinity: r.affinity,
+          tension: r.tension,
+        });
+      }
+    }
+    if (relRecords.length > 0) {
+      const BATCH = 200;
+      for (let i = 0; i < relRecords.length; i += BATCH) {
+        const chunk = relRecords.slice(i, i + BATCH);
         const { error } = await supabase
           .from("relationships")
-          .update({ affinity: r.affinity, tension: r.tension })
-          .eq("game_id", gameId)
-          .eq("country_code", c.id)
-          .eq("counterpart_code", r.countryCode);
-        if (error) throw new Error(`persistTurnResults.rel[${c.id}->${r.countryCode}]: ${error.message}`);
+          .upsert(chunk, { onConflict: "game_id,country_code,counterpart_code" });
+        if (error) throw new Error(`persistTurnResults.relationships: ${error.message}`);
       }
     }
 
-    // 4. reconcile units: delete units no longer in the roster, update survivors
+    // 4. reconcile units: batch delete units no longer in the roster, batch upsert survivors
     const survivorIds = new Set(units.map((u) => u.id));
     const { data: dbUnits, error: dbErr } = await supabase.from("units").select("id").eq("game_id", gameId);
     if (dbErr) throw new Error(`persistTurnResults.fetchUnits: ${dbErr.message}`);
-    for (const dbU of (dbUnits as { id: string }[] | null) ?? []) {
-      if (!survivorIds.has(dbU.id)) {
-        const { error } = await supabase.from("units").delete().eq("game_id", gameId).eq("id", dbU.id);
-        if (error) throw new Error(`persistTurnResults.deleteUnit[${dbU.id}]: ${error.message}`);
-      }
+    const staleIds = ((dbUnits as { id: string }[] | null) ?? []).filter((dbU) => !survivorIds.has(dbU.id));
+    if (staleIds.length > 0) {
+      const { error } = await supabase.from("units").delete().eq("game_id", gameId).in("id", staleIds.map((u) => u.id));
+      if (error) throw new Error(`persistTurnResults.deleteUnits: ${error.message}`);
     }
-    for (const u of units) {
-      const { error } = await supabase
-        .from("units")
-        .update({ readiness: u.readiness, morale: u.morale, lat: u.latlng[0], lng: u.latlng[1] })
-        .eq("game_id", gameId)
-        .eq("id", u.id);
-      if (error) throw new Error(`persistTurnResults.updateUnit[${u.id}]: ${error.message}`);
+    if (units.length > 0) {
+      const unitRecords = units.map((u) => ({
+        game_id: gameId,
+        id: u.id,
+        name: u.name,
+        owner_code: u.ownerCode,
+        type: u.type,
+        readiness: u.readiness,
+        morale: u.morale,
+        strength: u.strength,
+        lat: u.latlng[0],
+        lng: u.latlng[1],
+      }));
+      const BATCH = 200;
+      for (let i = 0; i < unitRecords.length; i += BATCH) {
+        const chunk = unitRecords.slice(i, i + BATCH);
+        const { error } = await supabase.from("units").upsert(chunk, { onConflict: "game_id,id" });
+        if (error) throw new Error(`persistTurnResults.upsertUnits: ${error.message}`);
+      }
     }
   }, "gameStore.persistTurnResults");
 }
