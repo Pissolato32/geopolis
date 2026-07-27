@@ -2,66 +2,104 @@ import { ISystem, SystemPriority } from '../../../core/interfaces/system.interfa
 import { IWorldState } from '../../../core/interfaces/world-state.interface.js';
 import { IEventBus } from '../../../core/interfaces/event-bus.interface.js';
 import { EntityId } from '../../../core/interfaces/entity.interface.js';
+import { IComponent } from '../../../core/interfaces/component.interface.js';
 import {
-  MILITARY_UNIT_TYPE,
-  MilitaryUnitComponent,
-} from '../components/war.components.js';
+  MILITARY_DETAIL_TYPE,
+  CountryMilitaryDetailComponent,
+} from '../components/military-detail.component.js';
 import {
   WAR_COMBAT_RESOLVED_EVENT,
+  WAR_CASUALTIES_TAKEN_EVENT,
+  WAR_EXHAUSTION_INCREASED_EVENT,
   IWarCombatResolvedPayload,
+  IWarCasualtiesTakenPayload,
+  IWarExhaustionIncreasedPayload,
 } from '../events/war.events.js';
+import { resolveCombat } from './combined-arms.js';
 import {
   RelationComponent,
 } from '../../diplomacy/components/relation.component.js';
+import {
+  WAR_EXHAUSTION_TYPE,
+  WarExhaustionComponent,
+} from '../../politics/components/war-exhaustion.component.js';
 
 export const COMBAT_SYSTEM_ID = 'war.combat';
 
-interface UnitGroup {
-  countryId: EntityId;
-  units: MilitaryUnitComponent[];
-  totalPower: number;
-}
-
+/**
+ * CombatSystem — Combined Arms Edition.
+ *
+ * Reads CountryMilitaryDetailComponent from belligerents, calculates combat
+ * outcomes using the combined-arms formula (logistics as sustainment multiplier,
+ * airpower as force multiplier), and emits typed events. Does NOT mutate state
+ * directly — all state changes flow through the EventBus.
+ */
 export class CombatSystem implements ISystem {
   readonly descriptor = {
     id: COMBAT_SYSTEM_ID,
-    name: 'Combat Resolution System',
+    name: 'Combat Resolution System (Combined Arms)',
     priority: 450 as SystemPriority,
-    requiredComponents: [MILITARY_UNIT_TYPE],
+    requiredComponents: [MILITARY_DETAIL_TYPE],
     subscribedEvents: [],
-    emittedEvents: [WAR_COMBAT_RESOLVED_EVENT],
+    emittedEvents: [
+      WAR_COMBAT_RESOLVED_EVENT,
+      WAR_CASUALTIES_TAKEN_EVENT,
+      WAR_EXHAUSTION_INCREASED_EVENT,
+    ],
   };
 
+  /** Tracks cumulative casualties per country (in-memory between ticks) */
+  private cumulativeCasualties: Map<string, number> = new Map();
+  /** Tracks current exhaustion per country (mirrored from components) */
+  private exhaustionState: Map<string, number> = new Map();
+
+  initialize(eventBus: IEventBus, worldState?: IWorldState): void {
+    if (!worldState) return;
+
+    // Subscribe to exhaustion-increased events to update the mirrored state
+    eventBus.subscribe<IWarExhaustionIncreasedPayload>(
+      WAR_EXHAUSTION_INCREASED_EVENT,
+      (event) => {
+        const countryId = event.payload.countryId;
+        if (worldState.hasEntity(countryId as EntityId)) {
+          const entity = worldState.getEntity(countryId as EntityId);
+          const current = entity?.getComponent<WarExhaustionComponent>(WAR_EXHAUSTION_TYPE);
+          if (current) {
+            worldState.updateComponent(countryId as EntityId, {
+              ...current,
+              exhaustion: event.payload.newExhaustion,
+              accumulatedCasualties: this.cumulativeCasualties.get(countryId) ?? current.accumulatedCasualties,
+              ticksAtWar: current.ticksAtWar + 1,
+            } as unknown as IComponent);
+          }
+          this.exhaustionState.set(countryId, event.payload.newExhaustion);
+        }
+      },
+    );
+  }
+
   execute(state: Readonly<IWorldState>, eventBus: IEventBus): void {
-    const units = state.getEntitiesByComponent(MILITARY_UNIT_TYPE);
+    const countries = state.getEntitiesByComponent(MILITARY_DETAIL_TYPE);
+    if (countries.length < 2) return;
 
-    const countryUnits = new Map<string, UnitGroup>();
-
-    for (const unitEntity of units) {
-      const mil = unitEntity.getComponent<MilitaryUnitComponent>(MILITARY_UNIT_TYPE);
-      if (!mil) continue;
-      if (mil.fuelReserves <= 0 || mil.readiness < 0.2) continue;
-
-      const cid = mil.ownerCountryId;
-      let group = countryUnits.get(cid);
-      if (!group) {
-        group = { countryId: cid, units: [], totalPower: 0 };
-        countryUnits.set(cid, group);
+    // Sync exhaustion state from components
+    for (const country of countries) {
+      const exhaustion = country.getComponent<WarExhaustionComponent>(WAR_EXHAUSTION_TYPE);
+      if (exhaustion) {
+        this.exhaustionState.set(country.id, exhaustion.exhaustion);
       }
-      group.units.push(mil);
-      group.totalPower += mil.personnel * mil.readiness * mil.morale;
     }
 
-    const countryIds = Array.from(countryUnits.keys());
     const resolvedPairs = new Set<string>();
 
-    for (let i = 0; i < countryIds.length; i++) {
-      for (let j = i + 1; j < countryIds.length; j++) {
-        const aId = countryIds[i]!;
-        const bId = countryIds[j]!;
+    for (let i = 0; i < countries.length; i++) {
+      for (let j = i + 1; j < countries.length; j++) {
+        const aId = countries[i]!.id;
+        const bId = countries[j]!.id;
         const pairKey = aId < bId ? `${aId}:${bId}` : `${bId}:${aId}`;
         if (resolvedPairs.has(pairKey)) continue;
 
+        // Check diplomatic relation — only fight if hostile
         const relA = state.getRelation(aId as EntityId, bId as EntityId);
         if (!relA) continue;
         const relComponent = relA as unknown as RelationComponent;
@@ -69,36 +107,72 @@ export class CombatSystem implements ISystem {
 
         resolvedPairs.add(pairKey);
 
-        const groupA = countryUnits.get(aId)!;
-        const groupB = countryUnits.get(bId)!;
-        const totalPower = groupA.totalPower + groupB.totalPower;
-        if (totalPower === 0) continue;
+        const aDetail = countries[i]!.getComponent<CountryMilitaryDetailComponent>(MILITARY_DETAIL_TYPE);
+        const bDetail = countries[j]!.getComponent<CountryMilitaryDetailComponent>(MILITARY_DETAIL_TYPE);
+        if (!aDetail || !bDetail) continue;
 
-        const winRoll = Math.random();
-        const aWinChance = groupA.totalPower / totalPower;
-        const victorId = winRoll < aWinChance ? aId : bId;
+        const outcome = resolveCombat(aId, bId, aDetail, bDetail);
 
-        const attackerGroup = victorId === aId ? groupA : groupB;
-        const defenderGroup = victorId === aId ? groupB : groupA;
-
-        const attackerCasualties = Math.round(defenderGroup.totalPower / totalPower * 1000);
-        const defenderCasualties = Math.round(attackerGroup.totalPower / totalPower * 1000);
-
+        // 1. Emit combat resolved event
         eventBus.publish<IWarCombatResolvedPayload>(
           WAR_COMBAT_RESOLVED_EVENT,
           {
-            attackerId: attackerGroup.countryId,
-            defenderId: defenderGroup.countryId,
-            attackerCasualties,
-            defenderCasualties,
-            victorId,
+            attackerId: outcome.attackerId,
+            defenderId: outcome.defenderId,
+            attackerCasualties: outcome.attackerCasualties,
+            defenderCasualties: outcome.defenderCasualties,
+            victorId: outcome.victorId,
             provinceId: '',
             eliminatedId: undefined,
           },
           COMBAT_SYSTEM_ID,
-          victorId as EntityId,
+          outcome.victorId as EntityId,
         );
+
+        // 2. Emit casualties-taken events for both sides
+        this.emitCasualties(eventBus, outcome.attackerId, outcome.attackerCasualties);
+        this.emitCasualties(eventBus, outcome.defenderId, outcome.defenderCasualties);
+
+        // 3. Emit exhaustion-increased events for both sides
+        this.emitExhaustion(eventBus, outcome.attackerId, outcome.attackerExhaustionDelta);
+        this.emitExhaustion(eventBus, outcome.defenderId, outcome.defenderExhaustionDelta);
       }
     }
+  }
+
+  private emitCasualties(eventBus: IEventBus, countryId: string, casualties: number): void {
+    if (casualties <= 0) return;
+    const cumulative = (this.cumulativeCasualties.get(countryId) ?? 0) + casualties;
+    this.cumulativeCasualties.set(countryId, cumulative);
+
+    eventBus.publish<IWarCasualtiesTakenPayload>(
+      WAR_CASUALTIES_TAKEN_EVENT,
+      {
+        countryId,
+        casualties,
+        cumulativeCasualties: cumulative,
+      },
+      COMBAT_SYSTEM_ID,
+      countryId as EntityId,
+    );
+  }
+
+  private emitExhaustion(eventBus: IEventBus, countryId: string, delta: number): void {
+    if (delta <= 0) return;
+    const previous = this.exhaustionState.get(countryId) ?? 0;
+    const newExhaustion = Math.min(100, previous + delta);
+    this.exhaustionState.set(countryId, newExhaustion);
+
+    eventBus.publish<IWarExhaustionIncreasedPayload>(
+      WAR_EXHAUSTION_INCREASED_EVENT,
+      {
+        countryId,
+        previousExhaustion: previous,
+        newExhaustion,
+        delta,
+      },
+      COMBAT_SYSTEM_ID,
+      countryId as EntityId,
+    );
   }
 }

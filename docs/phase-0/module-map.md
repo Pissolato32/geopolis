@@ -249,10 +249,16 @@ src/
 │   │   └── events/
 │   ├── war/
 │   │   ├── components/
+│   │   │   ├── war.components.ts          # MilitaryUnitComponent, LogisticsSupplyComponent
+│   │   │   └── military-detail.component.ts # CountryMilitaryDetailComponent (GFP: manpower, airpower, land, naval, logistics)
 │   │   ├── systems/
+│   │   │   ├── combined-arms.ts           # Pure combat math (logistics multiplier, airpower force multiplier)
+│   │   │   └── combat.system.ts           # Combat Resolution System — emits war.combat-resolved, war.casualties-taken, war.exhaustion-increased
 │   │   └── events/
 │   ├── politics/
 │   │   ├── components/
+│   │   │   ├── politics.components.ts      # GovernmentStabilityComponent, PoliticalFactionComponent
+│   │   │   └── war-exhaustion.component.ts # WarExhaustionComponent (0-100 exhaustion, casualties, ticks at war)
 │   │   ├── systems/
 │   │   └── events/
 │   ├── diplomacy/

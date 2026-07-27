@@ -4,12 +4,25 @@ import { IEventBus } from '../../core/interfaces/event-bus.interface.js';
 import { PerceptionFilter } from '../perception/perception-filter.js';
 import { AgentMemory, IAgentPersonality } from '../memory/agent-memory.js';
 import { StrictIntentParser } from '../parser/strict-intent-parser.js';
+import {
+  DIPLOMATIC_RELATION_TYPE,
+  RelationComponent,
+} from '../../domain/diplomacy/components/relation.component.js';
+import {
+  MILITARY_DETAIL_TYPE,
+} from '../../domain/war/components/military-detail.component.js';
+import {
+  evaluateMilitaryParity,
+  buildWarActionPayload,
+} from '../evaluation/military-parity.js';
 
 export interface IAgentControllerConfig {
   readonly countryId: EntityId;
   readonly personality?: Partial<IAgentPersonality>;
   /** Optional custom LLM decision evaluator function. */
   readonly llmEvaluator?: (prompt: string) => Promise<string> | string;
+  /** Intel level for Fog of War distortion (0.0 blind to 1.0 perfect). Default: 0.5 */
+  readonly intelLevel?: number;
 }
 
 /**
@@ -21,10 +34,18 @@ export class AgentController {
   readonly memory: AgentMemory;
   private readonly parser = new StrictIntentParser();
   private readonly llmEvaluator?: (prompt: string) => Promise<string> | string;
+  private readonly intelLevel: number;
+  private readonly personality: IAgentPersonality;
 
   constructor(config: IAgentControllerConfig) {
     this.countryId = config.countryId;
     this.memory = new AgentMemory(config.countryId, config.personality);
+    this.intelLevel = config.intelLevel ?? 0.5;
+    this.personality = {
+      aggressiveness: config.personality?.aggressiveness ?? 0.5,
+      riskTolerance: config.personality?.riskTolerance ?? 0.5,
+      trustPropensity: config.personality?.trustPropensity ?? 0.5,
+    };
     if (config.llmEvaluator) {
       this.llmEvaluator = config.llmEvaluator;
     }
@@ -34,6 +55,20 @@ export class AgentController {
    * Execute an agent decision cycle for the current tick under Fog of War.
    */
   public async evaluateTick(worldState: Readonly<IWorldState>, eventBus: IEventBus): Promise<boolean> {
+    // 0. Intel-driven war/peace pre-check — evaluate military parity against
+    // hostile nations using distorted perception (Fog of War)
+    const warAction = this.evaluateWarDecision(worldState);
+    if (warAction) {
+      this.memory.recordDecision(warAction.narrativeSummary);
+      eventBus.publish(
+        warAction.actionType,
+        warAction.parameters,
+        `agent.${this.countryId}`,
+        this.countryId,
+      );
+      return true;
+    }
+
     // 1. Gather Fog of War perception dump (dense YAML)
     const perceptionDump = PerceptionFilter.generatePerceptionDump(worldState, this.countryId);
 
@@ -65,6 +100,49 @@ export class AgentController {
     );
 
     return true;
+  }
+
+  /**
+   * Evaluate whether the agent should declare war or request peace based on
+   * military parity using distorted (Fog of War) perception of enemies.
+   * Returns an action payload if a war/peace decision is triggered, null otherwise.
+   */
+  private evaluateWarDecision(worldState: Readonly<IWorldState>): { actionType: string; parameters: Record<string, unknown>; narrativeSummary: string } | null {
+    // Only evaluate if we have military detail and hostile relations
+    const selfEntity = worldState.getEntity(this.countryId);
+    if (!selfEntity?.getComponent(MILITARY_DETAIL_TYPE)) return null;
+
+    // Find hostile relations — tension > 0.6, affinity < -0.3
+    const relations = worldState.getEntitiesByComponent(DIPLOMATIC_RELATION_TYPE);
+    for (const relEntity of relations) {
+      const rel = relEntity.getComponent<RelationComponent>(DIPLOMATIC_RELATION_TYPE);
+      if (!rel) continue;
+      // Only consider relations where this agent is involved
+      if (rel.targetCountryId !== this.countryId && relEntity.id !== this.countryId) continue;
+
+      const targetId = rel.targetCountryId === this.countryId ? relEntity.id : rel.targetCountryId;
+      if (!targetId) continue;
+      if (rel.affinity >= -0.3 || rel.tension < 0.6) continue;
+
+      const assessment = evaluateMilitaryParity(worldState, this.countryId, targetId, {
+        intelLevel: this.intelLevel,
+        aggressiveness: this.personality.aggressiveness,
+        riskTolerance: this.personality.riskTolerance,
+      });
+      if (!assessment) continue;
+
+      // Only trigger war/peace if recommendation is decisive
+      if (assessment.recommendation === 'declare-war' || assessment.recommendation === 'request-peace') {
+        const action = buildWarActionPayload(this.countryId, targetId, assessment);
+        return {
+          actionType: action.actionType,
+          parameters: action.parameters,
+          narrativeSummary: action.narrativeSummary,
+        };
+      }
+    }
+
+    return null;
   }
 
   private buildPrompt(perceptionDump: string): string {

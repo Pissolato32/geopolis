@@ -105,13 +105,13 @@ com LLM real e coordenação multi-agente.
 
 ### Marcos de Entrega
 
-1. **M0**: `ILlmProvider` interface + `MockProvider` + `OpenAiProvider`
-2. **M1**: AgentSystem integrado ao tick loop (remove chamada manual)
-3. **M2**: GoalManager com priorização por personalidade
-4. **M3**: Memória persistente via SQLite
-5. **M4**: 10+ action types cobertos com validação por schema
-6. **M5**: Multi-agente (1 controller por país, agendamento round-robin)
-7. **M6**: Distorção de Fog of War por nível de inteligência
+1. **M0**: `ILlmProvider` interface + `MockProvider` + `OpenAiProvider` ✅
+2. **M1**: AgentSystem integrado ao tick loop (remove chamada manual) ✅
+3. **M2**: GoalManager com priorização por personalidade ✅
+4. **M3**: Memória persistente via SQLite ✅
+5. **M4**: 10+ action types cobertos com validação por schema ✅
+6. **M5**: Multi-agente (1 controller por país, agendamento round-robin) ✅
+7. **M6**: Distorção de Fog of War por nível de inteligência ✅
 
 ---
 

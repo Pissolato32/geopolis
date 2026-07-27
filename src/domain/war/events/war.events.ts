@@ -53,7 +53,22 @@ export interface IWarPeaceRequestedPayload {
   readonly returnProvinces?: ReadonlyArray<string>;
 }
 
+export const WAR_CASUALTIES_TAKEN_EVENT = 'war.casualties-taken';
+export const WAR_EXHAUSTION_INCREASED_EVENT = 'war.exhaustion-increased';
 export const WAR_PEACE_SIGNED_EVENT = 'war.peace-signed';
+
+export interface IWarCasualtiesTakenPayload {
+  readonly countryId: string;
+  readonly casualties: number;
+  readonly cumulativeCasualties: number;
+}
+
+export interface IWarExhaustionIncreasedPayload {
+  readonly countryId: string;
+  readonly previousExhaustion: number;
+  readonly newExhaustion: number;
+  readonly delta: number;
+}
 
 export interface IWarPeaceSignedPayload {
   readonly initiator: string;

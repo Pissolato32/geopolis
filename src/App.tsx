@@ -30,6 +30,7 @@ import type { AdvisorSlotId, AdvisorState, CompetingOption, CabinetState } from 
 import { ResearchPanel } from "./research/ResearchPanel.js";
 import { calculateResearchOutput, calculateAdvisorResearchBonus, createInitialResearchState } from "./research/researchEngine.js";
 import { CovertOpsPanel } from "./CovertOpsPanel.js";
+import { WarRoom } from "./WarRoom.js";
 import { VictoryModal } from "./VictoryModal.js";
 import { calculateVictoryProgress } from "./victory/victoryManager.js";
 import { initializeBlocs } from "./domain/diplomacy/multilateralBlocs.js";
@@ -69,6 +70,7 @@ export default function App() {
   const [advisorResponses, setAdvisorResponses] = useState<ByodAdvisorResponse[]>([]);
   const [showCabinetManager, setShowCabinetManager] = useState(false);
   const [showVictoryModal, setShowVictoryModal] = useState(false);
+  const [showWarRoom, setShowWarRoom] = useState(false);
   const [cabinetOverride, setCabinetOverride] = useState<CabinetState | null>(null);
   const { online, wasOffline } = useOnlineStatus();
 
@@ -496,6 +498,13 @@ export default function App() {
             >
               ◆ Tech &amp; R&amp;D
             </button>
+            <button
+              className="view-btn"
+              onClick={() => setShowWarRoom(true)}
+              title="War Room — Active Conflicts"
+            >
+              ⚔ War Room
+            </button>
           </div>
           <div className="speed-controls">
             <button
@@ -614,6 +623,14 @@ export default function App() {
         />
       )}
 
+      <WarRoom
+        open={showWarRoom}
+        onClose={() => setShowWarRoom(false)}
+        events={events}
+        seed={seed}
+        playerCode={playerCode}
+        intelLevel={0.5}
+      />
       {showVictoryModal && victoryProgress && (
         <VictoryModal progress={victoryProgress} onClose={() => setShowVictoryModal(false)} />
       )}
