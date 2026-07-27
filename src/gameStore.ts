@@ -189,6 +189,7 @@ export async function persistTurnResults(
               gdp: c.economy.gdp,
               treasury: c.economy.treasury,
               stability: c.economy.stability,
+              tax_rate: c.economy.taxRate,
               readiness: c.military.readiness,
               morale: c.military.morale,
             })
