@@ -14,6 +14,11 @@ import {
   IEconomyGdpUpdatedPayload,
   IEconomyResourceShortagePayload,
 } from '../events/economy.events.js';
+import {
+  DIPLOMATIC_INFAMY_TYPE,
+  InfamyComponent,
+} from '../../diplomacy/components/infamy.component.js';
+import { computeInfamyEconomicPenalty } from '../../diplomacy/systems/diplomacy-ai.system.js';
 
 export const ECONOMY_SYSTEM_ID = 'economy.system';
 
@@ -65,12 +70,21 @@ export class EconomySystem implements ISystem {
 
       const currentGdp = typeof indicator.gdp === 'bigint' ? Number(indicator.gdp) : indicator.gdp;
 
+      // Infamy penalty: aggressive countries suffer GDP growth reduction,
+      // trade income loss, and inflation spikes. This is the organic
+      // consequence system — no scripted penalties, just economic reality.
+      const infamy = country.getComponent<InfamyComponent>(DIPLOMATIC_INFAMY_TYPE);
+      const infamyPenalty = infamy ? computeInfamyEconomicPenalty(infamy.infamyScore) : null;
+
       // GDP growth: realistic annual rate ~2-5%, scaled per-tick (weekly).
       // Ticks represent weeks, so the annual rate MUST be divided by 52.
       // Production capacity provides a small bonus, inflation subtracts.
+      // Infamy further reduces growth and adds inflation.
       // The growth factor is capped to prevent hyperinflation in mass simulations.
       const productionBonus = Math.min(0.02, (totalOutput / 500) * 0.0001);
-      const annualGrowthRate = Math.max(-0.02, Math.min(0.05, productionBonus - indicator.inflationRate * 0.0005));
+      const effectiveInflation = indicator.inflationRate + (infamyPenalty?.inflationIncrease ?? 0);
+      const infamyGdpPenalty = infamyPenalty?.gdpGrowthPenalty ?? 0;
+      const annualGrowthRate = Math.max(-0.05, Math.min(0.05, productionBonus - effectiveInflation * 0.0005 - infamyGdpPenalty * 0.5));
       const weeklyGrowthRate = annualGrowthRate / 52;
       const newGdp = Math.max(1, currentGdp * (1 + weeklyGrowthRate));
 

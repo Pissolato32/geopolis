@@ -32,7 +32,7 @@ import { OccupationSystem } from "./engine/domain/war/systems/occupation.system.
 import { PeaceSystem } from "./engine/domain/war/systems/peace.system.js";
 import { IntelligenceSystem } from "./engine/domain/intelligence/systems/intelligence.system.js";
 import { PopulationSystem } from "./engine/domain/demographics/systems/population.system.js";
-import { ScriptedConflictSystem } from "./engine/domain/war/systems/scripted-conflict.system.js";
+import { DiplomaticAISystem } from "./engine/domain/diplomacy/systems/diplomatic-ai-system.js";
 import { AchievementManager } from "./engine/scenarios/achievement-manager.js";
 
 import {
@@ -46,6 +46,7 @@ import {
 import { type RelationComponent } from "./engine/domain/diplomacy/components/relation.component.js";
 import { MILITARY_UNIT_TYPE, type MilitaryUnitComponent } from "./engine/domain/war/components/war.components.js";
 import { DEMOGRAPHIC_TYPE, type DemographicComponent } from "./engine/domain/demographics/components/demographic.components.js";
+import { DIPLOMATIC_INFAMY_TYPE } from "./engine/domain/diplomacy/components/infamy.component.js";
 
 import type { Country, GameEvent, Relationship, TurnSummary, Unit, WorldSeed } from "./shared/types.js";
 
@@ -58,6 +59,7 @@ const DOMAIN_SYSTEMS: ISystem[] = [
   new PoliticsSystem(),
   new CoupSystem(),
   new DiplomacySystem(),
+  new DiplomaticAISystem(),
   new CombatSystem(),
   new ProvinceCombatSystem(),
   new OccupationSystem(),
@@ -65,7 +67,6 @@ const DOMAIN_SYSTEMS: ISystem[] = [
   new PeaceSystem(),
   new WarSystem(),
   new IntelligenceSystem(),
-  new ScriptedConflictSystem(),
   new AchievementManager(),
 ];
 
@@ -152,6 +153,31 @@ export class EngineAdapter {
         country: p.countryId,
         stability: p.newPopulation,
         delta: p.weeklyGrowthRate,
+      } as GameEvent);
+    });
+
+    this.eventBus.subscribe<unknown>("diplomacy.war-declared-ai", (evt) => {
+      const p = evt.payload as { aggressorId: string; targetId: string; reason: string; isDefensive: boolean };
+      this.collectedEvents.push({
+        type: "war.declared",
+        at: evt.timestamp,
+        tick: evt.tick as unknown as number,
+        aggressor: p.aggressorId,
+        target: p.targetId,
+        reason: p.reason,
+      });
+    });
+
+    this.eventBus.subscribe<unknown>("diplomacy.infamy-increased", (evt) => {
+      const p = evt.payload as { aggressorId: string; previousInfamy: number; newInfamy: number; reason: string };
+      if (p.reason === "infamy-decay") return;
+      this.collectedEvents.push({
+        type: "turn.stability-shift",
+        at: evt.timestamp,
+        tick: evt.tick as unknown as number,
+        country: p.aggressorId,
+        stability: Math.round((1 - p.newInfamy) * 100),
+        delta: -(p.newInfamy - p.previousInfamy) * 100,
       } as GameEvent);
     });
   }
@@ -245,6 +271,14 @@ export class EngineAdapter {
         morale: c.military.morale / 100,
         fuelReserves: 100,
         currentProvinceId: c.id,
+      } as unknown as IComponent);
+
+      components.push({
+        type: DIPLOMATIC_INFAMY_TYPE,
+        infamyScore: 0,
+        ticksSinceAggression: 0,
+        coalitionMembers: [],
+        isGlobalThreat: false,
       } as unknown as IComponent);
 
       initialEntities.push({
