@@ -1,3 +1,4 @@
+import { EntityId } from '../../../core/interfaces/entity.interface.js';
 import { ISystem, SystemPriority } from '../../../core/interfaces/system.interface.js';
 import { IWorldState } from '../../../core/interfaces/world-state.interface.js';
 import { IEventBus } from '../../../core/interfaces/event-bus.interface.js';
@@ -36,7 +37,7 @@ export class EconomySystem implements ISystem {
     eventBus.subscribe<IEconomyGdpUpdatedPayload>(
       ECONOMY_GDP_UPDATED_EVENT,
       (event) => {
-        const countryId = event.payload.countryId as any;
+        const countryId = event.payload.countryId as EntityId;
         if (worldState.hasEntity(countryId)) {
           const entity = worldState.getEntity(countryId);
           const currentComp = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
