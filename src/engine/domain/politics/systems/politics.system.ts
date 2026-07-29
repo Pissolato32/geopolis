@@ -35,6 +35,14 @@ import {
   MILITARY_FORCES_TYPE,
   MilitaryForcesComponent,
 } from '../../war/components/military-forces.component.js';
+import {
+  WAR_EXHAUSTION_TYPE,
+  WarExhaustionComponent,
+} from '../components/war-exhaustion.component.js';
+import {
+  WAR_EXHAUSTION_INCREASED_EVENT,
+  IWarExhaustionIncreasedPayload,
+} from '../../war/events/war.events.js';
 
 export const POLITICS_SYSTEM_ID = 'politics.system';
 
@@ -47,7 +55,12 @@ export class PoliticsSystem implements ISystem {
     name: 'Politics, Factions & Legislative System',
     priority: 300 as SystemPriority,
     requiredComponents: [GOVERNMENT_STABILITY_TYPE],
-    subscribedEvents: [ECONOMY_RESOURCE_SHORTAGE_EVENT, 'war.declared', 'economy.adjust-tax'],
+    subscribedEvents: [
+      ECONOMY_RESOURCE_SHORTAGE_EVENT,
+      WAR_EXHAUSTION_INCREASED_EVENT,
+      'war.declared',
+      'economy.adjust-tax',
+    ],
     emittedEvents: [
       POLITICS_STABILITY_CHANGED_EVENT,
       POLITICS_COUP_RISK_EVENT,
@@ -57,6 +70,7 @@ export class PoliticsSystem implements ISystem {
   };
 
   private pendingShortageImpacts = new Map<string, number>();
+  private pendingExhaustionImpacts = new Map<string, number>();
 
   initialize(eventBus: IEventBus, worldState?: IWorldState): void {
     eventBus.subscribe<IEconomyResourceShortagePayload>(
@@ -64,6 +78,22 @@ export class PoliticsSystem implements ISystem {
       (event: ITypedEvent<IEconomyResourceShortagePayload>) => {
         const current = this.pendingShortageImpacts.get(event.payload.countryId) ?? 0;
         this.pendingShortageImpacts.set(event.payload.countryId, current + 0.02);
+      },
+    );
+
+    // War exhaustion drains stability: mild above 40, severe above 70.
+    eventBus.subscribe<IWarExhaustionIncreasedPayload>(
+      WAR_EXHAUSTION_INCREASED_EVENT,
+      (event: ITypedEvent<IWarExhaustionIncreasedPayload>) => {
+        const { countryId, newExhaustion, delta } = event.payload;
+        let stabilityDrain = 0;
+        if (newExhaustion > 70) {
+          stabilityDrain = delta * 0.015;
+        } else if (newExhaustion > 40) {
+          stabilityDrain = delta * 0.008;
+        }
+        const current = this.pendingExhaustionImpacts.get(countryId) ?? 0;
+        this.pendingExhaustionImpacts.set(countryId, current + stabilityDrain);
       },
     );
 
@@ -98,8 +128,13 @@ export class PoliticsSystem implements ISystem {
       this.updateLegislativeAssembly(state, eventBus, country.id, stabilityComp);
 
       const shortagePenalty = this.pendingShortageImpacts.get(country.id) ?? 0;
+      const exhaustionPenalty = this.pendingExhaustionImpacts.get(country.id) ?? 0;
       const naturalDrift = (stabilityComp.approvalRating - 0.5) * 0.01;
-      const totalDelta = naturalDrift - shortagePenalty;
+      const totalDelta = naturalDrift - shortagePenalty - exhaustionPenalty;
+
+      const exhaustionComp = country.getComponent<WarExhaustionComponent>(WAR_EXHAUSTION_TYPE);
+      const exhaustionLevel = exhaustionComp?.exhaustion ?? 0;
+      const loyaltyDrain = exhaustionLevel > 50 ? (exhaustionLevel - 50) * 0.001 : 0;
 
       const newStability = Math.min(1.0, Math.max(0.0, stabilityComp.stabilityIndex + totalDelta));
 
@@ -115,14 +150,15 @@ export class PoliticsSystem implements ISystem {
         country.id,
       );
 
-      if (newStability < 0.35 || stabilityComp.militaryLoyalty < 0.4) {
+      const coupThreshold = exhaustionLevel > 70 ? 0.45 : 0.35;
+      if (newStability < coupThreshold || stabilityComp.militaryLoyalty - loyaltyDrain < 0.4) {
         eventBus.publish<IPoliticsCoupRiskPayload>(
           POLITICS_COUP_RISK_EVENT,
           {
             countryId: country.id,
             stabilityIndex: newStability,
             militaryLoyalty: stabilityComp.militaryLoyalty,
-            riskLevel: newStability < 0.2 ? 'critical' : 'moderate',
+            riskLevel: newStability < 0.2 || exhaustionLevel > 80 ? 'critical' : 'moderate',
           },
           POLITICS_SYSTEM_ID,
           country.id,
@@ -131,6 +167,7 @@ export class PoliticsSystem implements ISystem {
     }
 
     this.pendingShortageImpacts.clear();
+    this.pendingExhaustionImpacts.clear();
   }
 
   private updateFactionDynamics(

@@ -18,11 +18,22 @@ import { IDoctrine, DoctrineType, DOCTRINES, assignDoctrinesByGdp } from '../doc
 
 export const AGENT_SYSTEM_ID = 'agent.evaluator';
 
+/** Priority tier for agent scheduling — major powers evaluate every tick,
+ *  minor powers every N ticks to prevent performance degradation. */
+export type AgentTier = 'major' | 'regional' | 'minor';
+
+const TIER_INTERVALS: Record<AgentTier, number> = { major: 1, regional: 3, minor: 5 };
+
 interface IAgentRecord {
   countryId: EntityId;
   memory: AgentMemory;
   goalManager: GoalManager;
   doctrine: IDoctrine | undefined;
+  tier: AgentTier;
+  /** Ticks between evaluations for this agent (1 = every tick). */
+  evaluationInterval: number;
+  /** Last tick this agent was evaluated. */
+  lastEvaluatedTick: number;
 }
 
 export interface IAgentSystemConfig {
@@ -35,6 +46,11 @@ export interface IAgentSystemConfig {
   readonly defaultIntelLevel?: number;
   /** Manual doctrine assignments. If not provided, doctrines are auto-assigned by GDP. */
   readonly doctrineAssignments?: Map<EntityId, DoctrineType>;
+  /** Map of country IDs to priority tiers. Explicitly controlled entities default
+   *  to 'major'; auto-discovered countries default to 'minor'. */
+  readonly tierAssignments?: Readonly<Record<string, AgentTier>>;
+  /** Maximum agents to evaluate per tick (round-robin cap). Default: 10. */
+  readonly maxAgentsPerTick?: number;
 }
 
 export class AgentSystem implements ISystem {
@@ -61,8 +77,10 @@ export class AgentSystem implements ISystem {
   private readonly defaultIntelLevel: number;
   private readonly manualDoctrines: Map<EntityId, DoctrineType> | undefined;
   private doctrineAssignments: Map<EntityId, DoctrineType> | undefined;
+  private readonly config: IAgentSystemConfig;
 
   constructor(config: IAgentSystemConfig = {}) {
+    this.config = config;
     this.provider = config.provider;
     this.evaluator = config.evaluator;
     this.personality = config.personality;
@@ -72,12 +90,12 @@ export class AgentSystem implements ISystem {
 
     if (config.controlledEntities) {
       for (const id of config.controlledEntities) {
-        this.registerAgent(id);
+        this.registerAgent(id, undefined, config.tierAssignments?.[id] ?? 'major');
       }
     }
   }
 
-  private registerAgent(id: EntityId, doctrine?: IDoctrine): IAgentRecord {
+  private registerAgent(id: EntityId, doctrine?: IDoctrine, tier: AgentTier = 'minor'): IAgentRecord {
     const fullPersonality: IAgentPersonality = {
       aggressiveness: doctrine?.personality.aggressiveness ?? this.personality?.aggressiveness ?? 0.5,
       riskTolerance: doctrine?.personality.riskTolerance ?? this.personality?.riskTolerance ?? 0.5,
@@ -96,7 +114,15 @@ export class AgentSystem implements ISystem {
       }
     }
 
-    const record: IAgentRecord = { countryId: id, memory, goalManager, doctrine };
+    const record: IAgentRecord = {
+      countryId: id,
+      memory,
+      goalManager,
+      doctrine,
+      tier,
+      evaluationInterval: TIER_INTERVALS[tier],
+      lastEvaluatedTick: -1000,
+    };
     this.agents.push(record);
     return record;
   }
@@ -166,11 +192,8 @@ export class AgentSystem implements ISystem {
       if (!existing.has(entity.id)) {
         const doctrineType = this.doctrineAssignments.get(entity.id);
         const doctrine = doctrineType ? DOCTRINES[doctrineType] : undefined;
-        if (doctrineType && doctrine) {
-          this.registerAgent(entity.id, doctrine);
-        } else {
-          this.registerAgent(entity.id);
-        }
+        const tier = this.config.tierAssignments?.[entity.id] ?? 'minor';
+        this.registerAgent(entity.id, doctrineType ? doctrine : undefined, tier);
         existing.add(entity.id);
       }
     }
@@ -202,7 +225,16 @@ export class AgentSystem implements ISystem {
 
     const tick = state.getMetadata().currentTick;
 
-    for (const agent of this.agents) {
+    // Schedule: only agents whose interval has elapsed, highest tier first,
+    // capped per tick so large worlds stay within the tick budget.
+    const tierOrder: Record<AgentTier, number> = { major: 0, regional: 1, minor: 2 };
+    const scheduled = this.agents
+      .filter((a) => tick - a.lastEvaluatedTick >= a.evaluationInterval)
+      .sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier])
+      .slice(0, this.config.maxAgentsPerTick ?? 10);
+
+    for (const agent of scheduled) {
+      agent.lastEvaluatedTick = tick;
       agent.goalManager.evaluateGoals(state, agent.countryId, tick);
 
       const intelLevel = this.getIntelLevel(state, agent.countryId);

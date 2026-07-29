@@ -150,4 +150,84 @@ export class PerceptionFilter {
     }
     return hash || 1;
   }
+
+  /**
+   * Probabilistic fog-of-war distortion (M6). Unlike {@link distort}, which is
+   * deterministic per line, this redacts and perturbs values at rates driven by
+   * the intelligence level: low intel redacts 40% of values, medium 20%, high 5%.
+   */
+  public static distortPerception(perceptionDump: string, intelligenceLevel: number): string {
+    if (intelligenceLevel >= 0.9) return perceptionDump;
+
+    const lines = perceptionDump.split('\n');
+    const distorted: string[] = [];
+
+    for (const line of lines) {
+      const isStructural =
+        /^\s*[A-Za-z_-]+:/.test(line) || line.trim() === '' || line.trim().startsWith('-');
+      if (isStructural && !line.includes(': ')) {
+        distorted.push(line);
+        continue;
+      }
+
+      const distortionRoll = Math.random();
+
+      if (intelligenceLevel < 0.3) {
+        if (distortionRoll < 0.4) {
+          distorted.push(line.replace(/: .+$/, ': [REDACTED]'));
+        } else if (distortionRoll < 0.5) {
+          distorted.push(PerceptionFilter.perturbNumericValue(line, 0.5));
+        } else {
+          distorted.push(line);
+        }
+      } else if (intelligenceLevel < 0.6) {
+        if (distortionRoll < 0.2) {
+          distorted.push(line.replace(/: .+$/, ': [PARTIAL]'));
+        } else if (distortionRoll < 0.35) {
+          distorted.push(PerceptionFilter.perturbNumericValue(line, 0.25));
+        } else {
+          distorted.push(line);
+        }
+      } else if (distortionRoll < 0.05) {
+        distorted.push(PerceptionFilter.perturbNumericValue(line, 0.1));
+      } else {
+        distorted.push(line);
+      }
+    }
+
+    return distorted.join('\n');
+  }
+
+  /** Perturb a numeric YAML value: large values become approximations, small ones ranges. */
+  private static perturbNumericValue(line: string, factor: number): string {
+    const match = line.match(/^(\s*[A-Za-z_-]+:\s*)([\d.]+)(.*)$/);
+    if (!match) return line;
+
+    const prefix = match[1]!;
+    const value = parseFloat(match[2]!);
+    const suffix = match[3] ?? '';
+
+    if (isNaN(value)) return line;
+
+    const spread = value * factor;
+    const lo = Math.round(value - spread);
+    const hi = Math.round(value + spread);
+
+    if (Math.abs(value) > 1000) {
+      const noisy = Math.round(value * (1 + (Math.random() - 0.5) * factor * 2));
+      return `${prefix}~${noisy}${suffix}`;
+    }
+    return `${prefix}${lo}-${hi}${suffix}`;
+  }
+
+  /** Filter the world state for an agent and apply {@link distortPerception}. */
+  public static generateDistortedPerception(
+    worldState: Readonly<IWorldState>,
+    countryId: EntityId,
+    intelligenceLevel: number,
+    config: IPerceptionFilterConfig = {},
+  ): string {
+    const rawDump = PerceptionFilter.generatePerceptionDump(worldState, countryId, config);
+    return PerceptionFilter.distortPerception(rawDump, intelligenceLevel);
+  }
 }

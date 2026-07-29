@@ -6,7 +6,7 @@ import type { Country, CovertOpType, CovertOperation } from "./shared/types.js";
 import {
   OP_TEMPLATES,
   createInitialCovertOpsState,
-} from "./domain/intelligence/covertOps.js";
+} from "./game/covertOps.js";
 import { gameSocket } from "./gameSocket.js";
 
 interface Props {

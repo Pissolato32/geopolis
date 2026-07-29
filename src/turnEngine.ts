@@ -1,3 +1,8 @@
+// DEPRECATED — legacy turn processor. The canonical simulation is the ECS
+// TickEngine in src/engine/, reached through EngineAdapter; both the dashboard
+// and the server tick through it. This file is kept only until the covert-ops
+// and multilateral-bloc rules it still owns are ported to ECS systems.
+//
 // turnEngine — processes one simulation turn. Given the current countries
 // (with live economy + military state) and units, it advances the world by
 // one tick: grows/shrinks every economy, decays or escalates tensions,
@@ -11,8 +16,8 @@ import { runAIDirector } from "./aiDirector.js";
 import { generateNarrativeBeats, buildProfiles } from "./narrativeDirector.js";
 import { createDefaultCabinet } from "./campaign/advisorTypes.js";
 import { createInitialResearchState, advanceResearch } from "./research/researchEngine.js";
-import { advanceCovertOps, createInitialCovertOpsState } from "./domain/intelligence/covertOps.js";
-import { initializeBlocs, applyBlocEconomicBonuses, triggerCollectiveDefense } from "./domain/diplomacy/multilateralBlocs.js";
+import { advanceCovertOps, createInitialCovertOpsState } from "./game/covertOps.js";
+import { initializeBlocs, applyBlocEconomicBonuses, triggerCollectiveDefense } from "./game/multilateralBlocs.js";
 import { calculateVictoryProgress } from "./victory/victoryManager.js";
 
 /** Evaluate the player country state and generate 0–3 dynamic cabinet cards. */
