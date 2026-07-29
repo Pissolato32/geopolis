@@ -4,4 +4,5 @@ data/savegames/
 dashboard/
 *.log
 .env
+*.tsbuildinfo
     

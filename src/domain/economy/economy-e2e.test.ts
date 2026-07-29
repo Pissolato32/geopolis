@@ -83,7 +83,7 @@ describe('E2E: Full Economic Pipeline — Sanction → Blockade → Price Shock'
     );
     eventBus.flush();
 
-    let routes = worldState.getEntitiesByComponent(ECONOMY_TRADE_ROUTE_TYPE);
+    const routes = worldState.getEntitiesByComponent(ECONOMY_TRADE_ROUTE_TYPE);
     expect(routes).toHaveLength(1);
     const routeComp = routes[0]!.getComponent<TradeRouteComponent>(ECONOMY_TRADE_ROUTE_TYPE);
     expect(routeComp?.isActive).toBe(true);
@@ -116,7 +116,7 @@ describe('E2E: Full Economic Pipeline — Sanction → Blockade → Price Shock'
     );
     eventBus.flush();
 
-    let sanctions = worldState.getEntitiesByComponent(ECONOMY_SANCTION_TYPE);
+    const sanctions = worldState.getEntitiesByComponent(ECONOMY_SANCTION_TYPE);
     expect(sanctions).toHaveLength(1);
     expect(timeline.query({ eventType: ECONOMY_SANCTION_IMPOSED_EVENT })).toHaveLength(1);
 

@@ -1,3 +1,4 @@
+import { EntityId } from '../../../core/interfaces/entity.interface.js';
 import { ISystem, SystemPriority } from '../../../core/interfaces/system.interface.js';
 import { IWorldState } from '../../../core/interfaces/world-state.interface.js';
 import { IEventBus } from '../../../core/interfaces/event-bus.interface.js';
@@ -32,7 +33,7 @@ export class DiplomacySystem implements ISystem {
     eventBus.subscribe<IDiplomacyTensionChangedPayload>(
       DIPLOMACY_TENSION_CHANGED_EVENT,
       (event) => {
-        const sourceId = event.payload.sourceCountryId as any;
+        const sourceId = event.payload.sourceCountryId as EntityId;
         if (worldState.hasEntity(sourceId)) {
           const entity = worldState.getEntity(sourceId);
           const currentComp = entity?.getComponent<RelationComponent>(DIPLOMATIC_RELATION_TYPE);

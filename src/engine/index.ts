@@ -141,7 +141,9 @@ function runHeadless(config: IEngineConfig): void {
 
 async function runServer(config: IEngineConfig): Promise<void> {
   const dbProvider = new DatabasePersistenceProvider();
-  let { engine, systems } = resolveEngine(config);
+  const resolved = resolveEngine(config);
+  const systems = resolved.systems;
+  let engine = resolved.engine;
 
   if (dbProvider.hasSave()) {
     try {

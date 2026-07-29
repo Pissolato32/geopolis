@@ -166,37 +166,31 @@ export class GeopoliticalAnomalyResolver {
    *  e.g., negative GDP → 0, stability > 100 → 100. */
   clampCountryValues(country: Country): Country {
     const clamped = { ...country };
-    let clampedCount = 0;
 
     // Economy clamping
     const economy: CountryEconomy = { ...clamped.economy };
     if (economy.gdp < 0) {
       this.logClamp(country.id, "economy.gdp", economy.gdp, 0);
       economy.gdp = 0;
-      clampedCount++;
     }
     if (economy.gdpPerCapita < 0) {
       this.logClamp(country.id, "economy.gdpPerCapita", economy.gdpPerCapita, 0);
       economy.gdpPerCapita = 0;
-      clampedCount++;
     }
     if (economy.stability < 0 || economy.stability > 100) {
       const clampedVal = Math.max(0, Math.min(100, economy.stability));
       this.logClamp(country.id, "economy.stability", economy.stability, clampedVal);
       economy.stability = clampedVal;
-      clampedCount++;
     }
     if (economy.taxRate < 0 || economy.taxRate > 1) {
       const clampedVal = Math.max(0, Math.min(1, economy.taxRate));
       this.logClamp(country.id, "economy.taxRate", economy.taxRate, clampedVal);
       economy.taxRate = clampedVal;
-      clampedCount++;
     }
     if (economy.legislativeSupport < 0 || economy.legislativeSupport > 1) {
       const clampedVal = Math.max(0, Math.min(1, economy.legislativeSupport));
       this.logClamp(country.id, "economy.legislativeSupport", economy.legislativeSupport, clampedVal);
       economy.legislativeSupport = clampedVal;
-      clampedCount++;
     }
     clamped.economy = economy;
 
@@ -206,29 +200,24 @@ export class GeopoliticalAnomalyResolver {
       const clampedVal = Math.max(0, Math.min(100, military.readiness));
       this.logClamp(country.id, "military.readiness", military.readiness, clampedVal);
       military.readiness = clampedVal;
-      clampedCount++;
     }
     if (military.morale < 0 || military.morale > 100) {
       const clampedVal = Math.max(0, Math.min(100, military.morale));
       this.logClamp(country.id, "military.morale", military.morale, clampedVal);
       military.morale = clampedVal;
-      clampedCount++;
     }
     if (military.militaryLoyalty < 0 || military.militaryLoyalty > 100) {
       const clampedVal = Math.max(0, Math.min(100, military.militaryLoyalty));
       this.logClamp(country.id, "military.militaryLoyalty", military.militaryLoyalty, clampedVal);
       military.militaryLoyalty = clampedVal;
-      clampedCount++;
     }
     if (military.totalPersonnel < 0) {
       this.logClamp(country.id, "military.totalPersonnel", military.totalPersonnel, 0);
       military.totalPersonnel = 0;
-      clampedCount++;
     }
     if (military.forceLimit < 0) {
       this.logClamp(country.id, "military.forceLimit", military.forceLimit, 0);
       military.forceLimit = 0;
-      clampedCount++;
     }
     clamped.military = military;
 
@@ -236,7 +225,6 @@ export class GeopoliticalAnomalyResolver {
     if (clamped.population < 0) {
       this.logClamp(country.id, "population", clamped.population, 0);
       clamped.population = 0;
-      clampedCount++;
     }
 
     // Relationship clamping
@@ -247,13 +235,11 @@ export class GeopoliticalAnomalyResolver {
         const clampedVal = Math.max(-100, Math.min(100, aff));
         this.logClamp(country.id, `relationships[${r.countryCode}].affinity`, aff, clampedVal);
         aff = clampedVal;
-        clampedCount++;
       }
       if (ten < 0 || ten > 100) {
         const clampedVal = Math.max(0, Math.min(100, ten));
         this.logClamp(country.id, `relationships[${r.countryCode}].tension`, ten, clampedVal);
         ten = clampedVal;
-        clampedCount++;
       }
       return { ...r, affinity: aff, tension: ten };
     });

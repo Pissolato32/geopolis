@@ -697,8 +697,8 @@ function computeTrends(turnEvents: GameEvent[], player: Country): IPresidentialB
   let popularityDelta = 0;
   let gdpDelta = 0;
   let inflationDelta = 0;
-  let debtDelta = 0;
-  let exchangeDelta = 0;
+  const debtDelta = 0;
+  const exchangeDelta = 0;
   let deficitDelta = 0;
 
   for (const e of turnEvents) {

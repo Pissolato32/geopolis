@@ -88,7 +88,7 @@ export function WorldMap({ seed, onCountryPicked }: { seed: WorldSeed; onCountry
       unsubUnits();
       unsubEvents();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // intel tracking: listen for intel.gathered events and update the map
@@ -99,7 +99,7 @@ export function WorldMap({ seed, onCountryPicked }: { seed: WorldSeed; onCountry
         if (selectedRef.current?.id === evt.target) selectedIntelRef.current = evt.intelLevel;
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // load topojson
