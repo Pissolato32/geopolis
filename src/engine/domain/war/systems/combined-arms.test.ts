@@ -12,7 +12,7 @@ import { WorldState } from "../../../core/world-state/world-state.js";
 import { EventBus } from "../../../core/event-bus/event-bus.js";
 import { Timeline } from "../../../core/timeline/timeline.js";
 import { EntityId } from "../../../core/interfaces/entity.interface.js";
-import { CombatSystem } from "./combat.system.js";
+import { CombinedArmsCombatSystem } from "./combined-arms-combat.system.js";
 import { PoliticsSystem } from "../../../domain/politics/systems/politics.system.js";
 import {
   DIPLOMATIC_RELATION_TYPE,
@@ -185,7 +185,7 @@ describe("Combined Arms Math", () => {
   });
 });
 
-describe("CombatSystem — Event-Driven", () => {
+describe("CombinedArmsCombatSystem — Event-Driven", () => {
   function makeWorldStateWithCombatants(): WorldState {
     const ws = new WorldState("combat-test");
     ws.createEntity("country-a" as EntityId, [
@@ -205,7 +205,7 @@ describe("CombatSystem — Event-Driven", () => {
     const timeline = new Timeline();
     const eventBus = new EventBus(timeline);
     const ws = makeWorldStateWithCombatants();
-    const combatSys = new CombatSystem();
+    const combatSys = new CombinedArmsCombatSystem();
     combatSys.initialize(eventBus, ws);
 
     combatSys.execute(ws, eventBus);
@@ -232,7 +232,7 @@ describe("CombatSystem — Event-Driven", () => {
       makeMilitaryDetail(),
       { type: DIPLOMATIC_RELATION_TYPE, targetCountryId: "country-x" as EntityId, affinity: 0.5, tension: 0.1, recognition: "full", activeTreaties: [] },
     ]);
-    const combatSys = new CombatSystem();
+    const combatSys = new CombinedArmsCombatSystem();
     combatSys.initialize(eventBus, ws);
 
     combatSys.execute(ws, eventBus);

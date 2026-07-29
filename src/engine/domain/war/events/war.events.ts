@@ -73,4 +73,24 @@ export interface IWarAdvantageShiftedPayload {
   readonly attackerAdvantagePct: number;
   /** Defender's share of combat power, 0..100. */
   readonly defenderAdvantagePct: number;
+  /** Absolute combat power, emitted by the combined-arms resolver. */
+  readonly attackerPower?: number;
+  readonly defenderPower?: number;
+}
+
+export const WAR_CASUALTIES_TAKEN_EVENT = 'war.casualties-taken';
+
+export interface IWarCasualtiesTakenPayload {
+  readonly countryId: string;
+  readonly casualties: number;
+  readonly cumulativeCasualties: number;
+}
+
+export const WAR_EXHAUSTION_INCREASED_EVENT = 'war.exhaustion-increased';
+
+export interface IWarExhaustionIncreasedPayload {
+  readonly countryId: string;
+  readonly previousExhaustion: number;
+  readonly newExhaustion: number;
+  readonly delta: number;
 }

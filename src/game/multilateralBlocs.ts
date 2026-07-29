@@ -6,7 +6,7 @@ import type {
   GameEvent,
   InternationalBloc,
   BlocType,
-} from "../../shared/types.js";
+} from "../shared/types.js";
 
 /** Predefined bloc templates for common real-world alliances. */
 export const BLOC_TEMPLATES: Array<Omit<InternationalBloc, "foundedTick">> = [

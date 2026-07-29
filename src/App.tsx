@@ -33,7 +33,7 @@ import { CovertOpsPanel } from "./CovertOpsPanel.js";
 import { WarRoom } from "./WarRoom.js";
 import { VictoryModal } from "./VictoryModal.js";
 import { calculateVictoryProgress } from "./victory/victoryManager.js";
-import { initializeBlocs } from "./domain/diplomacy/multilateralBlocs.js";
+import { initializeBlocs } from "./game/multilateralBlocs.js";
 import type { CovertOpType } from "./shared/types.js";
 
 const SEED = seedData as WorldSeed;

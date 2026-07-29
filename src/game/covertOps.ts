@@ -7,7 +7,7 @@ import type {
   CovertOpType,
   CovertOpsState,
   GameEvent,
-} from "../../shared/types.js";
+} from "../shared/types.js";
 
 /** Base parameters per operation type. */
 interface OpTemplate {

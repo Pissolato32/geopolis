@@ -22,6 +22,7 @@ import { CoupSystem } from './domain/politics/systems/coup.system.js';
 import { DiplomacySystem } from './domain/diplomacy/systems/diplomacy.system.js';
 import { WarSystem } from './domain/war/systems/war.system.js';
 import { CombatSystem } from './domain/war/systems/combat.system.js';
+import { CombinedArmsCombatSystem } from './domain/war/systems/combined-arms-combat.system.js';
 import { MovementSystem } from './domain/war/systems/movement.system.js';
 import { ProvinceCombatSystem } from './domain/war/systems/province-combat.system.js';
 import { OccupationSystem } from './domain/war/systems/occupation.system.js';
@@ -58,6 +59,7 @@ const DOMAIN_SYSTEMS = [
   new CoupSystem(),
   new DiplomacySystem(),
   new CombatSystem(),
+  new CombinedArmsCombatSystem(),
   new ProvinceCombatSystem(),
   new OccupationSystem(),
   new MovementSystem(),

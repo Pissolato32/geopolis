@@ -70,7 +70,7 @@ import {
   resolveOperation,
   generateExposureIncidents,
   advanceCovertOps,
-} from "../domain/intelligence/covertOps.js";
+} from "./covertOps.js";
 
 // Module 7: Multilateral Blocs & Collective Defense
 import {
@@ -80,7 +80,7 @@ import {
   triggerCollectiveDefense,
   applyBlocEconomicBonuses,
   createBloc,
-} from "../domain/diplomacy/multilateralBlocs.js";
+} from "./multilateralBlocs.js";
 
 // Module 8: Victory Conditions
 import {

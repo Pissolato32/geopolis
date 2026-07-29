@@ -56,7 +56,11 @@ src/engine/     motor canônico: core (ECS, tick-engine, event-bus, world-state,
                 timeline), domain (economy, war, politics, diplomacy,
                 intelligence, demographics), agents (LLM providers, memória,
                 goals, percepção), gateway (HTTP/WS), persistence, scenarios
+src/engineAdapter.ts  ponte entre o motor ECS e a camada de jogo/UI — usada tanto
+                pelo dashboard quanto pelo servidor
 src/server/     servidor de jogo do dashboard (Express + ws)
+src/game/       regras de jogo ainda fora do ECS (covert ops, blocos multilaterais)
+src/seed/       pipeline de sincronização e validação dos seeds
 src/            camada de UI React (App, WorldMap, WarRoom, briefing/, campaign/,
                 research/, victory/)
 data/           world seeds
@@ -64,11 +68,11 @@ supabase/       migrations SQL
 docs/           ADRs, module map e roadmap
 ```
 
-> **Dívida conhecida:** existe uma cópia legada do motor em
-> `src/core|domain|agents|gateway|persistence|scenarios`, divergente de
-> `src/engine/*`. A consolidação em `src/engine/` é o próximo passo arquitetural,
-> junto com migrar `src/server/index.ts` de `processTurn()` para o `EngineAdapter`
-> (ECS), eliminando os dois motores paralelos.
+> **Motor único:** a cópia legada do motor (`src/core|domain|agents|gateway|`
+> `persistence|scenarios`) foi consolidada em `src/engine/`, e o servidor passou a
+> avançar turnos pelo `EngineAdapter` (ECS). `src/turnEngine.ts` continua no repo
+> apenas porque ainda detém as regras de covert ops e blocos multilaterais que
+> faltam portar para sistemas ECS.
 
 ## Convenções
 

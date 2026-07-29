@@ -26,7 +26,7 @@ import {
   WarExhaustionComponent,
 } from '../../politics/components/war-exhaustion.component.js';
 
-export const COMBAT_SYSTEM_ID = 'war.combat';
+export const COMBINED_ARMS_COMBAT_SYSTEM_ID = 'war.combat.combined-arms';
 
 /**
  * CombatSystem — Combined Arms Edition.
@@ -36,9 +36,9 @@ export const COMBAT_SYSTEM_ID = 'war.combat';
  * airpower as force multiplier), and emits typed events. Does NOT mutate state
  * directly — all state changes flow through the EventBus.
  */
-export class CombatSystem implements ISystem {
+export class CombinedArmsCombatSystem implements ISystem {
   readonly descriptor = {
-    id: COMBAT_SYSTEM_ID,
+    id: COMBINED_ARMS_COMBAT_SYSTEM_ID,
     name: 'Combat Resolution System (Combined Arms)',
     priority: 450 as SystemPriority,
     requiredComponents: [MILITARY_DETAIL_TYPE],
@@ -128,7 +128,7 @@ export class CombatSystem implements ISystem {
             defenderAdvantagePct: outcome.defenderAdvantagePct,
             momentum: outcome.momentum,
           },
-          COMBAT_SYSTEM_ID,
+          COMBINED_ARMS_COMBAT_SYSTEM_ID,
         );
 
         // 2. Emit combat resolved event
@@ -143,7 +143,7 @@ export class CombatSystem implements ISystem {
             provinceId: '',
             eliminatedId: undefined,
           },
-          COMBAT_SYSTEM_ID,
+          COMBINED_ARMS_COMBAT_SYSTEM_ID,
           outcome.victorId as EntityId,
         );
 
@@ -170,7 +170,7 @@ export class CombatSystem implements ISystem {
         casualties,
         cumulativeCasualties: cumulative,
       },
-      COMBAT_SYSTEM_ID,
+      COMBINED_ARMS_COMBAT_SYSTEM_ID,
       countryId as EntityId,
     );
   }
@@ -189,7 +189,7 @@ export class CombatSystem implements ISystem {
         newExhaustion,
         delta,
       },
-      COMBAT_SYSTEM_ID,
+      COMBINED_ARMS_COMBAT_SYSTEM_ID,
       countryId as EntityId,
     );
   }

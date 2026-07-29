@@ -9,8 +9,8 @@ import {
   generateExposureIncidents,
   advanceCovertOps,
 } from "./covertOps.js";
-import type { Country, CovertOperation } from "../../shared/types.js";
-import { createInitialResearchState } from "../../research/researchEngine.js";
+import type { Country, CovertOperation } from "../shared/types.js";
+import { createInitialResearchState } from "../research/researchEngine.js";
 
 function makeCountry(id: string, overrides: Partial<Country> = {}): Country {
   return {

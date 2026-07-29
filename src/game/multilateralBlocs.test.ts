@@ -9,7 +9,7 @@ import {
   applyBlocEconomicBonuses,
   createBloc,
 } from "./multilateralBlocs.js";
-import type { Country, InternationalBloc } from "../../shared/types.js";
+import type { Country, InternationalBloc } from "../shared/types.js";
 
 function makeCountry(id: string): Country {
   return {
