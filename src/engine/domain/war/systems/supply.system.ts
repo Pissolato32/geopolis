@@ -24,7 +24,7 @@ import {
 } from '../events/war-terrain.events.js';
 import { WAR_FUEL_DEPLETED_EVENT, IWarFuelDepletedPayload } from '../events/war.events.js';
 
-export const SUPPLY_SYSTEM_ID = 'war.supply';
+const SUPPLY_SYSTEM_ID = 'war.supply';
 
 const MAX_SUPPLY_DISTANCE = 5;
 const DEGRADED_THRESHOLD = 3;
