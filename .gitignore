@@ -5,4 +5,4 @@ dashboard/
 *.log
 .env
 *.tsbuildinfo
-    
+    coverage/
