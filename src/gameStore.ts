@@ -412,6 +412,7 @@ function toCountryRow(c: Country, gameId: string): Record<string, unknown> {
     readiness: c.military.readiness,
     morale: c.military.morale,
     force_limit: c.military.forceLimit,
+    posture: c.posture,
   };
 }
 
