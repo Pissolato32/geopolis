@@ -41,7 +41,7 @@ describe('CORS middleware', () => {
           origin.endsWith(".repl.co") ||
           origin.endsWith(".webcontainer.io");
         const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
-        if (ALLOWED_ORIGINS.length === 0 || isDevelopmentPreview || isExplicitlyAllowed) {
+        if (isDevelopmentPreview || isExplicitlyAllowed) {
           res.header("Access-Control-Allow-Origin", origin);
           res.header("Vary", "Origin");
         }
@@ -88,7 +88,7 @@ describe('CORS middleware', () => {
           origin.endsWith(".repl.co") ||
           origin.endsWith(".webcontainer.io");
         const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
-        if (ALLOWED_ORIGINS.length === 0 || isDevelopmentPreview || isExplicitlyAllowed) {
+        if (isDevelopmentPreview || isExplicitlyAllowed) {
           res.header("Access-Control-Allow-Origin", origin);
           res.header("Vary", "Origin");
         }
@@ -121,6 +121,85 @@ describe('CORS middleware', () => {
       headers: { Origin: "https://bad-actor.com" }
     });
     expect(badHeaders['access-control-allow-origin']).toBeUndefined();
+
+    server.close();
+  });
+  it('should fail closed when ALLOWED_ORIGINS is empty', async () => {
+    const app = express();
+    process.env.ALLOWED_ORIGINS = "";
+    const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean);
+
+    app.use((req, res, next) => {
+      const origin = req.headers.origin;
+      if (origin) {
+        const isDevelopmentPreview =
+          origin.startsWith("http://localhost:") ||
+          origin.startsWith("http://127.0.0.1:") ||
+          origin.endsWith(".replit.dev") ||
+          origin.endsWith(".repl.co") ||
+          origin.endsWith(".webcontainer.io");
+        const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
+        if (isDevelopmentPreview || isExplicitlyAllowed) {
+          res.header("Access-Control-Allow-Origin", origin);
+          res.header("Vary", "Origin");
+        }
+      }
+      next();
+    });
+
+    app.get('/test', (_req, res) => res.json({ ok: true }));
+
+    const server = createServer(app);
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const addr = server.address() as AddressInfo;
+
+    const { headers } = await httpFetch(`http://127.0.0.1:${addr.port}/test`, {
+      headers: { Origin: "https://bad-actor.com" }
+    });
+    expect(headers['access-control-allow-origin']).toBeUndefined();
+
+    server.close();
+  });
+
+  it('should still allow development preview domains when ALLOWED_ORIGINS is empty', async () => {
+    const app = express();
+    process.env.ALLOWED_ORIGINS = "";
+    const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean);
+
+    app.use((req, res, next) => {
+      const origin = req.headers.origin;
+      if (origin) {
+        const isDevelopmentPreview =
+          origin.startsWith("http://localhost:") ||
+          origin.startsWith("http://127.0.0.1:") ||
+          origin.endsWith(".replit.dev") ||
+          origin.endsWith(".repl.co") ||
+          origin.endsWith(".webcontainer.io");
+        const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
+        if (isDevelopmentPreview || isExplicitlyAllowed) {
+          res.header("Access-Control-Allow-Origin", origin);
+          res.header("Vary", "Origin");
+        }
+      }
+      next();
+    });
+
+    app.get('/test', (_req, res) => res.json({ ok: true }));
+
+    const server = createServer(app);
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const addr = server.address() as AddressInfo;
+
+    const { headers } = await httpFetch(`http://127.0.0.1:${addr.port}/test`, {
+      headers: { Origin: "https://my-app.replit.dev" }
+    });
+    expect(headers['access-control-allow-origin']).toBe("https://my-app.replit.dev");
 
     server.close();
   });

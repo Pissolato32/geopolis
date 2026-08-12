@@ -133,7 +133,7 @@ function main() {
         origin.endsWith(".repl.co") ||
         origin.endsWith(".webcontainer.io");
       const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
-      if (ALLOWED_ORIGINS.length === 0 || isDevelopmentPreview || isExplicitlyAllowed) {
+      if (isDevelopmentPreview || isExplicitlyAllowed) {
         res.header("Access-Control-Allow-Origin", origin);
         res.header("Vary", "Origin");
       }
