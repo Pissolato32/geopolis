@@ -5,10 +5,6 @@ export function round2(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 
-export function formatPct(n: number, decimals = 2): string {
-  return `${round2(n).toFixed(decimals)}%`;
-}
-
 export function formatDelta(n: number, decimals = 2): string {
   const r = round2(n);
   const sign = r >= 0 ? "+" : "";
