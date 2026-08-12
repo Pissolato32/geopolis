@@ -1,9 +1,11 @@
 # ADR 004: Interactive Web Dashboard, Real-World Geographic Topology, and Engagement Systems (Tutorial & Achievements)
 
-> **Status:** Accepted  
+> **Status:** Superseded by ADR-005  
 > **Date:** 2026-07-24  
 > **Deciders:** Software Architect, Lead Game Engineer  
 > **Context Area:** Frontend (Dashboard), Geographic Model, UX, Gamification
+
+> **Historical note:** This ADR records the dashboard architecture proposed on 2026-07-24. The repository subsequently evolved to a React/Vite UI and consolidated ECS engine under `src/engine/`. Preserve this ADR for historical context; use ADR-005 and the current module map for implementation decisions.
 
 ---
 
@@ -44,7 +46,7 @@ A separação entre geografia física (imutável) e jurisdição política (mut�
 
 ### 3. UX & Dashboard Layout Grid
 
-```
+```text
 ┌───────────────────────────────────┬──────────────────┐
 │                                   │   Inspector      │
 │           MAPA PRINCIPAL          │   (Entidade      │
@@ -100,7 +102,7 @@ Inspirado pelo padrão de onboarding do Geopolitics.win:
   }
   ```
 - **Notificação:** O AchievementManager emite um evento `'achievement.unlocked'` no EventBus, que o dashboard escuta via WebSocket e exibe como Toast no canto superior direito (estilo Steam/PlayStation — fade in, 5s, fade out).
-- **Persistência Híbrida:** 
+- **Persistência Híbrida:**
   - `localStorage` (dashboard-side) para feedback visual imediato entre sessões.
   - Arquivo de save da Engine (`ISaveGamePayload`) para portabilidade entre máquinas.
 
@@ -137,16 +139,27 @@ Inspirado pelo padrão de onboarding do Geopolitics.win:
 
 ---
 
-## Implementation Phases
+## Implementation Phases — Historical
 
-O plano abaixo define as fases já executadas e as pendentes, integrando as novas features de Tutorial (M4) e Achievements (M5):
+O plano abaixo registra a arquitetura proposta no momento deste ADR. A implementação posterior divergiu da proposta em alguns pontos, principalmente na tecnologia de UI e na localização dos módulos. Consulte ADR-005 para o estado atual.
 
-| Fase | Entregas | Status |
-|------|----------|--------|
+| Fase | Entregas | Status histórico |
+|------|----------|------------------|
 | **Fase 0 (Schema)** | `position` em `IScenarioEntitySeed`, `IScenarioProvinceSeed`, validação lat/lng, `GeoPositionComponent` + `ProvinceListComponent` no loader | ✅ Concluído |
-| **M0 (Scaffold)** | `dashboard/` com Vite 6 + TS 5.8 + `index.html` + `style.css` + `main.ts` | ✅ Concluído |
-| **M1 (Connection)** | `types.ts`, `state-store.ts`, `ws-client.ts`, `api-client.ts` | ✅ Concluído |
-| **M2 (Visualizations)** | `map-view.ts` (3 camadas Canvas), `inspector-panel.ts`, `charts.ts`, `event-log.ts`, `control-panel.ts` | ✅ Concluído |
-| **M3 (Integration)** | `http-server.ts` (Express static), `gateway-router.ts` (`/entities`, `/provinces`), `index.ts` wiring | ✅ Concluído |
-| **M4 (Tutorial)** | `TutorialOverlay` (SVG spotlight mask), máquina de estados sequencial, persistência localStorage | ✅ Concluído |
-| **M5 (Achievements)** | `AchievementManager` (sistema opcional no engine), tabela de 8 conquistas, notificação Toast no dashboard, persistência híbrida | ✅ Concluído |
+| **M0 (Scaffold)** | `dashboard/` com Vite 6 + TS 5.8 + `index.html` + `style.css` + `main.ts` | Histórico |
+| **M1 (Connection)** | `types.ts`, `state-store.ts`, `ws-client.ts`, `api-client.ts` | Histórico |
+| **M2 (Visualizations)** | `map-view.ts` (3 camadas Canvas), `inspector-panel.ts`, `charts.ts`, `event-log.ts`, `control-panel.ts` | Histórico |
+| **M3 (Integration)** | `http-server.ts` (Express static), `gateway-router.ts` (`/entities`, `/provinces`), `index.ts` wiring | Histórico |
+| **M4 (Tutorial)** | `TutorialOverlay` (SVG spotlight mask), máquina de estados sequencial, persistência localStorage | Histórico |
+| **M5 (Achievements)** | `AchievementManager`, tabela de conquistas, notificações e persistência | Histórico |
+
+---
+
+## Current implementation reference
+
+For implementation work, use:
+
+- `docs/phase-0/module-map.md` — current repository structure;
+- `docs/future-roadmap.md` — current roadmap;
+- `docs/phase-0/adr/ADR-005-current-architecture-consolidation.md` — current architectural decision;
+- `README.md` — developer setup and operational commands.
