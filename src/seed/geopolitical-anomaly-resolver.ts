@@ -118,27 +118,16 @@ export class GeopoliticalAnomalyResolver {
         removed.push(baseCountry.id);
         const successor = COUNTRY_ALIASES[baseCountry.id];
 
+
         if (successor) {
           // Re-route relations to successor entity
-          for (const country of allCountries) {
-            if (country.id === successor) {
-              // Merge relationships from dissolved country into successor
-              for (const rel of baseCountry.relationships) {
-                if (rel.countryCode === baseCountry.id) continue;
-                const existing = country.relationships.find((r) => r.countryCode === rel.countryCode);
-                if (existing) {
-                  // Average the affinity and tension
-                  existing.affinity = Math.round((existing.affinity + rel.affinity) / 2);
-                  existing.tension = Math.round((existing.tension + rel.tension) / 2);
-                } else {
-                  country.relationships.push({ ...rel });
-                }
-                rerouted++;
-              }
-            }
+          const successorCountry = allCountries.find(c => c.id === successor);
+          if (successorCountry) {
+            rerouted += this.mergeRelationships(successorCountry, baseCountry);
           }
 
           this.logs.push({
+
             code: "GEO_ANOMALY_DELETED_ENTITY",
             message: `Entity ${baseCountry.id} missing. Re-routed to successor entity ${successor}.`,
             countryCode: baseCountry.id,
@@ -159,6 +148,24 @@ export class GeopoliticalAnomalyResolver {
 
     return { removed, rerouted };
   }
+
+  private mergeRelationships(successorCountry: Country, dissolvedCountry: Country): number {
+    let rerouted = 0;
+    for (const rel of dissolvedCountry.relationships) {
+      if (rel.countryCode === dissolvedCountry.id) continue;
+      const existing = successorCountry.relationships.find((r) => r.countryCode === rel.countryCode);
+      if (existing) {
+        // Average the affinity and tension
+        existing.affinity = Math.round((existing.affinity + rel.affinity) / 2);
+        existing.tension = Math.round((existing.tension + rel.tension) / 2);
+      } else {
+        successorCountry.relationships.push({ ...rel });
+      }
+      rerouted++;
+    }
+    return rerouted;
+  }
+
 
   // ─── Value Clamping ───────────────────────────────────────────────────
 
