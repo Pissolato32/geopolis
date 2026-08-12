@@ -115,7 +115,7 @@ function CountryProfileBody({
     <aside className="panel profile">
       <header className="profile-header">
         <img className="profile-flag" src={country.flag} alt={`Flag of ${country.name}`} />
-        <div className="profile-title">
+        <div className="profile-title" style={{ color: "var(--text-primary)", display: "flex", gap: "var(--space-2)" }}>
           <h2>{country.name}</h2>
           <span className="profile-code">{country.id} · {country.region || "—"}</span>
         </div>
@@ -757,7 +757,7 @@ function UnitProfile({ unit, toast }: { unit: Unit; toast: string | null }) {
     <aside className="panel profile">
       <header className="profile-header">
         <div className="profile-mark unit-mark" aria-hidden>▣</div>
-        <div className="profile-title">
+        <div className="profile-title" style={{ color: "var(--text-primary)", display: "flex", gap: "var(--space-2)" }}>
           <h2>{unit.name}</h2>
           <span className="profile-code">
             {unit.id} · {UNIT_TYPE_LABEL[unit.type]}
