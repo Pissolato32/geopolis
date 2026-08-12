@@ -137,9 +137,6 @@ function main() {
         res.header("Access-Control-Allow-Origin", origin);
         res.header("Vary", "Origin");
       }
-    } else {
-      // Direct requests / server-to-server fallback
-      res.header("Access-Control-Allow-Origin", "*");
     }
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Client-Info, Apikey");
