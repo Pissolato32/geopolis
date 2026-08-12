@@ -10,45 +10,23 @@ import {
 } from '../components/war.components.js';
 import {
   PROVINCE_TYPE,
-  ProvinceData,
   FRONTLINE_TYPE,
   FrontlineComponent,
 } from '../components/province.components.js';
 import {
   DIPLOMATIC_RELATION_TYPE,
 } from '../../diplomacy/components/relation.component.js';
+import { makeProvince } from '../test-utils.js';
 import { FrontlineSystem } from './frontline.system.js';
 import { WAR_FRONTLINE_SHIFTED_EVENT } from '../events/war-terrain.events.js';
-
-function makeProvince(
-  id: string,
-  ownerId: EntityId,
-  neighbors: string[],
-): ProvinceData {
-  return {
-    provinceId: id,
-    provinceName: `Province ${id}`,
-    lat: 0, lng: 0,
-    neighborIds: neighbors,
-    resourceRich: false,
-    ownerId,
-    terrain: 'plains',
-    isSupplySource: false,
-    occupationProgress: 0,
-    occupyingCountryId: undefined,
-  };
-}
-
 describe('FrontlineSystem', () => {
   it('should detect a frontline when hostile units share a province', () => {
     const timeline = new Timeline();
     const eventBus = new EventBus(timeline);
     const worldState = new WorldState('frontline-test');
     const engine = new TickEngine(worldState, eventBus, timeline);
-
     const countryA = 'country-a' as EntityId;
     const countryB = 'country-b' as EntityId;
-
     worldState.createEntity(countryA, [{
       type: PROVINCE_TYPE,
       provinces: [makeProvince('prov-a1', countryA, ['prov-b1'])],
@@ -65,7 +43,6 @@ describe('FrontlineSystem', () => {
       type: PROVINCE_TYPE,
       provinces: [makeProvince('prov-b1', countryB, ['prov-a1'])],
     } as unknown as IComponent]);
-
     worldState.createEntity('unit-a1' as EntityId, [{
       type: MILITARY_UNIT_TYPE,
       ownerCountryId: countryA,
@@ -76,7 +53,6 @@ describe('FrontlineSystem', () => {
       fuelReserves: 50,
       currentProvinceId: 'prov-b1',
     } as unknown as IComponent]);
-
     worldState.createEntity('unit-b1' as EntityId, [{
       type: MILITARY_UNIT_TYPE,
       ownerCountryId: countryB,
@@ -87,13 +63,10 @@ describe('FrontlineSystem', () => {
       fuelReserves: 50,
       currentProvinceId: 'prov-b1',
     } as unknown as IComponent]);
-
     engine.registerSystem(new FrontlineSystem());
     engine.tick();
-
     const shiftedEvents = timeline.query({ eventType: WAR_FRONTLINE_SHIFTED_EVENT });
     expect(shiftedEvents.length).toBeGreaterThanOrEqual(1);
-
     const frontlineEntity = worldState.getEntity('frontline-global' as EntityId);
     expect(frontlineEntity).toBeDefined();
     const flComp = frontlineEntity?.getComponent<FrontlineComponent>(FRONTLINE_TYPE);
@@ -102,16 +75,13 @@ describe('FrontlineSystem', () => {
     expect(flComp!.segments[0]!.countryA).toBe(countryA);
     expect(flComp!.segments[0]!.countryB).toBe(countryB);
   });
-
   it('should not create a frontline when relations are peaceful', () => {
     const timeline = new Timeline();
     const eventBus = new EventBus(timeline);
     const worldState = new WorldState('frontline-peace-test');
     const engine = new TickEngine(worldState, eventBus, timeline);
-
     const countryA = 'country-a' as EntityId;
     const countryB = 'country-b' as EntityId;
-
     worldState.createEntity(countryA, [{
       type: PROVINCE_TYPE,
       provinces: [makeProvince('prov-shared', countryA, [])],
@@ -124,7 +94,6 @@ describe('FrontlineSystem', () => {
       recognition: 'full' as const,
       activeTreaties: [],
     } as unknown as IComponent]);
-
     worldState.createEntity('unit-a1' as EntityId, [{
       type: MILITARY_UNIT_TYPE,
       ownerCountryId: countryA,
@@ -135,7 +104,6 @@ describe('FrontlineSystem', () => {
       fuelReserves: 50,
       currentProvinceId: 'prov-shared',
     } as unknown as IComponent]);
-
     worldState.createEntity('unit-b1' as EntityId, [{
       type: MILITARY_UNIT_TYPE,
       ownerCountryId: countryB,
@@ -146,13 +114,10 @@ describe('FrontlineSystem', () => {
       fuelReserves: 50,
       currentProvinceId: 'prov-shared',
     } as unknown as IComponent]);
-
     engine.registerSystem(new FrontlineSystem());
     engine.tick();
-
     const shiftedEvents = timeline.query({ eventType: WAR_FRONTLINE_SHIFTED_EVENT });
     expect(shiftedEvents).toHaveLength(0);
-
     const flEntity = worldState.getEntity('frontline-global' as EntityId);
     const flComp = flEntity?.getComponent<FrontlineComponent>(FRONTLINE_TYPE);
     expect(flComp).toBeDefined();
