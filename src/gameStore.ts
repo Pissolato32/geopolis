@@ -180,27 +180,27 @@ export async function persistTurnResults(
     const { error: tickErr } = await supabase.from("games").update({ current_tick: tick }).eq("id", gameId);
     if (tickErr) throw new Error(`persistTurnResults.tick: ${tickErr.message}`);
 
-    // 2. update country economy + military stats (batch upserts)
-    const BATCH = 50;
-    for (let i = 0; i < countries.length; i += BATCH) {
-      const chunk = countries.slice(i, i + BATCH);
-      await Promise.all(
-        chunk.map(async (c) => {
-          const { error } = await supabase
-            .from("countries")
-            .update({
-              gdp: c.economy.gdp,
-              treasury: c.economy.treasury,
-              stability: c.economy.stability,
-              tax_rate: c.economy.taxRate,
-              readiness: c.military.readiness,
-              morale: c.military.morale,
-            })
-            .eq("game_id", gameId)
-            .eq("code", c.id);
-          if (error) throw new Error(`persistTurnResults.country[${c.id}]: ${error.message}`);
-        })
-      );
+    // 2. update country economy + military stats in set-based batches.
+    // Supabase/PostgREST accepts an array for upsert, avoiding one UPDATE per country.
+    if (countries.length > 0) {
+      const countryRecords = countries.map((c) => ({
+        game_id: gameId,
+        code: c.id,
+        gdp: c.economy.gdp,
+        treasury: c.economy.treasury,
+        stability: c.economy.stability,
+        tax_rate: c.economy.taxRate,
+        readiness: c.military.readiness,
+        morale: c.military.morale,
+      }));
+      const BATCH = 200;
+      for (let i = 0; i < countryRecords.length; i += BATCH) {
+        const chunk = countryRecords.slice(i, i + BATCH);
+        const { error } = await supabase
+          .from("countries")
+          .upsert(chunk, { onConflict: "game_id,code" });
+        if (error) throw new Error(`persistTurnResults.countries: ${error.message}`);
+      }
     }
 
     // 3. update relationships — single batched upsert for all modified pairs
