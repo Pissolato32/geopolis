@@ -182,6 +182,12 @@ export function WorldMap({
 
   const proj = () => geoEqualEarth().fitSize([size.w, size.h], sphere);
 
+  // cache projected unit coordinates to avoid reprojecting every unit on every mousemove
+  const projectedUnits = useMemo(() => {
+    const projection = geoEqualEarth().fitSize([size.w, size.h], sphere);
+    return units.map(u => ({ unit: u, xy: projection(u.latlng) }));
+  }, [units, size.w, size.h]);
+
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -347,13 +353,11 @@ export function WorldMap({
   };
 
   const hitUnit = (mx: number, my: number): Unit | null => {
-    const projection = proj();
-    for (const u of units) {
-      const xy = projection(u.latlng);
+    for (const { unit, xy } of projectedUnits) {
       if (!xy) continue;
       const dx = mx - xy[0];
       const dy = my - xy[1];
-      if (dx * dx + dy * dy <= 9 * 9) return u;
+      if (dx * dx + dy * dy <= 9 * 9) return unit;
     }
     return null;
   };
