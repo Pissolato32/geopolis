@@ -181,18 +181,10 @@ export async function persistTurnResults(
     if (tickErr) throw new Error(`persistTurnResults.tick: ${tickErr.message}`);
 
     // 2. update country economy + military stats in set-based batches.
-    // Supabase/PostgREST accepts an array for upsert, avoiding one UPDATE per country.
+    // Upsert full country rows so the operation remains valid against the
+    // NOT NULL columns if a country is ever missing from the database.
     if (countries.length > 0) {
-      const countryRecords = countries.map((c) => ({
-        game_id: gameId,
-        code: c.id,
-        gdp: c.economy.gdp,
-        treasury: c.economy.treasury,
-        stability: c.economy.stability,
-        tax_rate: c.economy.taxRate,
-        readiness: c.military.readiness,
-        morale: c.military.morale,
-      }));
+      const countryRecords = countries.map((c) => toCountryRow(c, gameId));
       const BATCH = 200;
       for (let i = 0; i < countryRecords.length; i += BATCH) {
         const chunk = countryRecords.slice(i, i + BATCH);
