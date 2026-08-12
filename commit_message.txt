@@ -1,1 +1,0 @@
-fix(security): fail closed when CORS origins are unset
