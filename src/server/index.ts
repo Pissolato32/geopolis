@@ -14,6 +14,7 @@ import type { Country, GameEvent, MarketPrice, Unit, WorldSeed } from "../shared
 import { StrictIntentParser } from "./intentParser.js";
 import { EngineAdapter } from "../engineAdapter.js";
 import { seedMarketPrices, tickMarketPrices } from "./marketSim.js";
+import { createCorsMiddleware } from "./cors.js";
 
 interface ScenarioMeta {
   id: string;
@@ -47,8 +48,6 @@ function ensureSeed(): WorldSeed {
   const raw = readFileSync(SEED_PATH, "utf8");
   return JSON.parse(raw) as WorldSeed;
 }
-
-// ---- periodic simulated events --------------------------------------------
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -95,19 +94,11 @@ function makeRandomEvent(seed: WorldSeed): GameEvent {
   };
 }
 
-// ---- bootstrap -------------------------------------------------------------
-
 function main() {
   const seed = ensureSeed();
   const parser = new StrictIntentParser(seed);
   console.log(`[server] seed loaded: ${seed.countryCount} countries`);
 
-  // Mutable live state — the server now owns a running simulation that
-  // /api/v1/tick advances and /api/v1/action mutates. Both endpoints echo
-  // their events back over the WebSocket as event_emitted envelopes so
-  // connected dashboards stay in sync without polling.
-  // Single source of truth for the simulation: the ECS TickEngine (src/engine/),
-  // driven through the same adapter the dashboard uses.
   const engine = new EngineAdapter(seed);
   let liveCountries: Country[] = seed.countries.map((c) => ({ ...c }));
   let liveUnits: Unit[] = [];
@@ -118,40 +109,12 @@ function main() {
 
   const app = express();
   app.use(express.json());
-  const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
-    .split(",")
-    .map((o) => o.trim())
-    .filter(Boolean);
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-
-    if (origin) {
-      const isDevelopmentPreview =
-        origin.startsWith("http://localhost:") ||
-        origin.startsWith("http://127.0.0.1:") ||
-        origin.endsWith(".replit.dev") ||
-        origin.endsWith(".repl.co") ||
-        origin.endsWith(".webcontainer.io");
-      const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
-      if (isDevelopmentPreview || isExplicitlyAllowed) {
-        res.header("Access-Control-Allow-Origin", origin);
-        res.header("Vary", "Origin");
-      }
-    }
-    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Client-Info, Apikey");
-    if (req.method === "OPTIONS") {
-      res.sendStatus(204);
-      return;
-    }
-    next();
-  });
+  app.use(createCorsMiddleware());
   app.get("/health", (_req, res) => res.json({ ok: true, countries: seed.countryCount, tick: liveTick }));
   app.get("/api/world", (_req, res) => res.json(seed));
   app.get("/api/v1/scenarios", (_req, res) => res.json({ scenarios: SCENARIOS }));
   app.get("/api/v1/state", (_req, res) => res.json({ tick: liveTick, countries: liveCountries, units: liveUnits, market: liveMarket }));
 
-  // POST /api/v1/action — accept a strict intent, validate + simulate it.
   app.post("/api/v1/action", (req, res) => {
     try {
       const result = parser.parse(req.body);
@@ -168,7 +131,6 @@ function main() {
     }
   });
 
-  // POST /api/v1/tick — advance the simulation by one turn and stream events.
   app.post("/api/v1/tick", (_req, res) => {
     try {
       const result = engine.tick();
@@ -188,7 +150,6 @@ function main() {
     }
   });
 
-  // Serve the built dashboard so a single process powers the whole app on one port.
   if (existsSync(DIST_DIR)) {
     app.use(express.static(DIST_DIR));
     app.get("/{*splat}", (_req, res) => res.sendFile(resolve(DIST_DIR, "index.html")));
@@ -225,9 +186,6 @@ function main() {
     ws.on("close", () => clients.delete(ws));
   });
 
-  // periodic ambient events so the left-panel feed is alive on its own.
-  // Frozen when isPaused is true — the simulation only advances via
-  // POST /api/v1/tick (manual +1 Tick) or when the client unpauses.
   const ticker = setInterval(() => {
     if (isPaused) return;
     if (clients.size === 0) return;
