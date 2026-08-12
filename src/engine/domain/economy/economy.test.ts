@@ -117,6 +117,52 @@ describe('Economy Domain', () => {
     expect(finalGdp).toBeLessThan(initialGdp * Math.pow(1 + expectedAnnualGrowthRate, 2));
   });
 
+  it('should apply the exact 52-week conversion to a negative annual growth rate', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('economy-negative-growth-regression');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    // Zero production and 12% inflation produce an annual growth rate of -0.00006.
+    const initialGdp = 1_000_000;
+    const expectedAnnualGrowthRate = -0.00006;
+    const expectedWeeklyGrowthRate = Math.pow(1 + expectedAnnualGrowthRate, 1 / 52) - 1;
+    const expectedFinalGdp = initialGdp * (1 + expectedAnnualGrowthRate);
+
+    worldState.createEntity('country-negative-growth' as EntityId, [
+      {
+        type: ECONOMIC_INDICATOR_TYPE,
+        gdp: initialGdp,
+        inflationRate: 0.12,
+        treasury: 50_000,
+        taxRate: 0.2,
+      } as EconomicIndicatorComponent,
+      {
+        type: RESOURCE_PRODUCTION_TYPE,
+        energyOutput: 0,
+        foodOutput: 0,
+        mineralsOutput: 0,
+        industrialOutput: 0,
+      } as ResourceProductionComponent,
+    ]);
+
+    engine.registerSystem(new EconomySystem());
+    engine.runTicks(52);
+
+    const gdpEvents = timeline.query({ eventType: ECONOMY_GDP_UPDATED_EVENT });
+    expect(gdpEvents).toHaveLength(52);
+
+    const firstGdpEvent = gdpEvents[0]!;
+    const firstGrowthRate = (firstGdpEvent.event as ITypedEvent<{ gdpGrowthRate: number }>).payload.gdpGrowthRate;
+    expect(firstGrowthRate).toBeCloseTo(expectedWeeklyGrowthRate, 15);
+
+    const finalGdpEvent = gdpEvents[51]!;
+    const finalGdp = (finalGdpEvent.event as ITypedEvent<{ newGdp: number }>).payload.newGdp;
+
+    // The same annual-to-weekly invariant must hold for negative growth rates.
+    expect(finalGdp).toBeCloseTo(expectedFinalGdp, 5);
+  });
+
   it('should process economic simulation over 5 ticks and emit GDP events', () => {
     const timeline = new Timeline();
     const eventBus = new EventBus(timeline);
