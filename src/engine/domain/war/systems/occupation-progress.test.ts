@@ -13,7 +13,6 @@ import {
   ProvinceData,
   ProvinceComponent,
 } from '../components/province.components.js';
-import { makeProvince } from '../test-utils.js';
 import { OccupationProgressSystem } from './occupation-progress.system.js';
 import {
   WAR_OCCUPATION_PROGRESS_EVENT,
@@ -21,6 +20,24 @@ import {
 } from '../events/war-terrain.events.js';
 import { WAR_PROVINCE_CAPTURED_EVENT } from '../events/war.events.js';
 
+function makeProvince(
+  id: string,
+  ownerId: EntityId,
+  neighbors: string[] = [],
+): ProvinceData {
+  return {
+    provinceId: id,
+    provinceName: `Province ${id}`,
+    lat: 0, lng: 0,
+    neighborIds: neighbors,
+    resourceRich: false,
+    ownerId,
+    terrain: 'plains',
+    isSupplySource: false,
+    occupationProgress: 0,
+    occupyingCountryId: undefined,
+  };
+}
 
 describe('OccupationProgressSystem', () => {
   it('should begin occupation progress when a foreign unit garrisons an enemy province', () => {

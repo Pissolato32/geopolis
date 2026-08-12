@@ -5,7 +5,7 @@ import type { Country, VictoryProgress, VictoryType, InternationalBloc } from ".
 import { TECH_TREE } from "../research/techTree.js";
 
 /** Default survival scenario length in ticks. */
-const DEFAULT_SURVIVAL_TICKS = 200;
+export const DEFAULT_SURVIVAL_TICKS = 200;
 
 /** Tension threshold for Pax victory (must be below this). */
 export const PAX_TENSION_THRESHOLD = 15;

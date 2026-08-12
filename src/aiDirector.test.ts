@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 import { runAIDirector, resetEscalationState, PLAYER_CODE, EscalationLevel } from "./aiDirector.js";
 import type { Country, Relationship } from "./shared/types.js";
 
@@ -109,22 +109,19 @@ describe("runAIDirector", () => {
       military: { totalPersonnel: 50000, readiness: 80, morale: 80, forceLimit: 40000, militaryLoyalty: 80 },
       economy: { gdp: 5_000_000_000, gdpPerCapita: 5000, treasury: 1_000_000_000, taxRate: 0.25, stability: 70, legislativeSupport: 0.5 },
     });
-
-    vi.spyOn(Math, "random").mockReturnValue(0.01);
-    try {
-      let foundWar = false;
-      for (let t = 1; t <= 6 && !foundWar; t++) {
-        const { decisions } = runAIDirector([usa, rus], t);
-        for (const d of decisions) {
-          if (d.events.some((e) => e.type === "war.declared")) {
-            foundWar = true;
-          }
+    // War requires tick >= 6, casus belli accumulation, shared border or naval
+    // projection, and the nation must be selected as an actor (15% per turn).
+    // Run enough ticks to accumulate casus belli and trigger the declaration.
+    let foundWar = false;
+    for (let t = 1; t <= 60 && !foundWar; t++) {
+      const { decisions } = runAIDirector([usa, rus], t);
+      for (const d of decisions) {
+        if (d.events.some((e) => e.type === "war.declared")) {
+          foundWar = true;
         }
       }
-      expect(foundWar).toBe(true);
-    } finally {
-      vi.restoreAllMocks();
     }
+    expect(foundWar).toBe(true);
   });
 
   it("does not declare war before MIN_TICK_BEFORE_WAR", () => {
