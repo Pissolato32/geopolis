@@ -1,0 +1,4 @@
+.tabs { display:flex; gap:2px; border-bottom:1px solid var(--border-default); }
+.tab { border:0; border-bottom:2px solid transparent; padding:8px 12px; background:transparent; color:var(--text-secondary); cursor:pointer; }
+.active { color:var(--text-primary); border-bottom-color:var(--accent-primary); }
+.tab:disabled { opacity:.5; cursor:not-allowed; }
