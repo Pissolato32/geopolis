@@ -68,6 +68,55 @@ describe('Economy Domain', () => {
     expect(finalGdp).toBeLessThan(1_040_000);
   });
 
+  it('should preserve a low annual GDP growth rate over 52 weekly ticks', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('economy-weekly-regression');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    // Controlled fixture: totalOutput = 300 + (100 * 0.5) = 350 and inflationRate = 0.02.
+    // Therefore annualGrowthRate = 0.00007 - (0.02 * 0.0005) = 0.00006.
+    const initialGdp = 1_000_000;
+    const expectedAnnualGrowthRate = 0.00006;
+    const expectedFinalGdp = initialGdp * (1 + expectedAnnualGrowthRate);
+
+    worldState.createEntity('country-weekly' as EntityId, [
+      {
+        type: ECONOMIC_INDICATOR_TYPE,
+        gdp: initialGdp,
+        inflationRate: 0.02,
+        treasury: 50_000,
+        taxRate: 0.2,
+      } as EconomicIndicatorComponent,
+      {
+        type: RESOURCE_PRODUCTION_TYPE,
+        energyOutput: 100,
+        foodOutput: 100,
+        mineralsOutput: 50,
+        industrialOutput: 300,
+      } as ResourceProductionComponent,
+    ]);
+
+    engine.registerSystem(new EconomySystem());
+    engine.runTicks(52);
+
+    const gdpEvents = timeline.query({ eventType: ECONOMY_GDP_UPDATED_EVENT });
+    expect(gdpEvents).toHaveLength(52);
+
+    const firstGdpEvent = gdpEvents[0]!;
+    const firstGrowthRate = (firstGdpEvent.event as ITypedEvent<{ gdpGrowthRate: number }>).payload.gdpGrowthRate;
+    const expectedWeeklyGrowthRate = Math.pow(1 + expectedAnnualGrowthRate, 1 / 52) - 1;
+    expect(firstGrowthRate).toBeCloseTo(expectedWeeklyGrowthRate, 15);
+
+    const finalGdpEvent = gdpEvents[51]!;
+    const finalGdp = (finalGdpEvent.event as ITypedEvent<{ newGdp: number }>).payload.newGdp;
+
+    expect(finalGdp).toBeCloseTo(expectedFinalGdp, 5);
+
+    // Applying the full annual rate on every weekly tick would compound far beyond one year's growth.
+    expect(finalGdp).toBeLessThan(initialGdp * Math.pow(1 + expectedAnnualGrowthRate, 2));
+  });
+
   it('should process economic simulation over 5 ticks and emit GDP events', () => {
     const timeline = new Timeline();
     const eventBus = new EventBus(timeline);
