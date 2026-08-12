@@ -1,11 +1,12 @@
 import { Activity, Gauge, Map, Pause, Play, Zap } from "lucide-react";
-import type { SimSpeed } from "../../gameSocket.js";
+
+type SimulationSpeed = 0 | 1 | 2 | 5;
 
 interface CommandBarProps {
   tick: number;
   simPaused: boolean;
-  simSpeed: SimSpeed;
-  onSpeed: (speed: SimSpeed) => void;
+  simSpeed: SimulationSpeed;
+  onSpeed: (speed: SimulationSpeed) => void;
   onAdvance: () => void;
   busy?: boolean;
 }
