@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import styles from "./Badge.module.css";
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
@@ -6,5 +7,5 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export function Badge({ children, tone = "neutral", className = "", ...props }: BadgeProps) {
-  return <span {...props} className={`ui-badge ui-badge-${tone} ${className}`.trim()}>{children}</span>;
+  return <span {...props} className={[styles.badge, styles[tone], className].filter(Boolean).join(" ")}>{children}</span>;
 }
