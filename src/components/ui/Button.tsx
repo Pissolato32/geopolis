@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import styles from "./Button.module.css";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -18,7 +19,7 @@ export function Button({
     <button
       {...props}
       type={type}
-      className={`ui-button ui-button-${variant} ui-button-${size} ${className}`.trim()}
+      className={[styles.button, styles[variant], styles[size], className].filter(Boolean).join(" ")}
     >
       {children}
     </button>
