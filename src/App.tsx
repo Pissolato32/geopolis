@@ -3,29 +3,9 @@
 // The topbar carries the global search, player country picker, and speed controls.
 
 import { useEffect, useState } from "react";
-import {
-  Activity,
-  BriefcaseBusiness,
-  ChevronDown,
-  Circle,
-  FastForward,
-  FlaskConical,
-  Lock,
-  Map,
-  Pause,
-  Play,
-  Radio,
-  RotateCcw,
-  Shield,
-  Swords,
-  Trophy,
-  WifiOff,
-  Zap,
-} from "lucide-react";
 import { EventLog } from "./EventLog.js";
 import { WorldMap } from "./WorldMap.js";
 import { CountryProfile } from "./CountryProfile.js";
-import { GlobalSearch } from "./GlobalSearch.js";
 import { MarketTicker } from "./MarketTicker.js";
 import { CabinetModal } from "./CabinetModal.js";
 import { BriefingDashboard } from "./briefing/BriefingDashboard.js";
@@ -130,6 +110,7 @@ export default function App() {
     };
   }, [seed]);
 
+  // Load campaign state from localStorage on mount
   useEffect(() => {
     const saved = loadCampaign();
     if (saved && saved.locked) {
@@ -230,6 +211,7 @@ export default function App() {
     }
   };
 
+  // Generate advisor agenda when tick changes or events update
   const currentPlayer = gameSocket.getCountries().find((c) => c.id === playerCode);
   const effectiveCabinet = cabinetOverride ?? currentPlayer?.cabinet;
   const playerWithCabinet = effectiveCabinet && currentPlayer
@@ -272,6 +254,7 @@ export default function App() {
     if (intent) {
       gameSocket.sendIntent(intent);
     }
+    // Apply satisfaction/loyalty feedback to the cabinet
     if (currentPlayer?.cabinet) {
       const rejectedSlots = advisorAgenda.competingCards
         .find((c) => c.id === _cardId)?.options
@@ -360,6 +343,7 @@ export default function App() {
     : null;
 
   const handleLaunchCovertOp = (_type: CovertOpType, _target: string) => {
+    // Covert ops are handled via the game socket / turn engine
     pushToast({ kind: "info", title: "Operation Launched", message: `Covert operation initiated against ${_target}.`, dismissable: true, duration: 4000 });
   };
 
@@ -380,93 +364,103 @@ export default function App() {
   return (
     <div className="app-shell">
       <ErrorBoundary>
-        <header className="topbar">
-          <div className="brand">
-            <span className="brand-mark" aria-hidden><Shield size={18} /></span>
-            <div>
-              <h1>GEOSIM COMMAND</h1>
-              <span className="brand-sub">Modern World Dashboard · 2026</span>
-            </div>
+      <header className="topbar">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden>◤</span>
+          <div>
+            <h1>GEOSIM COMMAND</h1>
+            <span className="brand-sub">Modern World Dashboard · 2026</span>
           </div>
-          <GlobalSearch seed={seed} />
-          <div className="topbar-status">
-            {campaignLocked ? (
-              <div className="player-picker locked" title="Campaign locked — nation cannot be changed">
-                <span className="player-trigger locked-trigger">
-                  {playerCountry ? (
-                    <>
-                      <img className="player-flag" src={playerCountry.flag} alt="" />
-                      <span>{playerCountry.id}</span>
-                    </>
-                  ) : (
-                    <span>No Nation</span>
-                  )}
-                  <Lock size={14} aria-hidden="true" />
-                </span>
-              </div>
-            ) : (
-              <div className={`player-picker${playerOpen ? " open" : ""}`}>
-                <button
-                  className="player-trigger"
-                  onClick={() => setPlayerOpen((o) => !o)}
-                  title="Select your player country"
-                  aria-expanded={playerOpen}
-                  aria-haspopup="menu"
-                >
-                  {playerCountry ? (
-                    <>
-                      <img className="player-flag" src={playerCountry.flag} alt="" />
-                      <span>{playerCountry.id}</span>
-                    </>
-                  ) : (
-                    <span>Select Player</span>
-                  )}
-                  <ChevronDown size={14} aria-hidden="true" />
-                </button>
-                {playerOpen && (
-                  <div className="player-menu" role="menu">
-                    <input
-                      className="player-search"
-                      type="text"
-                      placeholder="Search country…"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === "Escape") setPlayerOpen(false);
-                      }}
-                    />
-                    {seed.countries
-                      .slice()
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .slice(0, 50)
-                      .map((c) => (
-                        <button
-                          key={c.id}
-                          className={`player-option${c.id === playerCode ? " active" : ""}`}
-                          onClick={() => pickPlayer(c.id)}
-                        >
-                          <img className="player-flag-sm" src={c.flag} alt="" />
-                          <span className="player-name">{c.name}</span>
-                          <span className="player-code">{c.id}</span>
-                        </button>
-                      ))}
-                  </div>
+        </div>
+                <div className="topbar-status">
+          {campaignLocked ? (
+            <div className="player-picker locked" title="Campaign locked — nation cannot be changed">
+              <span className="player-trigger locked-trigger">
+                {playerCountry ? (
+                  <>
+                    <img className="player-flag" src={playerCountry.flag} alt="" />
+                    <span>{playerCountry.id}</span>
+                  </>
+                ) : (
+                  <span>No Nation</span>
                 )}
-              </div>
-            )}
+                <span className="lock-icon" aria-hidden>🔒</span>
+              </span>
+            </div>
+          ) : (
+            <div className={`player-picker${playerOpen ? " open" : ""}`}>
+              <button
+                className="player-trigger"
+                onClick={() => setPlayerOpen((o) => !o)}
+                title="Select your player country"
+              >
+                {playerCountry ? (
+                  <>
+                    <img className="player-flag" src={playerCountry.flag} alt="" />
+                    <span>{playerCountry.id}</span>
+                  </>
+                ) : (
+                  <span>Select Player</span>
+                )}
+                <span className="player-icon" aria-hidden>▼</span>
+              </button>
+              {playerOpen && (
+                <div className="player-menu" role="menu">
+                  <input
+                    className="player-search"
+                    type="text"
+                    placeholder="Search country…"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setPlayerOpen(false);
+                    }}
+                  />
+                  {seed.countries
+                    .slice()
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .slice(0, 50)
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        className={`player-option${c.id === playerCode ? " active" : ""}`}
+                        onClick={() => pickPlayer(c.id)}
+                      >
+                        <img className="player-flag-sm" src={c.flag} alt="" />
+                        <span className="player-name">{c.name}</span>
+                        <span className="player-code">{c.id}</span>
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
           {campaignLocked && (
-            <button className="reset-campaign-btn" onClick={() => setShowResetConfirm(true)} title="Start a new campaign">
-              <RotateCcw size={14} aria-hidden="true" /> New Campaign
-            </button>
+            <button
+              className="reset-campaign-btn"
+              onClick={() => setShowResetConfirm(true)}
+              title="Start a new campaign"
+            ><span style={{marginRight: "4px"}}>↺</span> New Campaign</button>
           )}
           <div className={`scenario-picker${scenarioOpen ? " open" : ""}`}>
-            <button className="scenario-trigger" onClick={() => setScenarioOpen((o) => !o)} title="Switch scenario" aria-expanded={scenarioOpen}>
-              {scenarios.find((s) => s.id === activeScenario)?.name ?? "Modern World 2026"}
-              <ChevronDown size={14} aria-hidden="true" />
+            <button
+              className="scenario-trigger"
+              onClick={() => setScenarioOpen((o) => !o)}
+              title="Switch scenario"
+            >
+              {scenarios.find((s) => s.id === activeScenario)?.name ?? "Modern World 2026"} ▾
             </button>
             {scenarioOpen && (
               <div className="scenario-menu" role="menu">
                 {scenarios.map((s) => (
-                  <button key={s.id} className={`scenario-option${s.id === activeScenario ? " active" : ""}`} onClick={() => { setActiveScenario(s.id); setScenarioOpen(false); void location.reload(); }}>
+                  <button
+                    key={s.id}
+                    className={`scenario-option${s.id === activeScenario ? " active" : ""}`}
+                    onClick={() => {
+                      setActiveScenario(s.id);
+                      setScenarioOpen(false);
+                      void location.reload();
+                    }}
+                  >
                     <span className="scenario-name">{s.name}</span>
                     {s.description && <span className="scenario-desc">{s.description}</span>}
                   </button>
@@ -475,47 +469,109 @@ export default function App() {
             )}
           </div>
           <span className="tick-badge" title="Simulation turn">Turn {tick}</span>
-          <button className="victory-header-btn" onClick={() => setShowVictoryModal(true)} title="Campaign Victory Progress">
-            <Trophy size={15} aria-hidden="true" /> Victory
-          </button>
-          <div className="view-toggle" role="tablist" aria-label="Application views">
-            <button className={`view-btn ${view === "map" ? "active" : ""}`} onClick={() => setView("map")} title="Map Command View" role="tab" aria-selected={view === "map"}>
-              <Map size={15} aria-hidden="true" /> Map
+          <button className="victory-header-btn" onClick={() => setShowVictoryModal(true)} title="Campaign Victory Progress"><span style={{marginRight: "4px"}}>🏆</span> Victory</button>
+          <div className="view-toggle">
+            <button
+              className={`view-btn ${view === "map" ? "active" : ""}`}
+              onClick={() => setView("map")}
+              title="Map Command View"
+            >
+              ◈ Map
             </button>
-            <button className={`view-btn ${view === "briefing" ? "active" : ""}`} onClick={() => setView("briefing")} title="Presidential Briefing" role="tab" aria-selected={view === "briefing"}>
-              <BriefcaseBusiness size={15} aria-hidden="true" /> Briefing
+            <button
+              className={`view-btn ${view === "briefing" ? "active" : ""}`}
+              onClick={() => setView("briefing")}
+              title="Presidential Briefing"
+            >
+              ◢ Briefing
             </button>
-            <button className={`view-btn ${view === "research" ? "active" : ""}`} onClick={() => setView("research")} title="Tecnologia & P&D" role="tab" aria-selected={view === "research"}>
-              <FlaskConical size={15} aria-hidden="true" /> Tech &amp; R&amp;D
+            <button
+              className={`view-btn ${view === "research" ? "active" : ""}`}
+              onClick={() => setView("research")}
+              title="Tecnologia & P&D"
+            >
+              ◆ Tech &amp; R&amp;D
             </button>
-            <button className="view-btn" onClick={() => setShowWarRoom(true)} title="War Room — Active Conflicts">
-              <Swords size={15} aria-hidden="true" /> War Room
+            <button className="view-btn" onClick={() => setShowWarRoom(true)} title="War Room — Active Conflicts">⚔ War Room</button>
+          </div>
+          <div className="speed-controls">
+            <button
+              className={simPaused ? "speed-btn active" : "speed-btn"}
+              onClick={() => setSpeed(0)}
+              title="Pause simulation"
+            >
+              ⏸
+            </button>
+            <button
+              className={!simPaused && simSpeed === 1 ? "speed-btn active" : "speed-btn"}
+              onClick={() => setSpeed(1)}
+              title="1x speed"
+            >
+              ▶
+            </button>
+            <button
+              className={!simPaused && simSpeed === 2 ? "speed-btn active" : "speed-btn"}
+              onClick={() => setSpeed(2)}
+              title="2x speed"
+            >
+              ⏩
+            </button>
+            <button
+              className={!simPaused && simSpeed === 5 ? "speed-btn active" : "speed-btn"}
+              onClick={() => setSpeed(5)}
+              title="5x speed"
+            >
+              ⏭
+            </button>
+            <button
+              className={turnBusy ? "speed-btn advance turn-busy" : "speed-btn advance"}
+              onClick={advanceTurn}
+              disabled={turnBusy}
+              title="Advance one tick"
+            >
+              {turnBusy ? "…" : "⚡"}
             </button>
           </div>
-          <div className="speed-controls" role="group" aria-label="Simulation speed">
-            <button className={simPaused ? "speed-btn active" : "speed-btn"} onClick={() => setSpeed(0)} title="Pause simulation" aria-label="Pause simulation"><Pause size={15} aria-hidden="true" /></button>
-            <button className={!simPaused && simSpeed === 1 ? "speed-btn active" : "speed-btn"} onClick={() => setSpeed(1)} title="1x speed" aria-label="1x speed"><Play size={15} aria-hidden="true" /></button>
-            <button className={!simPaused && simSpeed === 2 ? "speed-btn active" : "speed-btn"} onClick={() => setSpeed(2)} title="2x speed" aria-label="2x speed"><FastForward size={15} aria-hidden="true" />2x</button>
-            <button className={!simPaused && simSpeed === 5 ? "speed-btn active" : "speed-btn"} onClick={() => setSpeed(5)} title="5x speed" aria-label="5x speed"><FastForward size={15} aria-hidden="true" />5x</button>
-            <button className={turnBusy ? "speed-btn advance turn-busy" : "speed-btn advance"} onClick={advanceTurn} disabled={turnBusy} title="Advance one tick" aria-label="Advance one tick"><Zap size={15} aria-hidden="true" /></button>
-          </div>
-          <span className={`status ${connClass}`} title={`Connection: ${connLabel}`}><Circle size={8} fill="currentColor" aria-hidden="true" /> {connLabel}{connStatus === "live" ? ` · ${seed.countryCount} nations` : ""}</span>
-          {!online && <span className="status status-error" title="You are offline"><WifiOff size={13} aria-hidden="true" /> No Internet</span>}
-          </div>
-        </header>
+          <span className={`status ${connClass}`} title={`Connection: ${connLabel}`}>
+            ● {connLabel}{connStatus === "live" ? ` · ${seed.countryCount} nations` : ""}
+          </span>
+          {!online && (
+            <span className="status status-error" title="You are offline">
+              ● No Internet
+            </span>
+          )}
+        </div>
+      </header>
+
       {view === "map" && <MarketTicker />}
+
       {view === "research" ? (
         <div className="research-fullpage">
           {playerWithResearch && (
             <>
-              <ResearchPanel playerCountry={playerWithResearch} researchOutput={calculateResearchOutput(playerWithResearch)} advisorBonus={calculateAdvisorResearchBonus(playerWithResearch.cabinet)} />
-              <CovertOpsPanel playerCountry={playerWithResearch} onLaunch={handleLaunchCovertOp} onAbort={handleAbortCovertOp} />
+              <ResearchPanel
+                playerCountry={playerWithResearch}
+                researchOutput={calculateResearchOutput(playerWithResearch)}
+                advisorBonus={calculateAdvisorResearchBonus(playerWithResearch.cabinet)}
+              />
+              <CovertOpsPanel
+                playerCountry={playerWithResearch}
+                onLaunch={handleLaunchCovertOp}
+                onAbort={handleAbortCovertOp}
+              />
             </>
           )}
         </div>
       ) : view === "briefing" ? (
         <BriefingDashboard
-          briefing={generateBriefing({ tick, playerCode, countries: gameSocket.getCountries(), units: gameSocket.getUnits(), market: gameSocket.getMarket(), events })}
+          briefing={generateBriefing({
+            tick,
+            playerCode,
+            countries: gameSocket.getCountries(),
+            units: gameSocket.getUnits(),
+            market: gameSocket.getMarket(),
+            events,
+          })}
           advisorAgenda={advisorAgenda}
           advisorResponses={advisorResponses}
           onAdvisorDirective={handleAdvisorDirective}
@@ -528,10 +584,13 @@ export default function App() {
       ) : (
         <main className="layout">
           <EventLog />
-          <section className="map-pane"><WorldMap seed={seed} /></section>
+          <section className="map-pane">
+            <WorldMap seed={seed} />
+          </section>
           <CountryProfile />
         </main>
       )}
+
       {showResetConfirm && (
         <div className="campaign-overlay" onClick={() => setShowResetConfirm(false)}>
           <div className="reset-confirm-modal" onClick={(e) => e.stopPropagation()}>
@@ -544,11 +603,33 @@ export default function App() {
           </div>
         </div>
       )}
-      {cabinetCards.length > 0 && <CabinetModal cards={cabinetCards} onResolved={() => setCabinetCards([])} />}
-      <WarRoom open={showWarRoom} onClose={() => setShowWarRoom(false)} events={events} seed={seed} playerCode={playerCode} intelLevel={0.5} />
-      {showVictoryModal && victoryProgress && <VictoryModal progress={victoryProgress} onClose={() => setShowVictoryModal(false)} />}
+
+      {cabinetCards.length > 0 && (
+        <CabinetModal
+          cards={cabinetCards}
+          onResolved={() => setCabinetCards([])}
+        />
+      )}
+
+      <WarRoom
+        open={showWarRoom}
+        onClose={() => setShowWarRoom(false)}
+        events={events}
+        seed={seed}
+        playerCode={playerCode}
+        intelLevel={0.5}
+      />
+      {showVictoryModal && victoryProgress && (
+        <VictoryModal progress={victoryProgress} onClose={() => setShowVictoryModal(false)} />
+      )}
       {showCabinetManager && currentPlayer?.cabinet && (
-        <CabinetManagerModal cabinet={cabinetOverride ?? currentPlayer.cabinet} tick={tick} onAppoint={handleAppointAdvisor} onLeaveVacant={handleLeaveVacant} onClose={() => setShowCabinetManager(false)} />
+        <CabinetManagerModal
+          cabinet={cabinetOverride ?? currentPlayer.cabinet}
+          tick={tick}
+          onAppoint={handleAppointAdvisor}
+          onLeaveVacant={handleLeaveVacant}
+          onClose={() => setShowCabinetManager(false)}
+        />
       )}
       </ErrorBoundary>
       <ToastContainer />

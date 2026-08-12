@@ -1,6 +1,0 @@
-.badge { display:inline-flex; align-items:center; border:1px solid var(--border-default); border-radius:999px; padding:2px 8px; font-size:var(--text-xs); line-height:1.4; }
-.success { color:var(--status-success); }
-.warning { color:var(--status-warning); }
-.danger { color:var(--status-danger); }
-.info { color:var(--status-info); }
-.neutral { color:var(--text-secondary); }
