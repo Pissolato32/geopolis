@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { simulateIntent } from "./gameSocket.js";
-import type { Country, Unit, WorldSeed } from "./shared/types.js";
+import type { Country, WorldSeed } from "./shared/types.js";
+import { makeUnit } from "./test-utils/unit-factory.js";
 
 function makeCountry(id: string): Country {
   return {
@@ -32,18 +33,6 @@ function makeCountry(id: string): Country {
   };
 }
 
-function makeUnit(id: string, ownerCode: string): Unit {
-  return {
-    id,
-    name: id,
-    ownerCode,
-    type: "infantry",
-    readiness: 60,
-    morale: 60,
-    latlng: [10, 10],
-    strength: 1000,
-  };
-}
 
 function makeSeed(): WorldSeed {
   return {

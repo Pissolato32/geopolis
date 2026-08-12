@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { processTurn } from "./turnEngine.js";
 import { resetEscalationState } from "./aiDirector.js";
-import type { Country, Unit, Relationship } from "./shared/types.js";
+import type { Country, Relationship } from "./shared/types.js";
+import { makeUnit } from "./test-utils/unit-factory.js";
 
 function makeRel(code: string, tension: number, affinity: number): Relationship {
   return { countryCode: code, tension, affinity };
@@ -41,18 +42,6 @@ function makeCountry(
   };
 }
 
-function makeUnit(id: string, ownerCode: string): Unit {
-  return {
-    id,
-    name: id,
-    ownerCode,
-    type: "infantry",
-    readiness: 60,
-    morale: 60,
-    latlng: [10, 10],
-    strength: 1000,
-  };
-}
 
 describe("processTurn", () => {
   it("returns the same number of countries as input", () => {
