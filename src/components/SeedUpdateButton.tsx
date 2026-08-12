@@ -3,10 +3,10 @@
 // fallback notifications when the network is unavailable.
 
 import { useState, useCallback } from "react";
-import { SeedSyncPipeline, type SyncResult } from "../scenarios/seed-sync-pipeline.js";
-import { SeedValidationSuite, type SeedValidationResult } from "../scenarios/seed-validation-suite.js";
-import { GeopoliticalAnomalyResolver } from "../scenarios/geopolitical-anomaly-resolver.js";
-import { SeedSyncPipeline as SeedSync } from "../scenarios/seed-sync-pipeline.js";
+import { SeedSyncPipeline, type SyncResult } from "../seed/seed-sync-pipeline.js";
+import { SeedValidationSuite, type SeedValidationResult } from "../seed/seed-validation-suite.js";
+import { GeopoliticalAnomalyResolver } from "../seed/geopolitical-anomaly-resolver.js";
+import { SeedSyncPipeline as SeedSync } from "../seed/seed-sync-pipeline.js";
 
 type UpdateStatus = "idle" | "checking" | "downloading" | "validating" | "done" | "error";
 

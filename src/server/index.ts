@@ -12,7 +12,7 @@ import express from "express";
 import { WebSocketServer, WebSocket } from "ws";
 import type { Country, GameEvent, MarketPrice, Unit, WorldSeed } from "../shared/types.js";
 import { StrictIntentParser } from "./intentParser.js";
-import { processTurn } from "../turnEngine.js";
+import { EngineAdapter } from "../engineAdapter.js";
 import { seedMarketPrices, tickMarketPrices } from "./marketSim.js";
 
 interface ScenarioMeta {
@@ -106,6 +106,9 @@ function main() {
   // /api/v1/tick advances and /api/v1/action mutates. Both endpoints echo
   // their events back over the WebSocket as event_emitted envelopes so
   // connected dashboards stay in sync without polling.
+  // Single source of truth for the simulation: the ECS TickEngine (src/engine/),
+  // driven through the same adapter the dashboard uses.
+  const engine = new EngineAdapter(seed);
   let liveCountries: Country[] = seed.countries.map((c) => ({ ...c }));
   let liveUnits: Unit[] = [];
   let liveTick = 0;
@@ -171,8 +174,8 @@ function main() {
   // POST /api/v1/tick — advance the simulation by one turn and stream events.
   app.post("/api/v1/tick", (_req, res) => {
     try {
-      liveTick += 1;
-      const result = processTurn(liveCountries, liveUnits, liveTick);
+      const result = engine.tick();
+      liveTick = engine.getCurrentTick();
       liveCountries = result.countries;
       liveUnits = result.units;
       liveMarket = tickMarketPrices(liveMarket);
@@ -181,7 +184,6 @@ function main() {
       res.json({ ok: true, tick: liveTick, events: result.events });
     } catch (err) {
       console.error("[server] tick error:", err);
-      liveTick = Math.max(0, liveTick - 1);
       res.status(500).json({
         ok: false,
         error: err instanceof Error ? err.message : "Simulation turn failed",

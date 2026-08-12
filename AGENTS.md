@@ -28,7 +28,8 @@ Todos devem passar — é exatamente o que o CI executa.
 
 ## Onde mexer
 
-- Motor canônico: `src/engine/`. Evite adicionar código novo à cópia legada em
-  `src/core|domain|agents|gateway|persistence|scenarios`.
+- Motor canônico: `src/engine/` — é o único motor. Todo sistema de simulação
+  novo entra ali; o servidor e o dashboard avançam turnos via `EngineAdapter`.
+- `src/turnEngine.ts` está depreciado: não adicione regras nele.
 - Decisões arquiteturais relevantes exigem um ADR em `docs/phase-0/adr/`.
 - Roadmap e status: `docs/future-roadmap.md`.
