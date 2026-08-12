@@ -12,6 +12,7 @@ import { ITickEngine } from './core/interfaces/tick-engine.interface.js';
 import { IWorldSeed } from './core/interfaces/world-seed.interface.js';
 import { ScenarioLoader } from './scenarios/scenario.loader.js';
 import { DatabasePersistenceProvider, SaveGameSerializer } from './persistence/index.js';
+import { formatActionResponse } from './repl-format.js';
 
 import { EconomySystem } from './domain/economy/systems/economy.system.js';
 import { TradeSystem } from './domain/economy/systems/trade.system.js';
@@ -259,9 +260,9 @@ async function runRepl(config: IEngineConfig): Promise<void> {
             params[args[i]!.slice(0, eqIdx)] = args[i]!.slice(eqIdx + 1);
           }
         }
-        const eventId = eventBus.publish(actionType, params, 'repl', actorId as EntityId);
+        eventBus.publish(actionType, params, 'repl', actorId as EntityId);
         eventBus.flush();
-        console.log(JSON.stringify({ eventId, actionType, status: 'processed' }));
+        console.log(JSON.stringify(formatActionResponse(actionType)));
         break;
       }
 
