@@ -14,6 +14,7 @@ import type { Country, GameEvent, MarketPrice, Unit, WorldSeed } from "../shared
 import { StrictIntentParser } from "./intentParser.js";
 import { EngineAdapter } from "../engineAdapter.js";
 import { seedMarketPrices, tickMarketPrices } from "./marketSim.js";
+import { createCorsMiddleware } from "./cors.js";
 
 interface ScenarioMeta {
   id: string;
@@ -118,34 +119,7 @@ function main() {
 
   const app = express();
   app.use(express.json());
-  const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
-    .split(",")
-    .map((o) => o.trim())
-    .filter(Boolean);
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-
-    if (origin) {
-      const isDevelopmentPreview =
-        origin.startsWith("http://localhost:") ||
-        origin.startsWith("http://127.0.0.1:") ||
-        origin.endsWith(".replit.dev") ||
-        origin.endsWith(".repl.co") ||
-        origin.endsWith(".webcontainer.io");
-      const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
-      if (ALLOWED_ORIGINS.length === 0 || isDevelopmentPreview || isExplicitlyAllowed) {
-        res.header("Access-Control-Allow-Origin", origin);
-        res.header("Vary", "Origin");
-      }
-    }
-    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Client-Info, Apikey");
-    if (req.method === "OPTIONS") {
-      res.sendStatus(204);
-      return;
-    }
-    next();
-  });
+  app.use(createCorsMiddleware());
   app.get("/health", (_req, res) => res.json({ ok: true, countries: seed.countryCount, tick: liveTick }));
   app.get("/api/world", (_req, res) => res.json(seed));
   app.get("/api/v1/scenarios", (_req, res) => res.json({ scenarios: SCENARIOS }));
