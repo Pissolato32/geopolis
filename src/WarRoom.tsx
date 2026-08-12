@@ -3,6 +3,7 @@
 // Follows ADR-004 layout rules — accessible as a modal overlay.
 
 import { useMemo } from "react";
+import { ShieldAlert } from "lucide-react";
 import type { GameEvent, WorldSeed } from "./shared/types.js";
 
 interface WarRoomProps {
@@ -113,7 +114,7 @@ export function WarRoom({ open, onClose, events, seed, playerCode, intelLevel }:
         {/* Header */}
         <div className="war-room-header">
           <div className="war-room-title-group">
-            <span className="war-room-icon">⚔</span>
+            <ShieldAlert size={20} className="war-room-icon" style={{color: "var(--status-danger)"}} />
             <h2 className="war-room-title">War Room — Active Conflicts</h2>
           </div>
           <button className="war-room-close" onClick={onClose} aria-label="Close">

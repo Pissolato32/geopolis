@@ -441,9 +441,7 @@ export default function App() {
               className="reset-campaign-btn"
               onClick={() => setShowResetConfirm(true)}
               title="Start a new campaign"
-            >
-              ↻ New Campaign
-            </button>
+            ><span style={{marginRight: "4px"}}>↺</span> New Campaign</button>
           )}
           <div className={`scenario-picker${scenarioOpen ? " open" : ""}`}>
             <button
@@ -473,9 +471,7 @@ export default function App() {
             )}
           </div>
           <span className="tick-badge" title="Simulation turn">Turn {tick}</span>
-          <button className="victory-header-btn" onClick={() => setShowVictoryModal(true)} title="Campaign Victory Progress">
-            ◆ Victory
-          </button>
+          <button className="victory-header-btn" onClick={() => setShowVictoryModal(true)} title="Campaign Victory Progress"><span style={{marginRight: "4px"}}>🏆</span> Victory</button>
           <div className="view-toggle">
             <button
               className={`view-btn ${view === "map" ? "active" : ""}`}
@@ -498,13 +494,7 @@ export default function App() {
             >
               ◆ Tech &amp; R&amp;D
             </button>
-            <button
-              className="view-btn"
-              onClick={() => setShowWarRoom(true)}
-              title="War Room — Active Conflicts"
-            >
-              ⚔ War Room
-            </button>
+            <button className="view-btn" onClick={() => setShowWarRoom(true)} title="War Room — Active Conflicts">⚔ War Room</button>
           </div>
           <div className="speed-controls">
             <button

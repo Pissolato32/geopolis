@@ -3437,3 +3437,63 @@ body {
   white-space: nowrap;
 }
 
+
+
+/* --- Responsive & Mobile Layout --- */
+@media (max-width: 1024px) {
+  .app-shell {
+    font-size: var(--text-xs);
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  /* Left Panel (Event Log) turns into a bottom sheet or drawer in mobile */
+  .layout > aside:first-child {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30vh;
+    z-index: 50;
+    border-right: none;
+    border-top: 1px solid var(--border-default);
+    transform: translateY(calc(100% - 40px));
+    transition: transform var(--transition-default);
+  }
+
+  .layout > aside:first-child:hover,
+  .layout > aside:first-child:focus-within {
+    transform: translateY(0);
+  }
+
+  /* Map takes full remaining space */
+  .layout > .map-pane {
+    flex: 1;
+    height: 100vh;
+  }
+
+  /* Right Panel (Profile) overlays on map */
+  .layout > aside:last-child {
+    position: absolute;
+    top: 60px;
+    right: var(--space-2);
+    left: var(--space-2);
+    bottom: 40vh;
+    width: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 40;
+    background: rgba(12, 19, 26, 0.95);
+    backdrop-filter: blur(8px);
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: var(--space-2);
+  }
+}
