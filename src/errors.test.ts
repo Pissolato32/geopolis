@@ -29,6 +29,9 @@ describe("src/errors.ts", () => {
   let consoleErrorMock: ReturnType<typeof vi.spyOn>;
   let consoleWarnMock: ReturnType<typeof vi.spyOn>;
 
+  // Save original navigator property descriptor if we need to mock it
+  let originalNavigatorDescriptor: PropertyDescriptor | undefined;
+
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
@@ -39,11 +42,19 @@ describe("src/errors.ts", () => {
     // Silence console
     consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {});
     consoleWarnMock = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    originalNavigatorDescriptor = Object.getOwnPropertyDescriptor(global, 'navigator');
   });
 
   afterEach(() => {
     consoleErrorMock.mockRestore();
     consoleWarnMock.mockRestore();
+
+    if (originalNavigatorDescriptor) {
+      Object.defineProperty(global, 'navigator', originalNavigatorDescriptor);
+    } else {
+      delete (global as any).navigator;
+    }
   });
 
   describe("Error Classes", () => {
@@ -58,17 +69,39 @@ describe("src/errors.ts", () => {
       expect(err.source).toBe("test");
       expect(err.metadata).toEqual({});
       expect(err.timestamp).toBeDefined();
-      expect(err.userMessage).toBeDefined();
+      expect(err.userMessage).toBe("The server couldn't process this request. Please try again in a moment.");
 
       const json = err.toJSON();
       expect(json.name).toBe("AppError");
       expect(json.message).toBe("Base error");
       expect(json.category).toBe("api");
+      expect(json.severity).toBe("error");
+      expect(json.source).toBe("test");
+      expect(json.metadata).toEqual({});
+      expect(json.timestamp).toBe(err.timestamp);
+      expect(json.userMessage).toBe(err.userMessage);
     });
 
     it("AppError uses provided userMessage", () => {
       const err = new AppError("Base error", { category: "api", userMessage: "Custom message" });
       expect(err.userMessage).toBe("Custom message");
+    });
+
+    it("AppError handles all default user messages", () => {
+      const categories: Array<[import("./errors.js").ErrorCategory, string]> = [
+        ["network", "Connection problem — your changes may not have been saved. Retrying automatically."],
+        ["api", "The server couldn't process this request. Please try again in a moment."],
+        ["validation", "Some of the information provided was invalid. Please review and try again."],
+        ["persistence", "We couldn't save your progress. Your game will continue, but changes may not persist."],
+        ["websocket", "Lost connection to the game server. Reconnecting automatically."],
+        ["render", "Something went wrong displaying this part of the dashboard. Try reloading the page."],
+        ["offline", "You appear to be offline. Your actions will be saved when you reconnect."]
+      ];
+
+      for (const [cat, expected] of categories) {
+        const err = new AppError("test", { category: cat });
+        expect(err.userMessage).toBe(expected);
+      }
     });
 
     it("NetworkError initializes with correct defaults", () => {
@@ -90,9 +123,14 @@ describe("src/errors.ts", () => {
       expect(err400.statusCode).toBe(400);
       expect(err400.endpoint).toBe("/api/test");
       expect(err400.metadata.statusCode).toBe(400);
+      expect(err400.metadata.endpoint).toBe("/api/test");
 
       const err500 = new ApiError("Internal server error", 500, "/api/test");
       expect(err500.severity).toBe("critical");
+
+      const errContext = new ApiError("With context", 404, "/api/test", { metadata: { custom: true } });
+      expect(errContext.metadata.custom).toBe(true);
+      expect(errContext.metadata.statusCode).toBe(404);
     });
 
     it("ValidationError initializes with field information", () => {
@@ -104,6 +142,11 @@ describe("src/errors.ts", () => {
       expect(err.severity).toBe("warning");
       expect(err.field).toBe("username");
       expect(err.metadata.field).toBe("username");
+
+      const errNoField = new ValidationError("General invalid", undefined, { metadata: { extra: 123 } });
+      expect(errNoField.field).toBeNull();
+      expect(errNoField.metadata.field).toBeUndefined();
+      expect(errNoField.metadata.extra).toBe(123);
     });
 
     it("PersistenceError initializes with correct defaults", () => {
@@ -189,8 +232,16 @@ describe("src/errors.ts", () => {
   });
 
   describe("logError and setLoggingEnabled", () => {
-    it("logs to supabase when enabled", async () => {
+    it("logs to supabase when enabled with navigator.userAgent", async () => {
       const err = new AppError("Test log", { category: "api" });
+      // ensure navigator is defined for this test
+      if (typeof global.navigator === 'undefined') {
+        Object.defineProperty(global, 'navigator', {
+          value: { userAgent: "test-agent" },
+          configurable: true
+        });
+      }
+
       await logError(err);
 
       expect(supabase.from).toHaveBeenCalledWith("error_logs");
@@ -199,6 +250,26 @@ describe("src/errors.ts", () => {
           category: err.category,
           severity: err.severity,
           message: err.message,
+          user_agent: expect.any(String), // should be a string because navigator is mocked/exists
+        })
+      );
+    });
+
+    it("logs to supabase with null user_agent if navigator is undefined", async () => {
+      const err = new AppError("Test log", { category: "api" });
+
+      // Force navigator to be undefined
+      Object.defineProperty(global, 'navigator', {
+        value: undefined,
+        configurable: true
+      });
+
+      await logError(err);
+
+      expect(supabase.from).toHaveBeenCalledWith("error_logs");
+      expect((supabase.from as any)().insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_agent: null,
         })
       );
     });
@@ -225,26 +296,39 @@ describe("src/errors.ts", () => {
   });
 
   describe("onError and reportError", () => {
-    it("notifies listeners and logs when reportError is called", () => {
+    it("notifies listeners and logs when reportError is called with critical severity", () => {
       const listener = vi.fn();
       const unsubscribe = onError(listener);
 
-      const reported = reportError(new Error("A bad thing"), { source: "test_report" });
+      const reported = reportError(new Error("A bad thing"), { source: "test_report", severity: "critical" });
 
       expect(reported).toBeInstanceOf(AppError);
       expect(listener).toHaveBeenCalledWith(reported);
       expect(supabase.from).toHaveBeenCalled(); // via logError
-      expect(consoleErrorMock).toHaveBeenCalled(); // level depends on severity
+      expect(consoleErrorMock).toHaveBeenCalledWith(
+        expect.stringContaining("[api] test_report: A bad thing"),
+        expect.any(Object)
+      );
 
       unsubscribe();
       reportError(new Error("Another bad thing"));
       expect(listener).toHaveBeenCalledTimes(1); // not called again
     });
 
-    it("uses console.warn for warnings", () => {
+    it("uses console.error for error severity", () => {
+      reportError(new Error("Error thing"), { severity: "error" });
+      expect(consoleErrorMock).toHaveBeenCalled();
+    });
+
+    it("uses console.warn for warnings and info", () => {
       reportError(new Error("Warning"), { severity: "warning" });
       expect(consoleWarnMock).toHaveBeenCalled();
       expect(consoleErrorMock).not.toHaveBeenCalled();
+
+      consoleWarnMock.mockClear();
+
+      reportError(new Error("Info"), { severity: "info" });
+      expect(consoleWarnMock).toHaveBeenCalled();
     });
   });
 
