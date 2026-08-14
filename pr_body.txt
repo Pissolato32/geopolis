@@ -1,19 +1,14 @@
-### 🎯 What
-Remove the unnecessary `DEFAULT_SURVIVAL_TICKS` export from `src/victory/victoryManager.ts`.
+## What
+Extracted the duplicated `makeCountry(...)` test fixture into a shared test utility in `src/test-utils/country-factory.ts`.
 
-### 💡 Why
-Reduce unnecessary module API surface and eliminate dead/unnecessary exported state.
+## Why
+This is a code health refactoring to reduce duplication across multiple test files. Previously, several test files (`src/aiDirector.test.ts`, `src/gameSocket.test.ts`, `src/selectionManager.test.ts`, `src/server/intentParser.test.ts`, `src/turnEngine.test.ts`) each defined their own identical or nearly identical `makeCountry` helper.
 
-### ✅ Verification
-Report:
-- repository-wide usage search: Only used in `src/victory/victoryManager.ts`.
-- whether the constant was internally used: Yes, it is used internally in `victoryManager.ts`.
-- whether any external consumers existed: No external consumers found.
-- any affected tests: No tests reference `DEFAULT_SURVIVAL_TICKS`.
-- lint result: Passed (`npm run lint`).
-- typecheck result: Passed (`npm run typecheck`).
-- full test result: Passed (`npm test`).
-- build result: Passed (`npm run build`).
+## Verification
+- Checked that the new shared factory preserves the same semantic properties and defaults as the originals.
+- Replaced the local functions with imports of the new shared factory.
+- Added a basic test for the factory to ensure properties and overrides are correctly assigned, and that object mutations do not leak between test calls.
+- Validated via `npm run lint && npm run typecheck && npm test && npm run build`.
 
-### ✨ Result
-No gameplay or runtime behavior changes; only the unnecessary export/dead constant is removed.
+## Result
+Tests pass as expected, and test files are now simpler and less repetitive. No changes to production code or simulation logic were made.
