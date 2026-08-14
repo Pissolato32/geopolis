@@ -1,3 +1,4 @@
+import { makeCountry } from "../test-utils/country-factory.js";
 import { describe, expect, it } from "vitest";
 import {
   createInitialResearchState,
@@ -15,41 +16,10 @@ import {
   SATISFACTION_BONUS_PER_POINT,
 } from "./researchEngine.js";
 import { TECH_TREE, TECH_MAP, getBranchNodes, BRANCH_META } from "./techTree.js";
-import type { Country } from "../shared/types.js";
+
 import { createDefaultCabinet } from "../campaign/advisorTypes.js";
 
-function makeCountry(id: string, overrides: Partial<Country> = {}): Country {
-  return {
-    id,
-    numericCode: "1",
-    name: id,
-    flag: "",
-    latlng: [0, 0],
-    region: "Americas",
-    subregion: "North America",
-    population: 1_000_000,
-    economy: {
-      gdp: 1_000_000_000,
-      gdpPerCapita: 1000,
-      treasury: 500_000_000,
-      taxRate: 0.25,
-      stability: 60,
-      legislativeSupport: 0.5,
-    },
-    military: {
-      totalPersonnel: 10000,
-      readiness: 50,
-      morale: 60,
-      forceLimit: 8000,
-      militaryLoyalty: 70,
-    },
-    posture: "diplomatic",
-    relationships: [],
-    cabinet: createDefaultCabinet(1),
-    research: createInitialResearchState(id),
-    ...overrides,
-  };
-}
+
 
 describe("TECH_TREE", () => {
   it("has exactly 9 tech nodes (3 branches x 3 tiers)", () => {
@@ -179,14 +149,14 @@ describe("calculateResearchOutput", () => {
     for (const slot of ["finance", "treasury", "defense", "foreign", "stability"] as const) {
       cabinet[slot]!.satisfaction = 60;
     }
-    const country = makeCountry("USA", { cabinet });
+    const country = makeCountry("USA", { research: createInitialResearchState("USA"), cabinet });
     expect(calculateResearchOutput(country)).toBe(BASE_RESEARCH_PER_TICK);
   });
 
   it("includes advisor bonus in output", () => {
     const cabinet = createDefaultCabinet(1);
     cabinet.finance!.satisfaction = 80;
-    const country = makeCountry("USA", { cabinet });
+    const country = makeCountry("USA", { research: createInitialResearchState("USA"), cabinet });
     const expected = BASE_RESEARCH_PER_TICK + (80 - 60) * 0.2;
     expect(calculateResearchOutput(country)).toBeCloseTo(expected, 1);
   });
@@ -259,7 +229,7 @@ describe("getResearchableTechs", () => {
 
 describe("advanceResearch", () => {
   it("advances all researchable techs by distributing output evenly", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     const result = advanceResearch(country, 1);
     // 3 T1 techs, each gets ~10/3 = 3.33 points
     for (const t1Id of ["eco-t1-industrial", "def-t1-mobilization", "gov-t1-survey"]) {
@@ -271,7 +241,7 @@ describe("advanceResearch", () => {
   });
 
   it("unlocks a tech when accumulated points exceed cost", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     // Manually set accumulated points near the threshold
     country.research!.progress["eco-t1-industrial"]!.accumulatedPoints = 48;
     const result = advanceResearch(country, 1);
@@ -282,14 +252,14 @@ describe("advanceResearch", () => {
   });
 
   it("increments totalUnlocked when a tech is unlocked", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     country.research!.progress["eco-t1-industrial"]!.accumulatedPoints = 48;
     const result = advanceResearch(country, 1);
     expect(result.research.totalUnlocked).toBe(1);
   });
 
   it("makes T2 researchable after T1 is unlocked", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     country.research!.progress["eco-t1-industrial"]!.unlocked = true;
     country.research!.progress["eco-t1-industrial"]!.accumulatedPoints = 50;
     const result = advanceResearch(country, 2);
@@ -301,10 +271,10 @@ describe("advanceResearch", () => {
   it("includes advisor bonus in research output", () => {
     const cabinet = createDefaultCabinet(1);
     cabinet.finance!.satisfaction = 100; // max bonus
-    const country = makeCountry("USA", { cabinet });
+    const country = makeCountry("USA", { research: createInitialResearchState("USA"), cabinet });
     const result = advanceResearch(country, 1);
     // With bonus, output > base, so each tech should have more points
-    const baseCountry = makeCountry("USA");
+    const baseCountry = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     const baseResult = advanceResearch(baseCountry, 1);
     const bonusProg = result.research.progress["eco-t1-industrial"]!.accumulatedPoints;
     const baseProg = baseResult.research.progress["eco-t1-industrial"]!.accumulatedPoints;
@@ -312,7 +282,7 @@ describe("advanceResearch", () => {
   });
 
   it("returns unchanged state when no techs are researchable", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     // Unlock all techs
     for (const tech of TECH_TREE) {
       country.research!.progress[tech.id]!.unlocked = true;
@@ -322,7 +292,7 @@ describe("advanceResearch", () => {
   });
 
   it("creates initial research state if country has none", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     country.research = undefined;
     const result = advanceResearch(country, 1);
     expect(result.research).toBeDefined();
@@ -332,7 +302,7 @@ describe("advanceResearch", () => {
 
 describe("concentrateResearch", () => {
   it("concentrates all output on the target tech", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     const result = concentrateResearch(country, "eco-t1-industrial", 1);
     const prog = result.research.progress["eco-t1-industrial"]!;
     // Should get full output (10 points), not 10/3
@@ -340,7 +310,7 @@ describe("concentrateResearch", () => {
   });
 
   it("unlocks the tech when points exceed cost", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     country.research!.progress["eco-t1-industrial"]!.accumulatedPoints = 45;
     const result = concentrateResearch(country, "eco-t1-industrial", 1);
     expect(result.research.progress["eco-t1-industrial"]!.unlocked).toBe(true);
@@ -348,14 +318,14 @@ describe("concentrateResearch", () => {
   });
 
   it("does nothing for locked techs (prereqs not met)", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     const result = concentrateResearch(country, "eco-t2-digital", 1);
     expect(result.newlyUnlocked).toHaveLength(0);
     expect(result.research.progress["eco-t2-digital"]!.accumulatedPoints).toBe(0);
   });
 
   it("does nothing for already unlocked techs", () => {
-    const country = makeCountry("USA");
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), research: createInitialResearchState("USA") });
     country.research!.progress["eco-t1-industrial"]!.unlocked = true;
     const result = concentrateResearch(country, "eco-t1-industrial", 1);
     expect(result.newlyUnlocked).toHaveLength(0);
