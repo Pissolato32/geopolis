@@ -1,11 +1,12 @@
+import { makeCountry } from "./test-utils/country-factory.js";
 import { describe, expect, it, beforeEach, vi } from "vitest";
 import { runAIDirector, resetEscalationState, PLAYER_CODE, EscalationLevel } from "./aiDirector.js";
 import type { Relationship } from "./shared/types.js";
-import { makeCountry } from "./test-utils/country-factory.js";
 
 function makeRel(code: string, tension: number, affinity: number): Relationship {
   return { countryCode: code, tension, affinity };
 }
+
 
 
 describe("runAIDirector", () => {

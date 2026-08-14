@@ -1,7 +1,9 @@
+import { makeCountry } from "../test-utils/country-factory.js";
 import { describe, expect, it } from "vitest";
 import { StrictIntentParser } from "./intentParser.js";
 import type { WorldSeed } from "../shared/types.js";
-import { makeCountry } from "../test-utils/country-factory.js";
+
+
 
 
 function makeSeed(): WorldSeed {

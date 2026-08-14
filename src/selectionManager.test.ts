@@ -1,8 +1,9 @@
+import { makeCountry } from "./test-utils/country-factory.js";
 import { describe, expect, it, vi } from "vitest";
 import { SelectionManager } from "./selectionManager.js";
 
-import { makeCountry } from "./test-utils/country-factory.js";
 import { makeUnit } from "./test-utils/unit-factory.js";
+
 
 
 

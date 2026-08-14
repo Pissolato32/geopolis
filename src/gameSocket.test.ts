@@ -1,8 +1,9 @@
+import { makeCountry } from "./test-utils/country-factory.js";
 import { describe, expect, it } from "vitest";
 import { simulateIntent } from "./gameSocket.js";
 import type { WorldSeed } from "./shared/types.js";
-import { makeCountry } from "./test-utils/country-factory.js";
 import { makeUnit } from "./test-utils/unit-factory.js";
+
 
 
 

@@ -1,13 +1,14 @@
+import { makeCountry } from "./test-utils/country-factory.js";
 import { describe, expect, it } from "vitest";
 import { processTurn } from "./turnEngine.js";
 import { resetEscalationState } from "./aiDirector.js";
-import { makeCountry } from "./test-utils/country-factory.js";
 import type { Country, Relationship } from "./shared/types.js";
 import { makeUnit } from "./test-utils/unit-factory.js";
 
 function makeRel(code: string, tension: number, affinity: number): Relationship {
   return { countryCode: code, tension, affinity };
 }
+
 
 
 
