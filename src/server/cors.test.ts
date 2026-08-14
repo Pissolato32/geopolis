@@ -69,13 +69,49 @@ describe("CORS middleware", () => {
     server.close();
   });
 
-  it("allows development preview origins when the allowlist is empty", async () => {
+  it("rejects preview origins when not explicitly configured", async () => {
     const { server, url } = await startTestServer([]);
+
+    for (const previewOrigin of [
+      "https://my-app.replit.dev",
+      "https://my-app.repl.co",
+      "https://my-app.webcontainer.io"
+    ]) {
+      const { headers } = await httpFetch(url, {
+        headers: { Origin: previewOrigin },
+      });
+      expect(headers["access-control-allow-origin"]).toBeUndefined();
+    }
+
+    server.close();
+  });
+
+  it("allows preview origins when explicitly configured", async () => {
+    const previewOrigin = "https://my-app.replit.dev";
+    const { server, url } = await startTestServer([previewOrigin]);
+
     const { headers } = await httpFetch(url, {
-      headers: { Origin: "https://my-app.replit.dev" },
+      headers: { Origin: previewOrigin },
     });
 
-    expect(headers["access-control-allow-origin"]).toBe("https://my-app.replit.dev");
+    expect(headers["access-control-allow-origin"]).toBe(previewOrigin);
+
+    server.close();
+  });
+
+  it("allows localhost origins when the allowlist is empty", async () => {
+    const { server, url } = await startTestServer([]);
+
+    for (const localOrigin of [
+      "http://localhost:3000",
+      "http://127.0.0.1:5173"
+    ]) {
+      const { headers } = await httpFetch(url, {
+        headers: { Origin: localOrigin },
+      });
+      expect(headers["access-control-allow-origin"]).toBe(localOrigin);
+    }
+
     server.close();
   });
 

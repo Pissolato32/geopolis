@@ -7,16 +7,6 @@ export function parseAllowedOrigins(value = process.env.ALLOWED_ORIGINS ?? ""): 
     .filter(Boolean);
 }
 
-function isDevelopmentPreview(origin: string): boolean {
-  return (
-    origin.startsWith("http://localhost:") ||
-    origin.startsWith("http://127.0.0.1:") ||
-    origin.endsWith(".replit.dev") ||
-    origin.endsWith(".repl.co") ||
-    origin.endsWith(".webcontainer.io")
-  );
-}
-
 export function createCorsMiddleware(
   allowedOrigins = parseAllowedOrigins(),
 ): RequestHandler {
@@ -25,7 +15,8 @@ export function createCorsMiddleware(
 
     if (origin) {
       const isExplicitlyAllowed = allowedOrigins.includes(origin);
-      if (isDevelopmentPreview(origin) || isExplicitlyAllowed) {
+      const isLocalhost = origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:");
+      if (isLocalhost || isExplicitlyAllowed) {
         res.header("Access-Control-Allow-Origin", origin);
         res.header("Vary", "Origin");
       }
