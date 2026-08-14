@@ -1,3 +1,4 @@
+import { makeCountry } from "../test-utils/country-factory.js";
 import { describe, expect, it } from "vitest";
 import {
   generateAdvisorAgenda,
@@ -20,46 +21,13 @@ import {
   SATISFACTION_LOSS_REJECT,
   LOYALTY_GAIN_ACCEPT,
 } from "./advisorTypes.js";
-import type { Country, Relationship, ActiveTreaty, PolicyCooldown, CompetingOption } from "../shared/types.js";
+import type { Relationship, ActiveTreaty, PolicyCooldown, CompetingOption } from "../shared/types.js";
 
 function makeRel(code: string, tension: number, affinity: number): Relationship {
   return { countryCode: code, tension, affinity };
 }
 
-function makeCountry(
-  id: string,
-  overrides: Partial<Country> = {},
-): Country {
-  return {
-    id,
-    numericCode: "1",
-    name: id,
-    flag: "",
-    latlng: [0, 0],
-    region: "Americas",
-    subregion: "North America",
-    population: 1_000_000,
-    economy: {
-      gdp: 1_000_000_000,
-      gdpPerCapita: 1000,
-      treasury: 500_000_000,
-      taxRate: 0.25,
-      stability: 60,
-      legislativeSupport: 0.5,
-    },
-    military: {
-      totalPersonnel: 10000,
-      readiness: 50,
-      morale: 60,
-      forceLimit: 8000,
-      militaryLoyalty: 70,
-    },
-    posture: "diplomatic",
-    relationships: [],
-    cabinet: createDefaultCabinet(1),
-    ...overrides,
-  };
-}
+
 
 describe("createDefaultCabinet", () => {
   it("creates a cabinet with all 5 slots filled", () => {
@@ -213,12 +181,12 @@ describe("hasTreatyKind", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const country = makeCountry("USA", { activeTreaties: treaties });
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), activeTreaties: treaties });
     expect(hasTreatyKind(country, "CAN", "trade")).toBe(true);
   });
 
   it("returns false when no matching treaty exists", () => {
-    const country = makeCountry("USA", { activeTreaties: [] });
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), activeTreaties: [] });
     expect(hasTreatyKind(country, "CAN", "trade")).toBe(false);
   });
 
@@ -230,7 +198,7 @@ describe("hasTreatyKind", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const country = makeCountry("USA", { activeTreaties: treaties });
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), activeTreaties: treaties });
     expect(hasTreatyKind(country, "CAN", "trade")).toBe(false);
   });
 
@@ -242,17 +210,17 @@ describe("hasTreatyKind", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const country = makeCountry("USA", { activeTreaties: treaties });
+    const country = makeCountry("USA", { cabinet: createDefaultCabinet(1), activeTreaties: treaties });
     expect(hasTreatyKind(country, "CAN", "trade")).toBe(false);
   });
 });
 
 describe("findNextDiplomaticCandidate", () => {
   it("suggests trade for high-affinity nation without existing trade pact", () => {
-    const usa = makeCountry("USA", {
+    const usa = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("CAN", 10, 40)],
     });
-    const can = makeCountry("CAN");
+    const can = makeCountry("CAN", { cabinet: createDefaultCabinet(1) });
     const result = findNextDiplomaticCandidate(usa, [usa, can]);
     expect(result).not.toBeNull();
     expect(result!.country.id).toBe("CAN");
@@ -267,28 +235,28 @@ describe("findNextDiplomaticCandidate", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const usa = makeCountry("USA", {
+    const usa = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("CAN", 5, 55)],
       activeTreaties: treaties,
     });
-    const can = makeCountry("CAN");
+    const can = makeCountry("CAN", { cabinet: createDefaultCabinet(1) });
     const result = findNextDiplomaticCandidate(usa, [usa, can]);
     expect(result).not.toBeNull();
     expect(result!.suggestedKind).toBe("alliance");
   });
 
   it("suggests non-aggression for low-affinity nation without any treaty", () => {
-    const usa = makeCountry("USA", {
+    const usa = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("CAN", 20, 20)],
     });
-    const can = makeCountry("CAN");
+    const can = makeCountry("CAN", { cabinet: createDefaultCabinet(1) });
     const result = findNextDiplomaticCandidate(usa, [usa, can]);
     expect(result).not.toBeNull();
     expect(result!.suggestedKind).toBe("non-aggression");
   });
 
   it("returns null when no eligible candidates exist", () => {
-    const usa = makeCountry("USA", { relationships: [] });
+    const usa = makeCountry("USA", { cabinet: createDefaultCabinet(1), relationships: [] });
     const result = findNextDiplomaticCandidate(usa, [usa]);
     expect(result).toBeNull();
   });
@@ -301,15 +269,15 @@ describe("findNextDiplomaticCandidate", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const usa = makeCountry("USA", {
+    const usa = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [
         makeRel("CAN", 5, 30),  // has trade pact
         makeRel("MEX", 10, 35),  // no pact, high affinity
       ],
       activeTreaties: treaties,
     });
-    const can = makeCountry("CAN");
-    const mex = makeCountry("MEX");
+    const can = makeCountry("CAN", { cabinet: createDefaultCabinet(1) });
+    const mex = makeCountry("MEX", { cabinet: createDefaultCabinet(1) });
     const result = findNextDiplomaticCandidate(usa, [usa, can, mex]);
     expect(result).not.toBeNull();
     expect(result!.country.id).toBe("MEX");
@@ -318,8 +286,7 @@ describe("findNextDiplomaticCandidate", () => {
 
 describe("generateAdvisorAgenda — competing proposals", () => {
   it("generates a competing tax card when tax is not on cooldown", () => {
-    const player = makeCountry("USA", {
-      cabinet: createDefaultCabinet(1),
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
     });
     const agenda = generateAdvisorAgenda({
       tick: 5,
@@ -334,8 +301,7 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("suppresses competing tax card during cooldown", () => {
-    const player = makeCountry("USA", {
-      cabinet: createDefaultCabinet(1),
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       cooldowns: [{ policyType: "set-tax", expiresAtTick: 15 }],
     });
     const agenda = generateAdvisorAgenda({
@@ -350,7 +316,7 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("competing tax card has options from finance, treasury, and stability", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
@@ -367,7 +333,7 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("each competing option has advisor name, ideology, objective, and target KPI", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
@@ -387,13 +353,13 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("generates a competing readiness card when tension is high", () => {
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("RUS", 60, -40)],
     });
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
-      countries: [player, makeCountry("RUS")],
+      countries: [player, makeCountry("RUS", { cabinet: createDefaultCabinet(1) })],
       events: [],
       previousCards: [],
     });
@@ -402,14 +368,14 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("suppresses competing readiness card during cooldown", () => {
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("RUS", 60, -40)],
       cooldowns: [{ policyType: "set-readiness", expiresAtTick: 15 }],
     });
     const agenda = generateAdvisorAgenda({
       tick: 10,
       player,
-      countries: [player, makeCountry("RUS")],
+      countries: [player, makeCountry("RUS", { cabinet: createDefaultCabinet(1) })],
       events: [],
       previousCards: [],
     });
@@ -418,7 +384,7 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("generates a competing deficit card when treasury is negative", () => {
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       economy: { ...makeCountry("USA").economy, treasury: -500_000_000 },
     });
     const agenda = generateAdvisorAgenda({
@@ -433,7 +399,7 @@ describe("generateAdvisorAgenda — competing proposals", () => {
   });
 
   it("does not generate deficit card when treasury is positive", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
@@ -448,7 +414,7 @@ describe("generateAdvisorAgenda — competing proposals", () => {
 
 describe("generateAdvisorAgenda — vacant slots", () => {
   it("reports vacant slots in the agenda", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     player.cabinet!.defense = null;
     player.cabinet!.foreign = null;
     const agenda = generateAdvisorAgenda({
@@ -464,7 +430,7 @@ describe("generateAdvisorAgenda — vacant slots", () => {
   });
 
   it("includes vacant count in council summary", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     player.cabinet!.defense = null;
     const agenda = generateAdvisorAgenda({
       tick: 5,
@@ -477,14 +443,14 @@ describe("generateAdvisorAgenda — vacant slots", () => {
   });
 
   it("suppresses defense advisor cards when defense slot is vacant", () => {
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("RUS", 50, -30)],
     });
     player.cabinet!.defense = null;
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
-      countries: [player, makeCountry("RUS")],
+      countries: [player, makeCountry("RUS", { cabinet: createDefaultCabinet(1) })],
       events: [],
       previousCards: [],
     });
@@ -493,14 +459,14 @@ describe("generateAdvisorAgenda — vacant slots", () => {
   });
 
   it("suppresses foreign advisor cards when foreign slot is vacant", () => {
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("CAN", 10, 30)],
     });
     player.cabinet!.foreign = null;
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
-      countries: [player, makeCountry("CAN")],
+      countries: [player, makeCountry("CAN", { cabinet: createDefaultCabinet(1) })],
       events: [],
       previousCards: [],
     });
@@ -518,14 +484,14 @@ describe("generateAdvisorAgenda — treaty filtering", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("CAN", 5, 40)],
       activeTreaties: treaties,
     });
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
-      countries: [player, makeCountry("CAN")],
+      countries: [player, makeCountry("CAN", { cabinet: createDefaultCabinet(1) })],
       events: [],
       previousCards: [],
     });
@@ -542,14 +508,14 @@ describe("generateAdvisorAgenda — treaty filtering", () => {
       signedTick: 1,
       durationYears: 5,
     }];
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("CAN", 5, 55)],
       activeTreaties: treaties,
     });
     const agenda = generateAdvisorAgenda({
       tick: 5,
       player,
-      countries: [player, makeCountry("CAN")],
+      countries: [player, makeCountry("CAN", { cabinet: createDefaultCabinet(1) })],
       events: [],
       previousCards: [],
     });
@@ -622,7 +588,7 @@ describe("getAlternativeDirectives", () => {
 
 describe("evaluateDirectiveByAdvisors", () => {
   it("generates responses for military directives", () => {
-    const player = makeCountry("USA", {
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1),
       relationships: [makeRel("RUS", 70, -50)],
     });
     const responses = evaluateDirectiveByAdvisors("increase military readiness and deploy troops to border", player, []);
@@ -632,7 +598,7 @@ describe("evaluateDirectiveByAdvisors", () => {
   });
 
   it("generates responses for economic directives", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     const responses = evaluateDirectiveByAdvisors("raise taxes to boost the economy and reduce deficit", player, []);
     expect(responses.length).toBeGreaterThan(0);
     const economy = responses.find((r) => r.advisorDomain === "economy");
@@ -640,13 +606,13 @@ describe("evaluateDirectiveByAdvisors", () => {
   });
 
   it("generates responses for diplomatic directives", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     const responses = evaluateDirectiveByAdvisors("pursue diplomatic negotiations and sign a treaty", player, []);
     expect(responses.length).toBeGreaterThan(0);
   });
 
   it("generates a fallback response for unclear directives", () => {
-    const player = makeCountry("USA");
+    const player = makeCountry("USA", { cabinet: createDefaultCabinet(1) });
     const responses = evaluateDirectiveByAdvisors("hello world", player, []);
     expect(responses).toHaveLength(1);
     expect(responses[0]!.supportsDirective).toBe(false);
