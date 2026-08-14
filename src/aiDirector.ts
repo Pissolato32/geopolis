@@ -118,7 +118,7 @@ function bestFriend(c: Country): Relationship | null {
 }
 
 /** The result of one AI evaluation pass. */
-interface AIDecision {
+export interface AIDecision {
   events: GameEvent[];
   /** Patches to apply to the acting nation's relationships (by counterpart code). */
   relPatches: Map<string, { tension?: number; affinity?: number }>;

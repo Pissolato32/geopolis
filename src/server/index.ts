@@ -14,7 +14,6 @@ import type { Country, GameEvent, MarketPrice, Unit, WorldSeed } from "../shared
 import { StrictIntentParser } from "./intentParser.js";
 import { EngineAdapter } from "../engineAdapter.js";
 import { seedMarketPrices, tickMarketPrices } from "./marketSim.js";
-import { createCorsMiddleware } from "./cors.js";
 
 interface ScenarioMeta {
   id: string;
@@ -24,9 +23,24 @@ interface ScenarioMeta {
 }
 
 const SCENARIOS: ScenarioMeta[] = [
-  { id: "world-seed-2026", name: "Modern World 2026", description: "Current geopolitical snapshot with all 246 nations.", seedFile: "data/world-seed-2026.json" },
-  { id: "crise-recursos-2030", name: "Resource Crisis 2030", description: "Global resource shortage scenario with elevated tensions.", seedFile: "data/world-seed-2026.json" },
-  { id: "guerra-fria-1962", name: "Cold War 1962", description: "Bipolar superpower standoff at the height of the Cuban Missile Crisis.", seedFile: "data/world-seed-2026.json" },
+  {
+    id: "world-seed-2026",
+    name: "Modern World 2026",
+    description: "Current geopolitical snapshot with all 246 nations.",
+    seedFile: "data/world-seed-2026.json",
+  },
+  {
+    id: "crise-recursos-2030",
+    name: "Resource Crisis 2030",
+    description: "Global resource shortage scenario with elevated tensions.",
+    seedFile: "data/world-seed-2026.json",
+  },
+  {
+    id: "guerra-fria-1962",
+    name: "Cold War 1962",
+    description: "Bipolar superpower standoff at the height of the Cuban Missile Crisis.",
+    seedFile: "data/world-seed-2026.json",
+  },
 ];
 
 const DIST_DIR = resolve(process.cwd(), "dist");
@@ -119,11 +133,45 @@ function main() {
 
   const app = express();
   app.use(express.json());
-  app.use(createCorsMiddleware());
-  app.get("/health", (_req, res) => res.json({ ok: true, countries: seed.countryCount, tick: liveTick }));
+  const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+
+    if (origin) {
+      const isDevelopmentPreview =
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.endsWith(".replit.dev") ||
+        origin.endsWith(".repl.co") ||
+        origin.endsWith(".webcontainer.io");
+      const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(origin);
+      if (ALLOWED_ORIGINS.length === 0 || isDevelopmentPreview || isExplicitlyAllowed) {
+        res.header("Access-Control-Allow-Origin", origin);
+        res.header("Vary", "Origin");
+      }
+    }
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Client-Info, Apikey",
+    );
+    if (req.method === "OPTIONS") {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+  app.get("/health", (_req, res) =>
+    res.json({ ok: true, countries: seed.countryCount, tick: liveTick }),
+  );
   app.get("/api/world", (_req, res) => res.json(seed));
   app.get("/api/v1/scenarios", (_req, res) => res.json({ scenarios: SCENARIOS }));
-  app.get("/api/v1/state", (_req, res) => res.json({ tick: liveTick, countries: liveCountries, units: liveUnits, market: liveMarket }));
+  app.get("/api/v1/state", (_req, res) =>
+    res.json({ tick: liveTick, countries: liveCountries, units: liveUnits, market: liveMarket }),
+  );
 
   // POST /api/v1/action — accept a strict intent, validate + simulate it.
   app.post("/api/v1/action", (req, res) => {
@@ -173,7 +221,14 @@ function main() {
 
   wss.on("connection", (ws: WebSocket) => {
     clients.add(ws);
-    ws.send(JSON.stringify({ type: "hello", at: new Date().toISOString(), countryCount: seed.countryCount, paused: isPaused }));
+    ws.send(
+      JSON.stringify({
+        type: "hello",
+        at: new Date().toISOString(),
+        countryCount: seed.countryCount,
+        paused: isPaused,
+      }),
+    );
     ws.on("message", (data: Buffer) => {
       let parsed: unknown;
       try {
@@ -187,7 +242,9 @@ function main() {
         isPaused = Boolean(m["paused"]);
         const speed = Number(m["speed"] ?? 0);
         console.log(`[server] simulation ${isPaused ? "PAUSED" : "RUNNING"} at ${speed}x`);
-        ws.send(JSON.stringify({ ok: true, type: "set_simulation_speed", paused: isPaused, speed }));
+        ws.send(
+          JSON.stringify({ ok: true, type: "set_simulation_speed", paused: isPaused, speed }),
+        );
         return;
       }
       const result = parser.parse(parsed);

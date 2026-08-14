@@ -77,17 +77,16 @@ export class EconomySystem implements ISystem {
       const infamy = country.getComponent<InfamyComponent>(DIPLOMATIC_INFAMY_TYPE);
       const infamyPenalty = infamy ? computeInfamyEconomicPenalty(infamy.infamyScore) : null;
 
-      // GDP growth is defined as an effective annual rate.
+      // GDP growth: realistic annual rate ~2-5%, scaled per-tick (weekly).
+      // Ticks represent weeks, so the annual rate MUST be divided by 52.
       // Production capacity provides a small bonus, inflation subtracts.
       // Infamy further reduces growth and adds inflation.
       // The growth factor is capped to prevent hyperinflation in mass simulations.
-      // Ticks represent weeks, so convert the annual rate to the equivalent weekly
-      // compounded rate before applying it to GDP.
       const productionBonus = Math.min(0.02, (totalOutput / 500) * 0.0001);
       const effectiveInflation = indicator.inflationRate + (infamyPenalty?.inflationIncrease ?? 0);
       const infamyGdpPenalty = infamyPenalty?.gdpGrowthPenalty ?? 0;
       const annualGrowthRate = Math.max(-0.05, Math.min(0.05, productionBonus - effectiveInflation * 0.0005 - infamyGdpPenalty * 0.5));
-      const weeklyGrowthRate = Math.pow(1 + annualGrowthRate, 1 / 52) - 1;
+      const weeklyGrowthRate = annualGrowthRate / 52;
       const newGdp = Math.max(1, currentGdp * (1 + weeklyGrowthRate));
 
       eventBus.publish<IEconomyGdpUpdatedPayload>(

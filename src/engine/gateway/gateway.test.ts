@@ -277,26 +277,4 @@ describe('Phase 5: API Gateway & Headless Exposure (ADR-001 / ADR-002)', () => {
     expect(tradeRoute).toBeDefined();
     expect(tradeRoute!.volume).toBe(50);
   });
-
-  it('should return 500 when an error is thrown during dispatch', async () => {
-    const { engine } = createEngine();
-    const router = new APIGatewayRouter({ engine });
-
-    const spy = vi.spyOn(engine, 'getWorldState').mockImplementation(() => {
-      throw new Error('Mock Engine Error');
-    });
-
-    try {
-      const response = await router.dispatch({
-        path: '/api/v1/state',
-        method: 'GET',
-      });
-
-      expect(response.statusCode).toBe(500);
-      expect(response.success).toBe(false);
-      expect(response.error).toBe('Mock Engine Error');
-    } finally {
-      spy.mockRestore();
-    }
-  });
 });

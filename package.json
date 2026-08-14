@@ -43,7 +43,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^9.31.0",
     "@types/d3-geo": "^3.1.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.10.5",

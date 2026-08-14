@@ -8,14 +8,7 @@ import { geoEqualEarth, geoPath } from "d3-geo";
 import type { GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type {
-  ConflictZone,
-  Country,
-  IntelLevel,
-  Unit,
-  UnitType,
-  WorldSeed,
-} from "./shared/types.js";
+import type { ConflictZone, Country, IntelLevel, Unit, UnitType, WorldSeed } from "./shared/types.js";
 import { gameSocket } from "./gameSocket.js";
 import { selection } from "./selectionManager.js";
 import { round2 } from "./briefing/format.js";
@@ -33,13 +26,7 @@ type CountryFeature = {
 
 const sphere: GeoPermissibleObjects = { type: "Sphere" } as GeoPermissibleObjects;
 
-export function WorldMap({
-  seed,
-  onCountryPicked,
-}: {
-  seed: WorldSeed;
-  onCountryPicked?: (c: Country) => void;
-}) {
+export function WorldMap({ seed, onCountryPicked }: { seed: WorldSeed; onCountryPicked?: (c: Country) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [features, setFeatures] = useState<CountryFeature[]>([]);
@@ -85,8 +72,7 @@ export function WorldMap({
   useEffect(() => {
     return selection.subscribe((sel) => {
       selectedRef.current = sel?.kind === "country" ? sel.country : null;
-      selectedIntelRef.current =
-        sel?.kind === "country" ? (intelRef.current.get(sel.country.id) ?? 0) : 0;
+      selectedIntelRef.current = sel?.kind === "country" ? (intelRef.current.get(sel.country.id) ?? 0) : 0;
       requestAnimationFrame(draw);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,6 +88,7 @@ export function WorldMap({
       unsubUnits();
       unsubEvents();
     };
+
   }, []);
 
   // intel tracking: listen for intel.gathered events and update the map
@@ -112,6 +99,7 @@ export function WorldMap({
         if (selectedRef.current?.id === evt.target) selectedIntelRef.current = evt.intelLevel;
       }
     });
+
   }, []);
 
   // load topojson
@@ -121,9 +109,7 @@ export function WorldMap({
       .then((r) => r.json())
       .then((topo) => {
         if (cancelled) return;
-        const fc = feature(topo, topo.objects.countries) as unknown as {
-          features: CountryFeature[];
-        };
+        const fc = feature(topo, topo.objects.countries) as unknown as { features: CountryFeature[] };
         setFeatures(fc.features);
       })
       .catch((err) => console.error("[map] topojson load failed", err));
@@ -181,12 +167,6 @@ export function WorldMap({
   }, [tensionMode, seed]);
 
   const proj = () => geoEqualEarth().fitSize([size.w, size.h], sphere);
-
-  // cache projected unit coordinates to avoid reprojecting every unit on every mousemove
-  const projectedUnits = useMemo(() => {
-    const projection = geoEqualEarth().fitSize([size.w, size.h], sphere);
-    return units.map(u => ({ unit: u, xy: projection(u.latlng) }));
-  }, [units, size.w, size.h]);
 
   const draw = () => {
     const canvas = canvasRef.current;
@@ -300,18 +280,7 @@ export function WorldMap({
     }, 1000);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    features,
-    size,
-    hoveredId,
-    units,
-    tensionMode,
-    intelMode,
-    tradeMode,
-    tensionMap,
-    trajectories,
-    tradeRoutes,
-  ]);
+  }, [features, size, hoveredId, units, tensionMode, intelMode, tradeMode, tensionMap, trajectories, tradeRoutes]);
 
   // pointer handling — hover + hit detection (country polygons then units)
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -353,11 +322,13 @@ export function WorldMap({
   };
 
   const hitUnit = (mx: number, my: number): Unit | null => {
-    for (const { unit, xy } of projectedUnits) {
+    const projection = proj();
+    for (const u of units) {
+      const xy = projection(u.latlng);
       if (!xy) continue;
       const dx = mx - xy[0];
       const dy = my - xy[1];
-      if (dx * dx + dy * dy <= 9 * 9) return unit;
+      if (dx * dx + dy * dy <= 9 * 9) return u;
     }
     return null;
   };
@@ -383,10 +354,7 @@ export function WorldMap({
     selection.selectCountry(country ?? null);
   };
 
-  const handleLeave = () => {
-    setHoveredId(null);
-    setTooltip(null);
-  };
+  const handleLeave = () => { setHoveredId(null); setTooltip(null); };
 
   return (
     <div ref={containerRef} className="map-container">
@@ -421,26 +389,14 @@ export function WorldMap({
       />
       {features.length === 0 && <div className="map-loading">Loading world map…</div>}
       {tooltip && (
-        <div className="map-tooltip" style={{ left: tooltip.x + 16, top: tooltip.y + 16 }}>
+        <div
+          className="map-tooltip"
+          style={{ left: tooltip.x + 16, top: tooltip.y + 16 }}
+        >
           <div className="map-tooltip-name">{tooltip.country.name}</div>
-          <div className="map-tooltip-row">
-            <span>GDP Growth</span>
-            <span>{round2(tooltip.country.economy?.stability ?? 0)}%</span>
-          </div>
-          <div className="map-tooltip-row">
-            <span>Tension</span>
-            <span>
-              {round2(
-                tooltip.country.relationships?.length > 0
-                  ? Math.max(...tooltip.country.relationships.map((r) => r.tension))
-                  : 0,
-              )}
-            </span>
-          </div>
-          <div className="map-tooltip-row">
-            <span>Readiness</span>
-            <span>{round2(tooltip.country.military?.readiness ?? 0)}%</span>
-          </div>
+          <div className="map-tooltip-row"><span>GDP Growth</span><span>{round2(tooltip.country.economy?.stability ?? 0)}%</span></div>
+          <div className="map-tooltip-row"><span>Tension</span><span>{round2(tooltip.country.relationships?.length > 0 ? Math.max(...tooltip.country.relationships.map((r) => r.tension)) : 0)}</span></div>
+          <div className="map-tooltip-row"><span>Readiness</span><span>{round2(tooltip.country.military?.readiness ?? 0)}%</span></div>
         </div>
       )}
     </div>
@@ -454,57 +410,20 @@ export function WorldMap({
 /** Group units within an 8° lat/lng radius into hexagonal conflict zones. */
 function clusterConflictZones(units: Unit[], radiusDeg: number): ConflictZone[] {
   if (units.length === 0) return [];
-
-  const cellSize = radiusDeg;
-  const grid = new Map<string, number[]>();
-
-  for (let i = 0; i < units.length; i++) {
-    const unit = units[i]!;
-    const latIdx = Math.floor(unit.latlng[0] / cellSize);
-    const lngIdx = Math.floor(unit.latlng[1] / cellSize);
-    const key = `${latIdx},${lngIdx}`;
-
-    let cell = grid.get(key);
-    if (!cell) {
-      cell = [];
-      grid.set(key, cell);
-    }
-    cell.push(i);
-  }
-
   const visited = new Set<number>();
   const zones: ConflictZone[] = [];
 
   for (let i = 0; i < units.length; i++) {
     if (visited.has(i)) continue;
-
-    const rootUnit = units[i]!;
-    const cluster = [rootUnit];
+    const cluster = [units[i]!];
     visited.add(i);
-
-    const latIdx = Math.floor(rootUnit.latlng[0] / cellSize);
-    const lngIdx = Math.floor(rootUnit.latlng[1] / cellSize);
-
-    for (let dLatIdx = -1; dLatIdx <= 1; dLatIdx++) {
-      for (let dLngIdx = -1; dLngIdx <= 1; dLngIdx++) {
-        const key = `${latIdx + dLatIdx},${lngIdx + dLngIdx}`;
-        const cellUnitIndices = grid.get(key);
-
-        if (cellUnitIndices) {
-          for (let k = 0; k < cellUnitIndices.length; k++) {
-            const j = cellUnitIndices[k]!;
-            if (visited.has(j)) continue;
-
-            const unit = units[j]!;
-            const dLat = Math.abs(rootUnit.latlng[0] - unit.latlng[0]);
-            const dLng = Math.abs(rootUnit.latlng[1] - unit.latlng[1]);
-
-            if (dLat <= radiusDeg && dLng <= radiusDeg) {
-              cluster.push(unit);
-              visited.add(j);
-            }
-          }
-        }
+    for (let j = i + 1; j < units.length; j++) {
+      if (visited.has(j)) continue;
+      const dLat = Math.abs(units[i]!.latlng[0] - units[j]!.latlng[0]);
+      const dLng = Math.abs(units[i]!.latlng[1] - units[j]!.latlng[1]);
+      if (dLat <= radiusDeg && dLng <= radiusDeg) {
+        cluster.push(units[j]!);
+        visited.add(j);
       }
     }
     const lat = cluster.reduce((s, u) => s + u.latlng[0], 0) / cluster.length;
@@ -514,10 +433,9 @@ function clusterConflictZones(units: Unit[], radiusDeg: number): ConflictZone[] 
     for (const u of cluster) typeCounts.set(u.type, (typeCounts.get(u.type) ?? 0) + 1);
     const dominantType = [...typeCounts.entries()].sort((a, b) => b[1] - a[1])[0]![0] as UnitType;
     // hostility: if multiple owners present, higher; scale by unit count
-    const hostility =
-      ownerSet.size > 1
-        ? Math.min(100, 50 + cluster.length * 10)
-        : Math.min(50, cluster.length * 5);
+    const hostility = ownerSet.size > 1
+      ? Math.min(100, 50 + cluster.length * 10)
+      : Math.min(50, cluster.length * 5);
     zones.push({
       id: `zone-${i}`,
       centroid: [lat, lng],
@@ -539,7 +457,7 @@ function drawConflictMarker(
   y: number,
   zone: ConflictZone,
   fogMode: boolean,
-  intel: IntelLevel,
+  intel: IntelLevel
 ): void {
   const r = 14;
   ctx.save();
@@ -588,7 +506,7 @@ function drawTrajectory(
   y1: number,
   x2: number,
   y2: number,
-  alpha: number,
+  alpha: number
 ): void {
   ctx.save();
   ctx.strokeStyle = `rgba(26, 188, 156, ${alpha})`;
@@ -619,7 +537,7 @@ function drawTradeRoute(
   y1: number,
   x2: number,
   y2: number,
-  affinity: number,
+  affinity: number
 ): void {
   ctx.save();
   const alpha = 0.2 + (affinity / 100) * 0.4;
@@ -664,7 +582,7 @@ function pointInFeature(
   pathGen: ReturnType<typeof geoPath>,
   f: CountryFeature,
   x: number,
-  y: number,
+  y: number
 ): boolean {
   const d = pathGen(f as unknown as GeoPermissibleObjects);
   if (!d) return false;
