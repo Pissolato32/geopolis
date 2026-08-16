@@ -273,14 +273,15 @@ export class DiplomaticAISystem implements ISystem {
     const countriesWithInfamy = state.getEntitiesByComponent(DIPLOMATIC_INFAMY_TYPE);
     const relationEntities = state.getEntitiesByComponent(DIPLOMATIC_RELATION_TYPE);
 
-    // Build a lookup: countryId -> relations toward others
-    const relationsBySource = new Map<string, RelationComponent[]>();
+    // Build a lookup: targetCountryId -> relations pointing to it
+    const relationsByTarget = new Map<string, { sourceId: string; relation: RelationComponent }[]>();
     for (const entity of relationEntities) {
       const rel = entity.getComponent<RelationComponent>(DIPLOMATIC_RELATION_TYPE);
       if (!rel) continue;
-      const list = relationsBySource.get(entity.id as string) ?? [];
-      list.push(rel);
-      relationsBySource.set(entity.id as string, list);
+      const targetId = rel.targetCountryId as string;
+      const list = relationsByTarget.get(targetId) ?? [];
+      list.push({ sourceId: entity.id as string, relation: rel });
+      relationsByTarget.set(targetId, list);
     }
 
     for (const entity of countriesWithInfamy) {
@@ -290,16 +291,15 @@ export class DiplomaticAISystem implements ISystem {
 
       // Gather candidate coalition members: all countries with relations toward the aggressor
       const candidates: { countryId: string; relation: RelationComponent; infamy: number }[] = [];
-      for (const [sourceId, relations] of relationsBySource) {
+
+      const relsTowardAggressor = relationsByTarget.get(entity.id as string) ?? [];
+      for (const { sourceId, relation } of relsTowardAggressor) {
         if (sourceId === entity.id as string) continue;
-        const relTowardAggressor = relations.find(
-          (r) => r.targetCountryId === entity.id,
-        );
-        if (!relTowardAggressor) continue;
+
         const candidateInfamy = this.getInfamy(state, sourceId);
         candidates.push({
           countryId: sourceId,
-          relation: relTowardAggressor,
+          relation,
           infamy: candidateInfamy?.infamyScore ?? 0,
         });
       }
