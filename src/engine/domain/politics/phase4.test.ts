@@ -60,17 +60,18 @@ function createFactionEntities(worldState: WorldState, countryId: EntityId) {
   }
 }
 
-describe('Phase 4 — Internal Factions', () => {
-  function setup() {
-    const timeline = new Timeline();
-    const eventBus = new EventBus(timeline);
-    const worldState = new WorldState('phase4-factions');
-    const engine = new TickEngine(worldState, eventBus, timeline);
-    return { timeline, eventBus, worldState, engine };
-  }
 
+function setup(worldStateId: string) {
+  const timeline = new Timeline();
+  const eventBus = new EventBus(timeline);
+  const worldState = new WorldState(worldStateId);
+  const engine = new TickEngine(worldState, eventBus, timeline);
+  return { timeline, eventBus, worldState, engine };
+}
+
+describe('Phase 4 — Internal Factions', () => {
   it('should model 4 internal factions per nation with power share and loyalty', () => {
-    const { worldState } = setup();
+    const { worldState } = setup('phase4-factions');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.7, approvalRating: 0.6, militaryLoyalty: 0.8, governmentType: 'democracy' as const, regimeStabilityTicks: 10 },
@@ -88,7 +89,7 @@ describe('Phase 4 — Internal Factions', () => {
   });
 
   it('should adjust military faction power based on defense readiness', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-factions');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.7, approvalRating: 0.6, militaryLoyalty: 0.8, governmentType: 'democracy' as const, regimeStabilityTicks: 10 },
@@ -110,7 +111,7 @@ describe('Phase 4 — Internal Factions', () => {
   });
 
   it('should increase populist faction power during high inflation', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-factions');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.5, approvalRating: 0.4, militaryLoyalty: 0.6, governmentType: 'democracy' as const, regimeStabilityTicks: 10 },
@@ -132,7 +133,7 @@ describe('Phase 4 — Internal Factions', () => {
   });
 
   it('should erode oligarch loyalty under high corporate tax', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-factions');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.6, approvalRating: 0.5, militaryLoyalty: 0.7, governmentType: 'democracy' as const, regimeStabilityTicks: 10 },
@@ -155,16 +156,8 @@ describe('Phase 4 — Internal Factions', () => {
 });
 
 describe('Phase 4 — Coup d\'État & Revolution', () => {
-  function setup() {
-    const timeline = new Timeline();
-    const eventBus = new EventBus(timeline);
-    const worldState = new WorldState('phase4-coup');
-    const engine = new TickEngine(worldState, eventBus, timeline);
-    return { timeline, eventBus, worldState, engine };
-  }
-
   it('should trigger military coup when stability < 30 AND military loyalty < 35', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.2, approvalRating: 0.3, militaryLoyalty: 0.25, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -187,7 +180,7 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
   });
 
   it('should disrupt 40% of treasury during coup', () => {
-    const { worldState, engine } = setup();
+    const { worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.15, approvalRating: 0.2, militaryLoyalty: 0.2, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -206,7 +199,7 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
   });
 
   it('should reset alliance treaties during coup', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.15, approvalRating: 0.2, militaryLoyalty: 0.2, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -238,7 +231,7 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
   });
 
   it('should emit regime-change event during coup', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.15, approvalRating: 0.2, militaryLoyalty: 0.2, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -256,7 +249,7 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
   });
 
   it('should not trigger coup when stability is above threshold', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.5, approvalRating: 0.5, militaryLoyalty: 0.7, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -272,7 +265,7 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
   });
 
   it('should not trigger coup when military loyalty is above threshold even with low stability', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.2, approvalRating: 0.3, militaryLoyalty: 0.5, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -288,7 +281,7 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
   });
 
   it('should shift military faction to government in power after coup', () => {
-    const { worldState, engine } = setup();
+    const { worldState, engine } = setup('phase4-coup');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.15, approvalRating: 0.2, militaryLoyalty: 0.2, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -315,14 +308,6 @@ describe('Phase 4 — Coup d\'État & Revolution', () => {
 });
 
 describe('Phase 4 — Legislative Assemblies & War Voting', () => {
-  function setup() {
-    const timeline = new Timeline();
-    const eventBus = new EventBus(timeline);
-    const worldState = new WorldState('phase4-legislative');
-    const engine = new TickEngine(worldState, eventBus, timeline);
-    return { timeline, eventBus, worldState, engine };
-  }
-
   it('should block war declaration in democracy when legislative support < 50%', () => {
     const assembly: LegislativeAssemblyComponent = {
       type: LEGISLATIVE_ASSEMBLY_TYPE,
@@ -383,7 +368,7 @@ describe('Phase 4 — Legislative Assemblies & War Voting', () => {
   });
 
   it('should update legislative assembly support based on approval rating', () => {
-    const { worldState, engine } = setup();
+    const { worldState, engine } = setup('phase4-legislative');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.7, approvalRating: 0.8, militaryLoyalty: 0.7, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -405,7 +390,7 @@ describe('Phase 4 — Legislative Assemblies & War Voting', () => {
   });
 
   it('should emit legislative vote event when war declaration is blocked by assembly', () => {
-    const { timeline, eventBus, worldState, engine } = setup();
+    const { timeline, eventBus, worldState, engine } = setup('phase4-legislative');
 
     worldState.createEntity('country-us' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.7, approvalRating: 0.5, militaryLoyalty: 0.7, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -435,7 +420,7 @@ describe('Phase 4 — Legislative Assemblies & War Voting', () => {
   });
 
   it('should run full Phase 4 pipeline: faction drift → low stability → coup → regime change', () => {
-    const { timeline, worldState, engine } = setup();
+    const { timeline, worldState, engine } = setup('phase4-legislative');
 
     worldState.createEntity('country-x' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.25, approvalRating: 0.2, militaryLoyalty: 0.2, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
@@ -461,7 +446,7 @@ describe('Phase 4 — Legislative Assemblies & War Voting', () => {
   });
 
   it('should run 100 ticks with full Phase 4 systems without errors', () => {
-    const { worldState, engine } = setup();
+    const { worldState, engine } = setup('phase4-legislative');
 
     worldState.createEntity('country-a' as EntityId, [
       { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex: 0.6, approvalRating: 0.5, militaryLoyalty: 0.7, governmentType: 'democracy' as const, regimeStabilityTicks: 50 },
