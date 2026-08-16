@@ -261,7 +261,7 @@ describe("simulateIntent", () => {
   it("returns error for declare-war with unknown country", () => {
     const seed = makeSeed();
     const result = simulateIntent(
-      { intent: "declare-war", from: "USA", target: "XXX" },
+      { intent: "declare-war", from: "USA", target: "UNKNOWN" },
       seed,
       [],
     );
