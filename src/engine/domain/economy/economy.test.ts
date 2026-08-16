@@ -1,3 +1,7 @@
+import { GOVERNMENT_STABILITY_TYPE, GovernmentStabilityComponent } from '../politics/components/politics.components.js';
+import { TradeSystem } from './systems/trade.system.js';
+import { TradeRouteComponent, ECONOMY_TRADE_ROUTE_TYPE } from './components/trade.components.js';
+import { ECONOMY_TAX_COLLECTED_EVENT } from './events/economy.events.js';
 import { describe, it, expect } from 'vitest';
 import { EconomySystem } from './systems/economy.system.js';
 import { WorldState } from '../../core/world-state/world-state.js';
@@ -144,7 +148,7 @@ describe('Economy Domain', () => {
     const results = engine.runTicks(5);
 
     expect(results).toHaveLength(5);
-    expect(timeline.getEventCount()).toBe(10); // 5 GDP + 5 shortage events
+    expect(timeline.getEventCount()).toBe(15); // 5 GDP + 5 shortage + 5 tax events
 
     const gdpEvents = timeline.query({ eventType: ECONOMY_GDP_UPDATED_EVENT });
     expect(gdpEvents).toHaveLength(5);
@@ -152,4 +156,127 @@ describe('Economy Domain', () => {
     const shortageEvents = timeline.query({ eventType: ECONOMY_RESOURCE_SHORTAGE_EVENT });
     expect(shortageEvents).toHaveLength(5);
   });
+});
+
+  it('should calculate exactly 1 weekly tax amount over 1 tick and not introduce 0.005 factor', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('tax-1-tick');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    const startTreasury = 100_000;
+    const gdp = 1_000_000;
+    const taxRate = 0.25;
+    const stabilityIndex = 0.6;
+
+    worldState.createEntity('country-tax' as EntityId, [
+      { type: ECONOMIC_INDICATOR_TYPE, gdp, inflationRate: 0, treasury: startTreasury, taxRate } as EconomicIndicatorComponent,
+      { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex, approvalRating: 0.5, militaryLoyalty: 0.5, governmentType: 'democracy', regimeStabilityTicks: 0 } as GovernmentStabilityComponent,
+    ]);
+
+    engine.registerSystem(new EconomySystem());
+    engine.tick();
+
+    const taxEvents = timeline.query({ eventType: ECONOMY_TAX_COLLECTED_EVENT });
+    expect(taxEvents).toHaveLength(1);
+
+    const entity = worldState.getEntity('country-tax' as EntityId);
+    const indicator = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
+    const currentTreasury = typeof indicator?.treasury === 'bigint' ? Number(indicator.treasury) : indicator?.treasury;
+
+    const expectedAnnualTax = gdp * taxRate * stabilityIndex; // 1M * 0.25 * 0.6 = 150k
+    const expectedWeeklyTax = expectedAnnualTax / 52; // 150k / 52 = 2884.615...
+
+    expect(currentTreasury).toBeCloseTo(startTreasury + expectedWeeklyTax, 2);
+
+    // Ensure historical 0.005 factor (which would give 750) is NOT used
+    expect(currentTreasury! - startTreasury).not.toBeCloseTo(gdp * taxRate * stabilityIndex * 0.005, 2);
+  });
+
+  it('should not charge annual taxation every tick over 52 ticks', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('tax-52-ticks');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    const startTreasury = 100_000;
+    const gdp = 1_000_000;
+    const taxRate = 0.25;
+    const stabilityIndex = 0.6;
+
+    worldState.createEntity('country-tax' as EntityId, [
+      { type: ECONOMIC_INDICATOR_TYPE, gdp, inflationRate: 0, treasury: startTreasury, taxRate } as EconomicIndicatorComponent,
+      { type: GOVERNMENT_STABILITY_TYPE, stabilityIndex, approvalRating: 0.5, militaryLoyalty: 0.5, governmentType: 'democracy', regimeStabilityTicks: 0 } as GovernmentStabilityComponent,
+    ]);
+
+    engine.registerSystem(new EconomySystem());
+    engine.runTicks(52);
+
+    const entity = worldState.getEntity('country-tax' as EntityId);
+    const indicator = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
+    const currentTreasury = typeof indicator?.treasury === 'bigint' ? Number(indicator.treasury) : indicator?.treasury;
+
+    const taxCollected = currentTreasury! - startTreasury;
+    const initialAnnualTax = gdp * taxRate * stabilityIndex; // 150k
+
+    // Should be approximately equal to 1 annual tax over 52 ticks, varying slightly due to compounding GDP growth
+    expect(taxCollected).toBeGreaterThan(initialAnnualTax * 0.95);
+    expect(taxCollected).toBeLessThan(initialAnnualTax * 1.50);
+
+    // The old bug would result in 52 * annual tax = 7.8M
+    expect(taxCollected).toBeLessThan(initialAnnualTax * 52);
+  });
+
+  it('should generate zero tax revenue if tax rate is zero', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('tax-zero');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    const startTreasury = 100_000;
+
+    worldState.createEntity('country-tax' as EntityId, [
+      { type: ECONOMIC_INDICATOR_TYPE, gdp: 1_000_000, inflationRate: 0, treasury: startTreasury, taxRate: 0 } as EconomicIndicatorComponent,
+    ]);
+
+    engine.registerSystem(new EconomySystem());
+    engine.tick();
+
+    const entity = worldState.getEntity('country-tax' as EntityId);
+    const indicator = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
+    const currentTreasury = typeof indicator?.treasury === 'bigint' ? Number(indicator.treasury) : indicator?.treasury;
+
+    expect(currentTreasury).toBe(startTreasury);
+  });
+
+  it('should persist both Trade and Tax treasury deltas in the same tick without overwrite', () => {
+    const timeline = new Timeline();
+    const eventBus = new EventBus(timeline);
+    const worldState = new WorldState('tax-trade-coexist');
+    const engine = new TickEngine(worldState, eventBus, timeline);
+
+    const startTreasury = 100_000;
+
+    worldState.createEntity('country-src' as EntityId, [
+      { type: ECONOMIC_INDICATOR_TYPE, gdp: 1_000_000, inflationRate: 0, treasury: startTreasury, taxRate: 0.25 } as EconomicIndicatorComponent,
+    ]);
+    worldState.createEntity('country-tgt' as EntityId, [
+      { type: ECONOMIC_INDICATOR_TYPE, gdp: 1_000_000, inflationRate: 0, treasury: 100_000, taxRate: 0.25 } as EconomicIndicatorComponent,
+    ]);
+    worldState.createEntity('route' as EntityId, [
+      { type: ECONOMY_TRADE_ROUTE_TYPE, sourceCountryId: 'country-src' as EntityId, targetCountryId: 'country-tgt' as EntityId, resourceType: 'energy', volumePerTick: 10, isActive: true, establishedTick: 0 as any, blockadeLevel: 0 } as TradeRouteComponent,
+    ]);
+
+    engine.registerSystem(new TradeSystem());
+    engine.registerSystem(new EconomySystem());
+    engine.tick();
+
+    const entity = worldState.getEntity('country-src' as EntityId);
+    const indicator = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
+    const currentTreasury = typeof indicator?.treasury === 'bigint' ? Number(indicator.treasury) : indicator?.treasury;
+
+    // Trade delta: 10 volume * 100 base price = 1000
+    // Tax delta: 1_000_000 * 0.25 * 1.0 (default stability) / 52 = 4807.69...
+    // Total expected: 100_000 + 1000 + 4807.69... = 105807.69...
+    expect(currentTreasury).toBeCloseTo(startTreasury + 1000 + (1_000_000 * 0.25 * 1.0 / 52), 2);
 });

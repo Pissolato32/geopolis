@@ -1,8 +1,8 @@
 # ADR-006: Canonical Political Ontology and Dynamic Regime Transitions
 
-> **Status:** Proposed  
-> **Date:** 2026-08-16  
-> **Deciders:** GeoPolis project maintainers  
+> **Status:** Proposed
+> **Date:** 2026-08-16
+> **Deciders:** GeoPolis project maintainers
 > **Complements:** ADR-001 (State & Context Management), ADR-005 (Current ECS Architecture Consolidation)
 
 ---

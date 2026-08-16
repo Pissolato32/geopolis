@@ -82,7 +82,7 @@ describe('Advanced Economy — Trade, Market & Sanctions Integration', () => {
 
     const brEntity = worldState.getEntity('country-br' as EntityId);
     const brIndicator = brEntity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
-    expect(brIndicator?.treasury).toBe(650); // 150 + 500
+    expect(brIndicator?.treasury).toBeCloseTo(150 + 500 + (2000 * 0.2 * 1.0 / 52), 2); // 150 + trade(500) + tax(7.69...)
   });
 
   it('should not emit trade-flow for inactive routes', () => {

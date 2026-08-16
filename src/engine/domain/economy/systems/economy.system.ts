@@ -3,6 +3,7 @@ import { ISystem, SystemPriority } from '../../../core/interfaces/system.interfa
 import { IWorldState } from '../../../core/interfaces/world-state.interface.js';
 import { IEventBus } from '../../../core/interfaces/event-bus.interface.js';
 import { IComponent } from '../../../core/interfaces/component.interface.js';
+import { GOVERNMENT_STABILITY_TYPE, GovernmentStabilityComponent } from '../../politics/components/politics.components.js';
 import {
   ECONOMIC_INDICATOR_TYPE,
   RESOURCE_PRODUCTION_TYPE,
@@ -12,8 +13,10 @@ import {
 import {
   ECONOMY_GDP_UPDATED_EVENT,
   ECONOMY_RESOURCE_SHORTAGE_EVENT,
+  ECONOMY_TAX_COLLECTED_EVENT,
   IEconomyGdpUpdatedPayload,
   IEconomyResourceShortagePayload,
+  IEconomyTaxCollectedPayload,
 } from '../events/economy.events.js';
 import {
   DIPLOMATIC_INFAMY_TYPE,
@@ -33,8 +36,8 @@ export class EconomySystem implements ISystem {
     name: 'Economy Simulation System',
     priority: 200 as SystemPriority,
     requiredComponents: [ECONOMIC_INDICATOR_TYPE],
-    subscribedEvents: [ECONOMY_GDP_UPDATED_EVENT],
-    emittedEvents: [ECONOMY_GDP_UPDATED_EVENT, ECONOMY_RESOURCE_SHORTAGE_EVENT],
+    subscribedEvents: [ECONOMY_GDP_UPDATED_EVENT, ECONOMY_TAX_COLLECTED_EVENT],
+    emittedEvents: [ECONOMY_GDP_UPDATED_EVENT, ECONOMY_RESOURCE_SHORTAGE_EVENT, ECONOMY_TAX_COLLECTED_EVENT],
   };
 
   initialize(eventBus: IEventBus, worldState?: IWorldState): void {
@@ -50,6 +53,25 @@ export class EconomySystem implements ISystem {
             worldState.updateComponent(countryId, {
               ...currentComp,
               gdp: event.payload.newGdp,
+            } as unknown as IComponent);
+          }
+        }
+      },
+    );
+
+    eventBus.subscribe<IEconomyTaxCollectedPayload>(
+      ECONOMY_TAX_COLLECTED_EVENT,
+      (event) => {
+        const countryId = event.payload.countryId as EntityId;
+        if (worldState.hasEntity(countryId)) {
+          const entity = worldState.getEntity(countryId);
+          const indicator = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
+          if (indicator) {
+            const currentTreasury = typeof indicator.treasury === 'bigint' ? Number(indicator.treasury) : indicator.treasury;
+            const newTreasury = currentTreasury + event.payload.taxRevenue;
+            worldState.updateComponent(countryId, {
+              ...indicator,
+              treasury: typeof indicator.treasury === 'bigint' ? BigInt(Math.round(newTreasury)) : newTreasury,
             } as unknown as IComponent);
           }
         }
@@ -89,6 +111,23 @@ export class EconomySystem implements ISystem {
       const annualGrowthRate = Math.max(-0.05, Math.min(0.05, productionBonus - effectiveInflation * 0.0005 - infamyGdpPenalty * 0.5));
       const weeklyGrowthRate = Math.pow(1 + annualGrowthRate, 1 / 52) - 1;
       const newGdp = Math.max(1, currentGdp * (1 + weeklyGrowthRate));
+
+      // Tax collection is based on GDP * tax rate * stability
+      const stabilityComp = country.getComponent<GovernmentStabilityComponent>(GOVERNMENT_STABILITY_TYPE);
+      const stabilityIndex = stabilityComp ? stabilityComp.stabilityIndex : 1.0;
+      const annualTaxRevenue = currentGdp * indicator.taxRate * stabilityIndex;
+      const weeklyTaxRevenue = annualTaxRevenue / 52;
+
+      if (weeklyTaxRevenue > 0) {
+        eventBus.publish<IEconomyTaxCollectedPayload>(
+          ECONOMY_TAX_COLLECTED_EVENT,
+          {
+            countryId: country.id,
+            taxRevenue: weeklyTaxRevenue,
+          },
+          ECONOMY_SYSTEM_ID,
+        );
+      }
 
       eventBus.publish<IEconomyGdpUpdatedPayload>(
         ECONOMY_GDP_UPDATED_EVENT,
