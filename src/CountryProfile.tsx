@@ -29,6 +29,9 @@ function intelTier(level: number): IntelTier {
 
 const ALL_TABS: Tab[] = ["overview", "economy", "military", "politics", "diplomacy", "intelligence"];
 
+const INTEL_BAR_TRACK_CLASS = "intel-bar-track";
+const BAR_TRACK_CLASS = "bar-track";
+
 export function CountryProfile() {
   const [sel, setSel] = useState<ReturnType<typeof selection.getSelected>>(null);
   const [tab, setTab] = useState<Tab>("overview");
@@ -153,7 +156,7 @@ function CountryProfileBody({
       {!isSelf && (
         <div className={`intel-banner intel-${tier}`}>
           <span className="intel-label">Intel Level</span>
-          <div className="intel-bar-track">
+          <div className={INTEL_BAR_TRACK_CLASS}>
             <div className="intel-bar-fill" style={{ width: `${intelLevel}%` }} />
           </div>
           <span className="intel-value">{intelLevel}/100 · {tier.toUpperCase()}</span>
@@ -260,7 +263,7 @@ function OverviewTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
       )}
       <div className="bar">
         <span className="bar-label">Stability</span>
-        <div className="bar-track">
+        <div className={BAR_TRACK_CLASS}>
           <div className="bar-fill bar-fill-stab" style={{ width: `${stability}%` }} />
         </div>
       </div>
@@ -509,7 +512,7 @@ function PoliticsTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: I
       <Stat label="Legislative Support" value={`${(legSupport * 100).toFixed(0)}%`} />
       <div className="bar">
         <span className="bar-label">Stability</span>
-        <div className="bar-track">
+        <div className={BAR_TRACK_CLASS}>
           <div className="bar-fill bar-fill-stab" style={{ width: `${stability}%` }} />
         </div>
       </div>
@@ -586,7 +589,7 @@ function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: In
         {c.intelligence && <Stat label="GDP Growth" value={`${c.intelligence.gdpGrowth >= 0 ? "+" : ""}${(c.intelligence.gdpGrowth * 100).toFixed(1)}%`} />}
         <div className="bar">
           <span className="bar-label">Stability</span>
-          <div className="bar-track">
+          <div className={BAR_TRACK_CLASS}>
             <div className="bar-fill bar-fill-stab" style={{ width: `${stability}%` }} />
           </div>
         </div>
@@ -602,7 +605,7 @@ function EconomyTab({ c, isSelf, tier }: { c: Country; isSelf: boolean; tier: In
         <Stat label="Population" value={(c.population ?? 0).toLocaleString()} />
         <div className="bar">
           <span className="bar-label">Stability (est.)</span>
-          <div className="bar-track">
+          <div className={BAR_TRACK_CLASS}>
             <div className="bar-fill bar-fill-stab" style={{ width: `${Math.max(0, Math.min(100, stability))}%`, opacity: 0.6 }} />
           </div>
         </div>
@@ -698,7 +701,7 @@ function Bar({ label, value, cls }: { label: string; value: number; cls: string 
   return (
     <div className="bar">
       <span className="bar-label">{label}</span>
-      <div className="bar-track">
+      <div className={BAR_TRACK_CLASS}>
         <div className={`bar-fill ${cls}`} style={{ width: `${value}%` }} />
       </div>
     </div>
@@ -722,7 +725,7 @@ function MiniMeter({
       <span className="mini-label">
         {label} <b>{value > 0 ? "+" : ""}{value}</b>
       </span>
-      <div className="bar-track">
+      <div className={BAR_TRACK_CLASS}>
         <div className="bar-fill bar-fill-diplo" style={{ width: `${pct}%` }} />
       </div>
     </div>
