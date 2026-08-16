@@ -66,12 +66,12 @@ describe("StrictIntentParser.parse()", () => {
     });
 
     it("rejects unknown from country", () => {
-      const result = parser.parse({ intent: "declare-war", from: "XXX", target: "CAN" });
+      const result = parser.parse({ intent: "declare-war", from: "UNKNOWN", target: "CAN" });
       expect(result.ok).toBe(false);
     });
 
     it("rejects unknown target country", () => {
-      const result = parser.parse({ intent: "declare-war", from: "USA", target: "XXX" });
+      const result = parser.parse({ intent: "declare-war", from: "USA", target: "UNKNOWN" });
       expect(result.ok).toBe(false);
     });
   });
@@ -99,7 +99,7 @@ describe("StrictIntentParser.parse()", () => {
     });
 
     it("rejects unknown from", () => {
-      expect(parser.parse({ intent: "set-tax", from: "XXX", rate: 0.3 }).ok).toBe(false);
+      expect(parser.parse({ intent: "set-tax", from: "UNKNOWN", rate: 0.3 }).ok).toBe(false);
     });
 
     it("accepts rate of 0", () => {

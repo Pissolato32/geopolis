@@ -1,19 +1,4 @@
-### 🎯 What
-Remove the unnecessary `DEFAULT_SURVIVAL_TICKS` export from `src/victory/victoryManager.ts`.
-
-### 💡 Why
-Reduce unnecessary module API surface and eliminate dead/unnecessary exported state.
-
-### ✅ Verification
-Report:
-- repository-wide usage search: Only used in `src/victory/victoryManager.ts`.
-- whether the constant was internally used: Yes, it is used internally in `victoryManager.ts`.
-- whether any external consumers existed: No external consumers found.
-- any affected tests: No tests reference `DEFAULT_SURVIVAL_TICKS`.
-- lint result: Passed (`npm run lint`).
-- typecheck result: Passed (`npm run typecheck`).
-- full test result: Passed (`npm test`).
-- build result: Passed (`npm run build`).
-
-### ✨ Result
-No gameplay or runtime behavior changes; only the unnecessary export/dead constant is removed.
+🎯 **What:** Replaced the magic string `"XXX"` with `"UNKNOWN"` in `src/server/intentParser.test.ts` and `src/gameSocket.test.ts`.
+💡 **Why:** Using "XXX" for an unknown or invalid ISO country code is a code smell. While "XXX" is a user-assigned ISO 3166-1 alpha-3 code, using it this way reduces test readability and risks future collisions. `"UNKNOWN"` is explicitly invalid and much clearer.
+✅ **Verification:** Ran `npm run lint && npm run typecheck && npm test && npm run build`. All tests passed. The substitution explicitly replaced `"XXX"` only where it served as a dummy country identifier.
+✨ **Result:** Enhanced test readability and robustness without altering any runtime behavior.
