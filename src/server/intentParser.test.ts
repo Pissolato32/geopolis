@@ -267,7 +267,7 @@ describe("StrictIntentParser.parse()", () => {
     });
   });
 
-  describe("improve-relations", () =>
+  describe("improve-relations", () => {
     it("accepts valid improve-relations", () => {
       const result = parser.parse({ intent: "improve-relations", from: "USA", target: "CAN" });
       expect(result.ok).toBe(true);
