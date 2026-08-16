@@ -36,7 +36,7 @@ export class EconomySystem implements ISystem {
     name: 'Economy Simulation System',
     priority: 200 as SystemPriority,
     requiredComponents: [ECONOMIC_INDICATOR_TYPE],
-    subscribedEvents: [ECONOMY_GDP_UPDATED_EVENT],
+    subscribedEvents: [ECONOMY_GDP_UPDATED_EVENT, ECONOMY_TAX_COLLECTED_EVENT],
     emittedEvents: [ECONOMY_GDP_UPDATED_EVENT, ECONOMY_RESOURCE_SHORTAGE_EVENT, ECONOMY_TAX_COLLECTED_EVENT],
   };
 
@@ -53,6 +53,25 @@ export class EconomySystem implements ISystem {
             worldState.updateComponent(countryId, {
               ...currentComp,
               gdp: event.payload.newGdp,
+            } as unknown as IComponent);
+          }
+        }
+      },
+    );
+
+    eventBus.subscribe<IEconomyTaxCollectedPayload>(
+      ECONOMY_TAX_COLLECTED_EVENT,
+      (event) => {
+        const countryId = event.payload.countryId as EntityId;
+        if (worldState.hasEntity(countryId)) {
+          const entity = worldState.getEntity(countryId);
+          const indicator = entity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
+          if (indicator) {
+            const currentTreasury = typeof indicator.treasury === 'bigint' ? Number(indicator.treasury) : indicator.treasury;
+            const newTreasury = currentTreasury + event.payload.taxRevenue;
+            worldState.updateComponent(countryId, {
+              ...indicator,
+              treasury: typeof indicator.treasury === 'bigint' ? BigInt(Math.round(newTreasury)) : newTreasury,
             } as unknown as IComponent);
           }
         }
@@ -93,26 +112,13 @@ export class EconomySystem implements ISystem {
       const weeklyGrowthRate = Math.pow(1 + annualGrowthRate, 1 / 52) - 1;
       const newGdp = Math.max(1, currentGdp * (1 + weeklyGrowthRate));
 
-      // Tax collection is a weekly treasury delta based on current GDP,
-      // tax rate, and authoritative political stability. The legacy 0.005
-      // factor is intentionally not applied.
+      // Tax collection is based on GDP * tax rate * stability
       const stabilityComp = country.getComponent<GovernmentStabilityComponent>(GOVERNMENT_STABILITY_TYPE);
-      const stabilityIndex = stabilityComp?.stabilityIndex ?? 1.0;
-      const weeklyTaxRevenue = currentGdp * indicator.taxRate * stabilityIndex / 52;
+      const stabilityIndex = stabilityComp ? stabilityComp.stabilityIndex : 1.0;
+      const annualTaxRevenue = currentGdp * indicator.taxRate * stabilityIndex;
+      const weeklyTaxRevenue = annualTaxRevenue / 52;
 
       if (weeklyTaxRevenue > 0) {
-        const currentTreasury = typeof indicator.treasury === 'bigint'
-          ? Number(indicator.treasury)
-          : indicator.treasury;
-        const newTreasury = currentTreasury + weeklyTaxRevenue;
-
-        state.updateComponent(country.id, {
-          ...indicator,
-          treasury: typeof indicator.treasury === 'bigint'
-            ? BigInt(Math.round(newTreasury))
-            : newTreasury,
-        } as unknown as IComponent);
-
         eventBus.publish<IEconomyTaxCollectedPayload>(
           ECONOMY_TAX_COLLECTED_EVENT,
           {
@@ -120,7 +126,6 @@ export class EconomySystem implements ISystem {
             taxRevenue: weeklyTaxRevenue,
           },
           ECONOMY_SYSTEM_ID,
-          country.id,
         );
       }
 

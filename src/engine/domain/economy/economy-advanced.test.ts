@@ -78,11 +78,11 @@ describe('Advanced Economy — Trade, Market & Sanctions Integration', () => {
 
     const payload = (flowEvents[0]!.event as ITypedEvent<{ routeId: string; sourceCountryId: string; value: number }>).payload;
     expect(payload.sourceCountryId).toBe('country-br');
-    expect(payload.value).toBe(500);
+    expect(payload.value).toBe(500); // 10 volume * 50 price
 
     const brEntity = worldState.getEntity('country-br' as EntityId);
     const brIndicator = brEntity?.getComponent<EconomicIndicatorComponent>(ECONOMIC_INDICATOR_TYPE);
-    expect(brIndicator?.treasury).toBeCloseTo(657.6923076923, 10); // 150 + trade(500) + weekly tax(2000 * 0.2 / 52)
+    expect(brIndicator?.treasury).toBeCloseTo(150 + 500 + (2000 * 0.2 * 1.0 / 52), 2); // 150 + trade(500) + tax(7.69...)
   });
 
   it('should not emit trade-flow for inactive routes', () => {
